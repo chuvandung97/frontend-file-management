@@ -1,0 +1,208 @@
+<template>
+  <v-card flat>
+    <v-card-title>
+      Danh sách quyền hệ thống
+      <v-spacer></v-spacer>
+      <v-text-field
+        v-model="search"
+        append-icon="search"
+        label="Tìm kiếm"
+        single-line
+        hide-details
+      ></v-text-field>
+    </v-card-title>
+    <v-data-table
+      v-model="selected"
+      :headers="headers"
+      :items="desserts"
+      :search="search"
+      item-key="name"
+      :show-select=true
+    >
+      <template v-slot:item.active="{ item }">
+        <v-chip :color="getColor(item.active)" dark>{{ item.active }}</v-chip>
+      </template>
+      <template v-slot:top>
+        <v-toolbar flat color="white">
+          <v-dialog v-model="dialog" max-width="500px">
+            <template v-slot:activator="{ on }">
+              <v-btn color="primary" dark class="mb-2" v-on="on">Thêm mới</v-btn>
+            </template>
+            <v-card>
+              <v-card-title>
+                <span class="headline">{{ formTitle }}</span>
+              </v-card-title>
+
+              <v-card-text>
+                <v-container>
+                  <v-form ref="form">
+                    <v-row>
+                      <v-col cols="12" sm="6" md="6">
+                        <v-text-field 
+                          v-model="editedItem.code" 
+                          label="Mã" 
+                          required 
+                          :counter="10" 
+                          :rules="codeRules"
+                        ></v-text-field>
+                      </v-col>
+                      <v-col cols="12" sm="6" md="6">
+                        <v-text-field 
+                          v-model="editedItem.name" 
+                          label="Tên" 
+                          required 
+                          :counter="30" 
+                          :rules="nameRules"
+                        ></v-text-field>
+                      </v-col>
+                      <v-col cols="12" sm="6" md="12">
+                        <v-textarea
+                          v-model="editedItem.description" 
+                          label="Mô tả"
+                          counter
+                        ></v-textarea>
+                      </v-col>
+                      <v-col cols="12" sm="6" md="6">
+                        <v-checkbox v-model="isActive"  label="Hoạt động"></v-checkbox>
+                      </v-col>
+                    </v-row>
+                  </v-form>
+                </v-container>
+              </v-card-text>
+
+              <v-card-actions>
+                <v-spacer></v-spacer>
+                <v-btn color="blue darken-1" text @click="close">Cancel</v-btn>
+                <v-btn color="blue darken-1" text @click="save">Save</v-btn>
+              </v-card-actions>
+            </v-card>
+          </v-dialog>
+        </v-toolbar>
+      </template>
+      <template v-slot:item.action="{ item }">
+      <v-icon
+        small
+        class="mr-2"
+        @click="editItem(item)"
+      >
+        edit
+      </v-icon>
+      <v-icon
+        small
+        @click="deleteItem(item)"
+      >
+        delete
+      </v-icon>
+    </template>
+    </v-data-table>
+  </v-card>
+</template>
+
+<script>
+  export default {
+    data () {
+      return {
+        dialog: false,
+        isActive: true,
+        editedIndex: -1,
+        editedItem: {
+          code: '',
+          name: '',
+          description: '',
+        },
+        defaultItem: {
+          code: '',
+          name: '',
+          description: '',
+        },
+        codeRules: [
+          v => !!v || 'Code is required',
+          v => v.length <= 10 || 'Code must be less than 10 characters',
+        ],
+        nameRules: [
+          v => !!v || 'Name is required',
+          v => v.length <= 30 || 'Name must be less than 30 characters',
+        ],
+        search: '',
+        selected: [],
+        headers: [
+          { text: 'Mã', value: 'code'},
+          {
+            text: 'Tên',
+            align: 'left',
+            sortable: false,
+            value: 'name',
+          },
+          { text: 'Mô tả', value: 'description' },
+          { text: 'Trạng thái', align: 'center', value: 'active' },
+          { text: 'Actions', value: 'action', sortable: false },
+        ],
+        desserts: [
+          {
+            code: 'ADMIN',
+            name: 'Admin',
+            description: null,
+            active: 'Hoạt động',
+          },
+          {
+            code: 'GROUP',
+            name: 'Người dùng tổ chức',
+            description: null,
+            active: ' Không hoạt động',
+          },
+          {
+            code: 'USER',
+            name: 'Người dùng hệ thống',
+            description: null,
+            active: 'Hoạt động',
+          },
+        ],
+      }
+    },
+
+    computed: {
+      formTitle () {
+        return this.editedIndex === -1 ? 'Thêm mới quyền hệ thống' : 'Sửa thông tin quyền hệ thống'
+      },
+    },
+
+    watch: {
+      dialog (val) {
+        val || this.close()
+      },
+    },
+
+    methods: {
+      getColor(active) {
+        if(active == 'Hoạt động') return 'green'
+        else return 'gray'
+      },
+
+      editItem (item) {
+        this.$refs.form.resetValidation()
+        this.editedIndex = this.desserts.indexOf(item)
+        this.editedItem = Object.assign({}, item)
+        this.dialog = true
+      },
+
+      close () {
+        this.dialog = false
+        setTimeout(() => {
+          this.editedItem = Object.assign({}, this.defaultItem)
+          this.editedIndex = -1
+          this.$refs.form.resetValidation()
+        }, 300)
+      },
+
+      save () {
+        if (this.editedIndex > -1) {
+          Object.assign(this.desserts[this.editedIndex], this.editedItem)
+        } else {
+          this.desserts.push(this.editedItem)
+        }
+        this.$refs.form.resetValidation()
+        this.close()
+      },
+    }
+  }
+</script>

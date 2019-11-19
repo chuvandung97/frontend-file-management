@@ -5,11 +5,11 @@ Vue.use(Vuex)
 
 export default new Vuex.Store({
   state: {
-    count: 0
+    drawer: null
   },
   mutations: {
-    increment(state) {
-      state.count++
+    setDrawer(state, payload) {
+      state.drawer = payload
     }
   },
   actions: {

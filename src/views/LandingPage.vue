@@ -1,8 +1,10 @@
 <template>
-  <div>
-    <AppBar />
-    <HelloWorld />
-  </div>
+  <v-app>
+    <v-content>
+      <AppBar />
+      <HelloWorld />
+    </v-content>
+  </v-app>
 </template>
 
 <script>

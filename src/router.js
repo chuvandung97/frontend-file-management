@@ -25,8 +25,26 @@ export default new Router({
     },
     {
       path: '/user',
-      name: 'user',
-      component: () => import('./views/Home.vue')
+      component: () => import('./views/Home.vue'),
+      children: [
+        {
+          path: '',
+          component: () => import('./components/home/User.vue')
+        },
+        {
+          path: 'role',
+          component: () => import('./components/home/Role.vue')
+        },
+        {
+          path: 'group',
+          component: () => import('./components/home/group/index'),
+        },
+        {
+          path: 'group/add',
+          name: 'group.add',
+          component: () => import('./components/home/group/add'),
+        }
+      ]
     }
   ]
 })
