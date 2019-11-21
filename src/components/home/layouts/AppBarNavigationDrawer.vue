@@ -62,7 +62,7 @@
             </v-list-item>
           </v-list-group>
           <v-list-item
-            v-else
+            v-else-if="item.role == role"
             :key="item.text"
             :to="item.link"
           >
@@ -91,18 +91,19 @@
       >
         <span class="hidden-sm-and-down">File Management</span>
       </v-toolbar-title>
-      <!-- <v-text-field
+      <v-text-field
+        v-if="role == 'user'"
         flat
         solo-inverted
         hide-details
         prepend-inner-icon="search"
         label="Search"
         class="hidden-sm-and-down"
-      ></v-text-field> -->
+      ></v-text-field>
       <v-spacer></v-spacer>
-      <v-btn icon>
+      <!-- <v-btn icon>
         <v-icon>apps</v-icon>
-      </v-btn>
+      </v-btn> -->
       <v-btn icon>
         <v-icon>notifications</v-icon>
       </v-btn>
@@ -129,10 +130,14 @@
     data () {
         return {
             drawer: null,
+            role: 'admin',
             items: [
-                { icon: 'person', text: 'User', link: '/user'},
-                { icon: 'history', text: 'Role', link: '/user/role' },
-                { icon: 'group', text: 'Group', link: '/user/group' },
+                { icon: 'person', text: 'User', link: '/user/info', role: 'admin'},
+                { icon: 'history', text: 'Role', link: '/user/role', role: 'admin'},
+                { icon: 'group', text: 'Group', link: '/user/group', role: 'admin'},
+                { icon: 'folder_open', text: 'File của tôi', link: '/user/drive', role: 'user'},
+                { icon: 'folder_shared', text: 'Được chia sẻ với tôi', link: '/user/share', role: 'user'},
+                { icon: 'delete', text: 'Thùng rác', link: '/user/trash', role: 'user'},
             ],
         }
     },

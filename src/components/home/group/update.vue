@@ -13,19 +13,17 @@
       ></v-text-field> -->
     </v-card-title>
     <v-card-text>
-      <v-container>
-        <v-form ref="form">
-            <v-row>
-                <v-col cols="12" sm="6" md="4">
-                    <v-text-field 
-                        label="Tên" 
-                        required 
-                        :counter="20" 
-                    ></v-text-field>
-                </v-col>
-            </v-row>
-        </v-form>
-      </v-container>
+      <v-form ref="form">
+          <v-row>
+              <v-col cols="12" sm="6" md="4">
+                  <v-text-field 
+                      label="Tên" 
+                      required 
+                      :counter="20" 
+                  ></v-text-field>
+              </v-col>
+          </v-row>
+      </v-form>
     </v-card-text>
     <v-card-actions>
       <v-btn class="mb-2 ml-3" :to="{ name: 'group' }"><v-icon>mdi-arrow-left</v-icon>Quay lại</v-btn>

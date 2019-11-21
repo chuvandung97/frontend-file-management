@@ -28,7 +28,7 @@ export default new Router({
       component: () => import('./views/Home.vue'),
       children: [
         {
-          path: '',
+          path: 'info',
           component: () => import('./components/home/User.vue')
         },
         {
@@ -49,6 +49,16 @@ export default new Router({
           path: 'group/update',
           name: 'group.update',
           component: () => import('./components/home/group/update'),
+        },
+        {
+          path: 'drive',
+          name: 'user.drive',
+          component: () => import('./components/home/my-drive/index'),
+        },
+        {
+          path: 'share',
+          name: 'user.share',
+          component: () => import('./components/home/my-drive/share'),
         }
       ]
     }
