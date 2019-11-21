@@ -35,7 +35,7 @@
 
               <v-card-text>
                 <v-container>
-                  <v-form ref="form">
+                  <v-form ref="form" lazy-validation v-model="valid">
                     <v-row>
                       <v-col cols="12" sm="6" md="6">
                         <v-text-field 
@@ -117,6 +117,7 @@
   export default {
     data () {
       return {
+        valid: true,
         dialog: false,
         isAdmin: false,
         isActive: true,
@@ -137,7 +138,7 @@
         },
         nameRules: [
           v => !!v || 'Name is required',
-          v => v.length <= 10 || 'Name must be less than 10 characters',
+          v => (v && v.length <= 10) || 'Name must be less than 10 characters',
         ],
         emailRules: [
           v => !!v || 'Email is required',
@@ -145,7 +146,7 @@
         ],
         passwordRules: [
           v => !!v || 'Password is required',
-          v => v.length >= 8 || 'Password must be more than 8 characters',
+          v => (v && v.length >=8) || 'Password must be more than 8 characters',
         ],
         search: '',
         selected: [],
@@ -203,7 +204,9 @@
       },
 
       editItem (item) {
-        this.$refs.form.resetValidation()
+        if(this.$refs.form != undefined) {
+          this.$refs.form.resetValidation()
+        }
         this.editedIndex = this.desserts.indexOf(item)
         this.editedItem = Object.assign({}, item)
         this.dialog = true
@@ -219,13 +222,15 @@
       },
 
       save () {
-        if (this.editedIndex > -1) {
-          Object.assign(this.desserts[this.editedIndex], this.editedItem)
-        } else {
-          this.desserts.push(this.editedItem)
+        if(this.$refs.form.validate()) {
+          if (this.editedIndex > -1) {
+            Object.assign(this.desserts[this.editedIndex], this.editedItem)
+          } else {
+            this.desserts.push(this.editedItem)
+          }
+          this.$refs.form.resetValidation()
+          this.close()
         }
-        this.$refs.form.resetValidation()
-        this.close()
       },
     }
   }

@@ -2,7 +2,7 @@
 <div>
   <v-card flat>
     <v-card-title>
-      Thêm mới nhóm
+      Cập nhật thông tin nhóm
       <v-spacer></v-spacer>
       <!-- <v-text-field
         v-model="search"
@@ -31,7 +31,7 @@
       <v-btn class="mb-2 ml-3" :to="{ name: 'group' }"><v-icon>mdi-arrow-left</v-icon>Quay lại</v-btn>
       <v-spacer></v-spacer>
       <v-btn color="primary" dark class="mb-2" @click="memberList = !memberList">Danh sách thành viên</v-btn>
-      <v-btn color="primary" dark class="mb-2" :to="{ name: 'group' }">Thêm mới<v-icon>add</v-icon></v-btn>
+      <v-btn color="primary" dark class="mb-2" :to="{ name: 'group' }">Cập nhật<v-icon>add</v-icon></v-btn>
     </v-card-actions>
   </v-card>
   <v-card v-if="memberList" flat>

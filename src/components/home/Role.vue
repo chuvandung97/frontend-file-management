@@ -179,7 +179,9 @@
       },
 
       editItem (item) {
-        this.$refs.form.resetValidation()
+        if(this.$refs.form != undefined) {
+          this.$refs.form.resetValidation()
+        }
         this.editedIndex = this.desserts.indexOf(item)
         this.editedItem = Object.assign({}, item)
         this.dialog = true
@@ -195,13 +197,15 @@
       },
 
       save () {
-        if (this.editedIndex > -1) {
-          Object.assign(this.desserts[this.editedIndex], this.editedItem)
-        } else {
-          this.desserts.push(this.editedItem)
+        if(this.$refs.form.validate()) {
+          if (this.editedIndex > -1) {
+            Object.assign(this.desserts[this.editedIndex], this.editedItem)
+          } else {
+            this.desserts.push(this.editedItem)
+          }
+          this.$refs.form.resetValidation()
+          this.close()
         }
-        this.$refs.form.resetValidation()
-        this.close()
       },
     }
   }

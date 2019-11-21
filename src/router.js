@@ -37,12 +37,18 @@ export default new Router({
         },
         {
           path: 'group',
+          name: 'group',
           component: () => import('./components/home/group/index'),
         },
         {
           path: 'group/add',
           name: 'group.add',
           component: () => import('./components/home/group/add'),
+        },
+        {
+          path: 'group/update',
+          name: 'group.update',
+          component: () => import('./components/home/group/update'),
         }
       ]
     }

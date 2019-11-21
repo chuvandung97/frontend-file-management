@@ -4,7 +4,7 @@
     <v-content>
       <router-view></router-view>
     </v-content>
-    <v-btn
+    <!-- <v-btn
       bottom
       color="pink"
       dark
@@ -14,7 +14,7 @@
       @click="dialog = !dialog"
     >
       <v-icon>mdi-plus</v-icon>
-    </v-btn>
+    </v-btn> -->
   </v-app>
 </template>
 

@@ -21,23 +21,16 @@
     >
       <template v-slot:top>
         <v-toolbar flat color="white">
-          <v-btn color="primary" dark class="mb-2" :to="{ name: 'group.add' }">Thêm mới</v-btn>
+          <v-btn color="primary" dark class="mb-2" :to="{ name: 'group.add' }">Thêm mới<v-icon>add</v-icon></v-btn>
         </v-toolbar>
       </template>
       <template v-slot:item.action="{ item }">
-        <v-icon
-            small
-            class="mr-2"
-            @click="editItem(item)"
-        >
-            edit
-        </v-icon>
-        <v-icon
-            small
-            @click="deleteItem(item)"
-        >
-            delete
-        </v-icon>
+        <v-btn text icon :to="{ name: 'group.update' }">
+          <v-icon small>edit</v-icon>
+        </v-btn>
+        <v-btn text icon>
+          <v-icon small>delete</v-icon>
+        </v-btn>
       </template>
     </v-data-table>
   </v-card>
@@ -60,7 +53,7 @@
           { text: 'Số thành viên', align: 'center', value: 'member_count' },
           { text: 'Người tạo', align: 'center', value: 'user_created' },
           { text: 'Ngày tạo', align: 'center', value: 'created_at' },
-          { text: 'Actions', value: 'action', sortable: false },
+          { text: 'Actions', align: 'center', value: 'action', sortable: false },
         ],
         desserts: [
           {
