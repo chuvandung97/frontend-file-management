@@ -16,7 +16,7 @@
       :headers="headers"
       :items="desserts"
       :search="search"
-      item-key="name"
+      item-key="email"
       :show-select=true
     >
       <template v-slot:item.active="{ item }">
@@ -108,7 +108,7 @@
         >
             delete
         </v-icon>
-        </template>
+      </template>
     </v-data-table>
   </v-card>
 </template>

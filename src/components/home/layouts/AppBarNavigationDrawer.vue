@@ -65,6 +65,7 @@
             v-else-if="item.role == role"
             :key="item.text"
             :to="item.link"
+            color="primary"
           >
             <v-list-item-action>
               <v-icon>{{ item.icon }}</v-icon>
@@ -130,13 +131,13 @@
     data () {
         return {
             drawer: null,
-            role: 'admin',
+            role: 'user',
             items: [
                 { icon: 'person', text: 'User', link: '/user/info', role: 'admin'},
                 { icon: 'history', text: 'Role', link: '/user/role', role: 'admin'},
                 { icon: 'group', text: 'Group', link: '/user/group', role: 'admin'},
-                { icon: 'folder_open', text: 'File của tôi', link: '/user/drive', role: 'user'},
-                { icon: 'folder_shared', text: 'Được chia sẻ với tôi', link: '/user/share', role: 'user'},
+                { icon: 'mdi-folder', text: 'File của tôi', link: '/user/drive', role: 'user'},
+                { icon: 'mdi-account-multiple', text: 'Được chia sẻ với tôi', link: '/user/share', role: 'user'},
                 { icon: 'delete', text: 'Thùng rác', link: '/user/trash', role: 'user'},
             ],
         }

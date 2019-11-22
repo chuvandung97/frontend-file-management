@@ -16,7 +16,7 @@
       :headers="headers"
       :items="desserts"
       :search="search"
-      item-key="name"
+      item-key="code"
       :show-select=true
     >
       <template v-slot:item.active="{ item }">

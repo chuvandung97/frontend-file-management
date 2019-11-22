@@ -31,6 +31,7 @@
       <v-btn color="primary" dark class="mb-2" :to="{ name: 'group' }">Thêm mới<v-icon>add</v-icon></v-btn>
     </v-card-actions>
     <template v-if="memberList">
+      <v-divider></v-divider>
       <v-card-title>
         Danh sách thành viên
         <v-spacer></v-spacer>
