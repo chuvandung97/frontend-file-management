@@ -1,5 +1,5 @@
 <template>
-  <v-app>
+  <div>
     <v-content>
       <v-container fluid fill-height>
         <v-layout align-center justify-center>
@@ -17,12 +17,14 @@
                     autocomplete="off"
                     autofocus
                     @keypress.enter="formSubmit()"
+                    :rules="emailRules"
                   ></v-text-field>
                   <v-text-field id="password"
                     name="password" label="Password" type="password" required
                     v-model="password"
                     autocomplete="off"
                     @keypress.enter="formSubmit()"
+                    :rules="passwordRules"
                   ></v-text-field>
                 </v-form>
               </v-card-text>
@@ -36,15 +38,50 @@
       </v-container>
       
     </v-content>
-  </v-app>
+  </div>
 </template>
 
 <script>
+  import axios from 'axios'
   export default {
     data: () => ({
         email: null,
         password: null,
-        valid: null
-    })
+        valid: true,
+        emailRules: [
+          v => !!v || 'Email is required',
+        ],
+        passwordRules: [
+          v => !!v || 'Password is required',
+        ],
+    }),
+
+    methods: {
+      async login() {
+        if(this.$refs.form.validate()) {
+          this.valid = false
+          try {
+            let response = await axios.post('http://localhost:3000/login', {
+              email: this.email,
+              password: this.password
+            })
+            localStorage.setItem('jwt_token', response.data.body.token)
+            this.$router.push('/')
+          } catch(e) {
+            this.$store.commit('setNoti', {
+              typeNoti: 0,
+              textNoti: e,
+              showNoti: true
+            })
+          } finally {
+            this.valid =  true
+          }
+        }
+      },
+
+      formSubmit() {
+        this.login()
+      }
+    }
   }
 </script>

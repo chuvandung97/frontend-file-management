@@ -1,6 +1,8 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 import LandingPage from './views/LandingPage.vue'
+import Axios from 'axios'
+import store from './store/store'
 
 Vue.use(Router)
 
@@ -11,7 +13,29 @@ export default new Router({
     {
       path: '/',
       name: 'landingpage',
-      component: LandingPage
+      component: LandingPage,
+      beforeEnter: async (to, from, next) => {
+        let token = localStorage.getItem('jwt_token')
+        if(!token) {
+          next('/login')
+        } else {
+          try {
+            let res = await Axios.get('http://localhost:3000/me', {
+             headers: {
+               Authorization: `Bearer ${localStorage.getItem('jwt_token')}`
+             } 
+            })
+            if(res.data.code == 200) {
+              store.commit('setUser', res.data.body)
+              next('/user/info')
+            } else {
+              next('/login')
+            }
+          } catch (error) {
+            next('/login')
+          }
+        }
+      }
     },
     {
       path: '/login',
@@ -26,10 +50,18 @@ export default new Router({
     {
       path: '/user',
       component: () => import('./views/Home.vue'),
+      beforeEnter: (to, from, next) => {
+        let token = localStorage.getItem('jwt_token')
+        if(!token) {
+          next('/login')
+        } else {
+          next()
+        }
+      },
       children: [
         {
           path: 'info',
-          component: () => import('./components/home/User.vue')
+          component: () => import('./components/home/User.vue'),
         },
         {
           path: 'role',
@@ -59,6 +91,11 @@ export default new Router({
           path: 'share',
           name: 'user.share',
           component: () => import('./components/home/my-drive/share'),
+        },
+        {
+          path: 'trash',
+          name: 'user.trash',
+          component: () => import('./components/home/my-drive/trash'),
         }
       ]
     }

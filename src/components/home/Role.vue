@@ -17,7 +17,7 @@
       :items="desserts"
       :search="search"
       item-key="code"
-      :show-select=true
+      :show-select=false
     >
       <template v-slot:item.active="{ item }">
         <v-chip :color="getColor(item.active)" dark>{{ item.active }}</v-chip>
@@ -62,9 +62,6 @@
                           counter
                         ></v-textarea>
                       </v-col>
-                      <v-col cols="12" sm="6" md="6">
-                        <v-checkbox v-model="isActive"  label="Hoạt động"></v-checkbox>
-                      </v-col>
                     </v-row>
                   </v-form>
                 </v-container>
@@ -99,11 +96,11 @@
 </template>
 
 <script>
+import Axios from 'axios'
   export default {
     data () {
       return {
         dialog: false,
-        isActive: true,
         editedIndex: -1,
         editedItem: {
           code: '',
@@ -134,30 +131,14 @@
             value: 'name',
           },
           { text: 'Mô tả', value: 'description' },
-          { text: 'Trạng thái', align: 'center', value: 'active' },
-          { text: 'Actions', value: 'action', sortable: false },
+          { text: 'Chỉnh sửa', value: 'action', sortable: false, align: 'center' },
         ],
-        desserts: [
-          {
-            code: 'ADMIN',
-            name: 'Admin',
-            description: null,
-            active: 'Hoạt động',
-          },
-          {
-            code: 'GROUP',
-            name: 'Người dùng tổ chức',
-            description: null,
-            active: ' Không hoạt động',
-          },
-          {
-            code: 'USER',
-            name: 'Người dùng hệ thống',
-            description: null,
-            active: 'Hoạt động',
-          },
-        ],
+        desserts: [],
       }
+    },
+
+    mounted() {
+      this.getRole()
     },
 
     computed: {
@@ -173,6 +154,20 @@
     },
 
     methods: {
+      async getRole() {
+        this.useremail = localStorage.getItem('useremail')
+        try {
+          let res = await Axios.get('http://localhost:3000/roles/lists', {
+            headers: {
+                Authorization: `Bearer ${localStorage.getItem('jwt_token')}`
+            }
+          })  
+          this.desserts = res.data.body.role_list
+        } catch (error) {
+          console.log(error)
+        }
+      },
+
       getColor(active) {
         if(active == 'Hoạt động') return 'green'
         else return 'gray'
@@ -196,12 +191,48 @@
         }, 300)
       },
 
-      save () {
+      async save () {
         if(this.$refs.form.validate()) {
           if (this.editedIndex > -1) {
-            Object.assign(this.desserts[this.editedIndex], this.editedItem)
+            try {
+              let res = await Axios.post('http://localhost:3000/roles/update/' + this.editedItem.id, {
+                code: this.editedItem.code,
+                name: this.editedItem.name,
+                description: this.editedItem.description
+              }) 
+              this.$store.commit('setNoti', {
+                typeNoti: 1,
+                textNoti: res.data.message,
+                showNoti: true
+              })
+              this.getRole()
+            } catch(e) {
+              this.$store.commit('setNoti', {
+                typeNoti: 0,
+                textNoti: 'Cập nhật thất bại !',
+                showNoti: true
+              })
+            }
           } else {
-            this.desserts.push(this.editedItem)
+            try {
+              let res = await Axios.post('http://localhost:3000/roles/add', {
+                code: this.editedItem.code,
+                name: this.editedItem.name,
+                description: this.editedItem.description
+              })
+              this.$store.commit('setNoti', {
+                typeNoti: 1,
+                textNoti: res.data.message,
+                showNoti: true
+              })
+              this.getRole()
+            } catch(e) {
+                this.$store.commit('setNoti', {
+                  typeNoti: 0,
+                  textNoti: 'Thêm mới thất bại !',
+                  showNoti: true
+                })
+            }
           }
           this.$refs.form.resetValidation()
           this.close()

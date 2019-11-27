@@ -15,20 +15,27 @@
                     name="name" label="Name" required
                     v-model="name"
                     autocomplete="off"
+                    :counter="10"
                     autofocus
                     @keypress.enter="formSubmit()"
+                    :rules="nameRules"
                   ></v-text-field>
                   <v-text-field  
                     name="email" label="Email" required
                     v-model="email"
                     autocomplete="off"
                     @keypress.enter="formSubmit()"
+                    :rules="emailRules"
                   ></v-text-field>
                   <v-text-field id="password"
-                    name="password" label="Password" type="password" required
+                    name="password" label="Password" required
+                    :type="showPass ? 'text' : 'password'"
                     v-model="password"
                     autocomplete="off"
                     @keypress.enter="formSubmit()"
+                    :rules="passwordRules"
+                    :append-icon="showPass ? 'mdi-eye' : 'mdi-eye-off'"
+                    @click:append="showPass = !showPass"
                   ></v-text-field>
                 </v-form>
               </v-card-text>
@@ -40,7 +47,6 @@
           </v-flex>
         </v-layout>
       </v-container>
-      
     </v-content>
   </v-app>
 </template>
@@ -48,25 +54,64 @@
 <script>
   import axios from 'axios'
   export default {
+    components: {
+      
+    },
     data: () => ({
         name: null,
         email: null,
         password: null,
-        valid: null
+        valid: true,
+        showPass: false,
+        typeNoti: null,
+        textNoti: null,
+        showNoti: false,
+        nameRules: [
+          v => !!v || 'Name is required',
+          v => (v && v.length <= 10) || 'Name must be less than 10 characters',
+        ],
+        emailRules: [
+          v => !!v || 'Email is required',
+          v => /.+@.+\..+/.test(v) || 'E-mail must be valid',
+        ],
+        passwordRules: [
+          v => !!v || 'Password is required',
+          v => (v && v.length >=8) || 'Password must be more than 8 characters',
+        ],
     }),
 
     methods: {
-        signup() {
-            axios.post('http://localhost:3000/register', {
-              params: {
+        async signup() {
+          if(this.$refs.form.validate()) {
+            try {
+              this.valid = false
+              let response = await axios.post('http://localhost:3000/register', {
                 name: this.name,
                 email: this.email,
                 password: this.password
+              })
+              if(response) {
+                this.$store.commit('setNoti', {
+                  typeNoti: 1,
+                  textNoti: "Đăng kí thành công !",
+                  showNoti: true
+                })
+                this.$router.push('login')
               }
-            })
-            .then(() => {
-              
-            })
+            } catch(e) { 
+              this.$store.commit('setNoti', {
+                typeNoti: 0,
+                textNoti: "Email đã được sử dụng !",
+                showNoti: true
+              })
+            } finally {
+              this.valid =  true
+            }
+          }
+        },
+
+        formSubmit() {
+          this.signup()
         }
      }
   }

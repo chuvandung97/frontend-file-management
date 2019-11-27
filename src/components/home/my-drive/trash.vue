@@ -1,12 +1,37 @@
 <template>
     <v-card flat>
         <v-row>
-            <v-col cols="10" md="11" class="pa-0">
+            <v-col cols="5" md="6" class="pa-0">
                 <v-breadcrumbs :items="items" large>
                     <template v-slot:divider>
                         <v-icon>mdi-chevron-right</v-icon>
                     </template>
                 </v-breadcrumbs>
+            </v-col>
+            <v-col cols="5" md="5">
+                <v-tooltip bottom v-if="selected.length == 0">
+                    <template v-slot:activator="{ on }">
+                        <v-btn 
+                            depressed 
+                            text 
+                            icon
+                            class="float-right mr-n6"
+                            v-on="on"
+                            @click="showSelectTable = !showSelectTable"
+                        >
+                            <v-icon>delete</v-icon>
+                        </v-btn>
+                    </template>
+                    <span>Xóa</span>
+                </v-tooltip>
+                <v-btn 
+                    text 
+                    class="float-right mr-n6 text-none"
+                    @click="''"
+                    v-else
+                >
+                Xóa vĩnh viễn
+                </v-btn>
             </v-col>
             <v-col cols="2" md="1">
                 <v-btn 
@@ -19,6 +44,7 @@
         </v-row>
         <v-divider></v-divider>
         <v-data-table
+            v-model="selected"
             :headers="headers"
             :items="desserts"
             hide-default-footer
@@ -26,9 +52,11 @@
             sort-by="name"
             v-if="viewFile"
             :class="'view_list'"
+            item-key="name"
+            :show-select="showSelectTable"
         >
             <template v-slot:item.name="{ item }">
-                <v-icon class="mr-2">folder_shared</v-icon> {{ item.name }}
+                <v-icon class="mr-2">mdi-folder</v-icon> {{ item.name }}
             </template> 
         </v-data-table>
         <template v-if="!viewFile">
@@ -36,11 +64,29 @@
             <v-card-text>
                 <v-row>
                     <v-col v-for="folder in folders" cols="3" :key="folder.name">
-                        <v-card outlined class="pa-3" :to="'/user/drive'" @click.right.prevent="abc">
+                        <v-card outlined class="pa-3" :to="'/user/drive'"  @contextmenu="abc">
                             <v-icon class="mr-2">mdi-folder</v-icon> {{ folder.name }}    
                         </v-card>
                     </v-col>
                 </v-row>
+                <v-menu
+                    v-model="show"
+                    :position-x="x"
+                    :position-y="y"
+                    absolute
+                    offset-y
+                    transition="scale-transition"
+                >
+                    <v-list>
+                        <v-list-item
+                            v-for="(item, i) in itemsss"
+                            :key="i"
+                            @click="aa"
+                        >
+                            <v-list-item-title>{{ item.title }}</v-list-item-title>
+                        </v-list-item>
+                    </v-list>
+                </v-menu>
             </v-card-text>
             <v-card-title>File</v-card-title>
             <v-card-text>
@@ -59,7 +105,18 @@
 <script>
   export default {
     data: () => ({
+        showSelectTable: false,
+        itemsss: [
+            { title: 'Click Me' },
+            { title: 'Click Me' },
+            { title: 'Click Me' },
+            { title: 'Click Me 2' },
+        ],
+        show: false,
+        x: 0,
+        y: 0,
         viewFile: true,
+        selected: [],
         folders: [
             {
                 name: 'Dashboard',
@@ -94,14 +151,9 @@
         ],
         items: [
             {
-                text: 'Được chia sẻ với tôi',
+                text: 'Thùng rác',
                 disabled: false,
                 href: 'breadcrumbs_dashboard',
-            },
-            {
-                text: 'Link 1',
-                disabled: false,
-                href: 'breadcrumbs_link_1',
             },
         ],
 
@@ -186,8 +238,18 @@
     }),
 
     methods: {
-        abc() {
-            console.log('test')
+        abc(e) {
+            e.preventDefault();
+            this.show = false;
+            this.x = e.clientX;
+            this.y = e.clientY;
+            this.$nextTick(() => {
+                this.show = true;
+            });
+        },
+
+        aa() {
+            console.log(123)
         }
     }
   }

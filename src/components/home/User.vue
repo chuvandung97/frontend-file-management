@@ -1,7 +1,7 @@
 <template>
   <v-card flat>
     <v-card-title>
-      Danh sách người dùng
+      Danh sách người dùng {{useremail}}
       <v-spacer></v-spacer>
       <v-text-field
         v-model="search"
@@ -17,10 +17,10 @@
       :items="desserts"
       :search="search"
       item-key="email"
-      :show-select=true
+      :show-select=false
     >
       <template v-slot:item.active="{ item }">
-        <v-chip :color="getColor(item.active)" dark>{{ item.active }}</v-chip>
+        <v-chip :color="getColor(item.active)" dark>{{ item.active == true ? 'Hoạt động' : 'Không hoạt động' }}</v-chip>
       </template>
       <template v-slot:top>
         <v-toolbar flat color="white">
@@ -114,9 +114,11 @@
 </template>
 
 <script>
+import Axios from 'axios'
   export default {
     data () {
       return {
+        useremail: null,
         valid: true,
         dialog: false,
         isAdmin: false,
@@ -137,16 +139,16 @@
           repassword: '',
         },
         nameRules: [
-          v => !!v || 'Name is required',
-          v => (v && v.length <= 10) || 'Name must be less than 10 characters',
+          v => !!v || 'Mời bạn nhập tên',
+          v => (v && v.length <= 10) || 'Tên phải nhỏ hơn 10 kí tự',
         ],
         emailRules: [
-          v => !!v || 'Email is required',
-          v => /.+@.+\..+/.test(v) || 'E-mail must be valid',
+          v => !!v || 'Mời bạn nhập email',
+          v => /.+@.+\..+/.test(v) || 'E-mail không hợp lệ',
         ],
         passwordRules: [
-          v => !!v || 'Password is required',
-          v => (v && v.length >=8) || 'Password must be more than 8 characters',
+          v => !!v || 'Mời bạn nhập mật khẩu',
+          v => (v && v.length >=8) || 'Mật khẩu phải nhiều hơn 8 kí tự',
         ],
         search: '',
         selected: [],
@@ -160,28 +162,24 @@
           { text: 'Email', value: 'email' },
           { text: 'Vai trò', value: 'role' },
           { text: 'Trạng thái', align: 'center', value: 'active' },
-          { text: 'Actions', value: 'action', sortable: false },
+          { text: 'Chỉnh sửa', value: 'action', sortable: false },
         ],
-        desserts: [
-          {
-            name: 'Admin',
-            email: 'admin@gmail.com',
-            role: 'ADMIN',
-            active: 'Hoạt động'
-          },
-          {
-            name: 'Tester',
-            email: 'tester@gmail.com',
-            role: 'GROUP',
-            active: 'Hoạt động'
-          },
-          {
-            name: 'Tester1',
-            email: 'tester1@gmail.com',
-            role: 'USER',
-            active: 'Không hoạt động'
-          },
-        ],
+        desserts: [],
+      }
+    },
+    
+    async mounted() {
+      this.useremail = localStorage.getItem('useremail')
+      try {
+        let res = await Axios.get('http://localhost:3000/users/lists', {
+          headers: {
+              
+              Authorization: `Bearer ${localStorage.getItem('jwt_token')}`
+          }
+        })  
+        this.desserts = res.data.body.user_list
+      } catch (error) {
+        console.log(error)
       }
     },
 
@@ -199,7 +197,7 @@
 
     methods: {
       getColor(active) {
-        if(active == 'Hoạt động') return 'green'
+        if(active == true) return 'green'
         else return 'gray'
       },
 
@@ -221,12 +219,22 @@
         }, 300)
       },
 
-      save () {
+      async save () {
         if(this.$refs.form.validate()) {
           if (this.editedIndex > -1) {
-            Object.assign(this.desserts[this.editedIndex], this.editedItem)
+            console.log(1)
           } else {
-            this.desserts.push(this.editedItem)
+            try {
+              await Axios.post('http://localhost:3000/users/add', {
+                name: this.editedItem.name,
+                email: this.editedItem.email,
+                password: this.editedItem.password,
+                role: this.isAdmin == true ? 'ADMIN' : 'GROUP',
+                active: this.isActive
+              })
+            } catch(e) {
+              alert(e)
+            }
           }
           this.$refs.form.resetValidation()
           this.close()

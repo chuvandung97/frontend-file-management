@@ -27,17 +27,38 @@
             v-if="viewFile"
             :class="'view_list'"
         >
+            <template v-slot:item.name="{ item }">
+                <v-icon class="mr-2">mdi-folder</v-icon> {{ item.name }}
+            </template> 
         </v-data-table>
         <template v-if="!viewFile">
             <v-card-title>Thư mục</v-card-title>
             <v-card-text>
                 <v-row>
                     <v-col v-for="folder in folders" cols="3" :key="folder.name">
-                        <v-card outlined class="pa-3" :to="'/user/drive'">
+                        <v-card outlined class="pa-3" :to="'/user/drive'"  @contextmenu="abc">
                             <v-icon class="mr-2">mdi-folder</v-icon> {{ folder.name }}    
                         </v-card>
                     </v-col>
                 </v-row>
+                <v-menu
+                    v-model="show"
+                    :position-x="x"
+                    :position-y="y"
+                    absolute
+                    offset-y
+                    transition="scale-transition"
+                >
+                    <v-list>
+                        <v-list-item
+                            v-for="(item, i) in itemsss"
+                            :key="i"
+                            @click="aa"
+                        >
+                            <v-list-item-title>{{ item.title }}</v-list-item-title>
+                        </v-list-item>
+                    </v-list>
+                </v-menu>
             </v-card-text>
             <v-card-title>File</v-card-title>
             <v-card-text>
@@ -56,6 +77,15 @@
 <script>
   export default {
     data: () => ({
+        itemsss: [
+            { title: 'Click Me' },
+            { title: 'Click Me' },
+            { title: 'Click Me' },
+            { title: 'Click Me 2' },
+        ],
+        show: false,
+        x: 0,
+        y: 0,
         viewFile: true,
         folders: [
             {
@@ -186,5 +216,21 @@
             },
         ],
     }),
+
+    methods: {
+        abc(e) {
+            e.preventDefault();
+            this.show = false;
+            this.x = e.clientX;
+            this.y = e.clientY;
+            this.$nextTick(() => {
+                this.show = true;
+            });
+        },
+
+        aa() {
+            console.log(123)
+        }
+    }
   }
 </script>

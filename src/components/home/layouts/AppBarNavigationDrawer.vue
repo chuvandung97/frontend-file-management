@@ -131,12 +131,12 @@
     data () {
         return {
             drawer: null,
-            role: 'user',
+            role: 'admin',
             items: [
                 { icon: 'person', text: 'User', link: '/user/info', role: 'admin'},
                 { icon: 'history', text: 'Role', link: '/user/role', role: 'admin'},
                 { icon: 'group', text: 'Group', link: '/user/group', role: 'admin'},
-                { icon: 'mdi-folder', text: 'File của tôi', link: '/user/drive', role: 'user'},
+                { icon: 'folder_open', text: 'File của tôi', link: '/user/drive', role: 'user'},
                 { icon: 'mdi-account-multiple', text: 'Được chia sẻ với tôi', link: '/user/share', role: 'user'},
                 { icon: 'delete', text: 'Thùng rác', link: '/user/trash', role: 'user'},
             ],

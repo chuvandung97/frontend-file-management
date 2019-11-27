@@ -1,5 +1,5 @@
 <template>
-  <v-app>
+  <div>
     <AppBarNavigationDrawer />
     <v-content>
       <router-view></router-view>
@@ -15,7 +15,7 @@
     >
       <v-icon>mdi-plus</v-icon>
     </v-btn> -->
-  </v-app>
+  </div>
 </template>
 
 <script>
