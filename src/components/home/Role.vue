@@ -17,7 +17,10 @@
       :items="desserts"
       :search="search"
       item-key="code"
-      :show-select=false
+      :show-select=true
+      :footer-props="{
+        itemsPerPageText: 'Hiển thị',
+      }"
     >
       <template v-slot:item.active="{ item }">
         <v-chip :color="getColor(item.active)" dark>{{ item.active }}</v-chip>
@@ -68,15 +71,36 @@
               </v-card-text>
 
               <v-card-actions>
+                <v-btn color="blue darken-1" text @click="close">Đóng</v-btn>
                 <v-spacer></v-spacer>
-                <v-btn color="blue darken-1" text @click="close">Cancel</v-btn>
-                <v-btn color="blue darken-1" text @click="save">Save</v-btn>
+                <v-btn color="blue darken-1" text @click="save">Lưu</v-btn>
               </v-card-actions>
             </v-card>
           </v-dialog>
+          <v-spacer></v-spacer>
+          <v-btn 
+              depressed 
+              text 
+              icon
+              v-if="selected.length > 0"
+              @click="deleteRole()"
+          >
+              <v-badge
+                color="primary"
+                overlap
+                class="align-self-center"
+              >
+                <template v-slot:badge>
+                  <span>{{ selected.length }}</span>
+                </template>
+                <v-icon large>
+                  delete
+                </v-icon>
+              </v-badge>
+          </v-btn>
         </v-toolbar>
       </template>
-      <template v-slot:item.action="{ item }">
+      <template v-slot:item.edit="{ item }">
       <v-icon
         small
         class="mr-2"
@@ -84,12 +108,12 @@
       >
         edit
       </v-icon>
-      <v-icon
+      <!-- <v-icon
         small
         @click="deleteItem(item)"
       >
         delete
-      </v-icon>
+      </v-icon> -->
     </template>
     </v-data-table>
   </v-card>
@@ -131,7 +155,7 @@ import Axios from 'axios'
             value: 'name',
           },
           { text: 'Mô tả', value: 'description' },
-          { text: 'Chỉnh sửa', value: 'action', sortable: false, align: 'center' },
+          { text: 'Chỉnh sửa', value: 'edit', sortable: false, align: 'center' },
         ],
         desserts: [],
       }
@@ -205,13 +229,14 @@ import Axios from 'axios'
                 textNoti: res.data.message,
                 showNoti: true
               })
-              this.getRole()
             } catch(e) {
               this.$store.commit('setNoti', {
                 typeNoti: 0,
                 textNoti: 'Cập nhật thất bại !',
                 showNoti: true
               })
+            } finally {
+              this.getRole()
             }
           } else {
             try {
@@ -225,19 +250,49 @@ import Axios from 'axios'
                 textNoti: res.data.message,
                 showNoti: true
               })
-              this.getRole()
             } catch(e) {
                 this.$store.commit('setNoti', {
                   typeNoti: 0,
                   textNoti: 'Thêm mới thất bại !',
                   showNoti: true
                 })
+            } finally {
+              this.getRole()
             }
           }
           this.$refs.form.resetValidation()
           this.close()
         }
       },
+
+      async deleteRole() {
+        let roleSelected = this.selected
+        let roleIds = roleSelected.map((currentElArray) => {
+          return currentElArray.id
+        })
+        try {
+          let res = await Axios.delete('http://localhost:3000/roles/delete', {
+            params: {
+              roleIds: roleIds
+            }
+          })
+          this.$store.commit('setNoti', {
+            typeNoti: 1,
+            textNoti: res.data.message + res.data.count + ' dữ liệu !',
+            showNoti: true
+          })
+          this.getRole()
+        } catch (e) {
+          this.$store.commit('setNoti', {
+            typeNoti: 0,
+            textNoti: 'Xóa thất bại !',
+            showNoti: true
+          })
+        } finally {
+          this.getRole()
+          this.selected = []
+        }
+      }
     }
   }
 </script>
