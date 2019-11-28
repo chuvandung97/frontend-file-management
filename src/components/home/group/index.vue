@@ -19,6 +19,9 @@
       item-key="name"
       :show-select=true
     >
+      <template v-slot:item.member_count="{ item }">
+        {{item.storage != null ? item.storage.Users.length : 0}}
+      </template>
       <template v-slot:top>
         <v-toolbar flat color="white">
           <!-- <v-btn color="primary" dark class="mb-2" :to="{ name: 'group.add' }">Thêm mới<v-icon>add</v-icon></v-btn> -->
@@ -100,7 +103,6 @@ import Axios from 'axios'
           {
             text: 'Tên',
             align: 'left',
-            sortable: false,
             value: 'name',
           },
           { text: 'Số thành viên', align: 'center', value: 'member_count' },

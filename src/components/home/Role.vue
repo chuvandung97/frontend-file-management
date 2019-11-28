@@ -22,9 +22,6 @@
         itemsPerPageText: 'Hiển thị',
       }"
     >
-      <template v-slot:item.active="{ item }">
-        <v-chip :color="getColor(item.active)" dark>{{ item.active }}</v-chip>
-      </template>
       <template v-slot:top>
         <v-toolbar flat color="white">
           <v-dialog v-model="dialog" max-width="500px">
@@ -190,11 +187,6 @@ import Axios from 'axios'
         } catch (error) {
           console.log(error)
         }
-      },
-
-      getColor(active) {
-        if(active == 'Hoạt động') return 'green'
-        else return 'gray'
       },
 
       editItem (item) {

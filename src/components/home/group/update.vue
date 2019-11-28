@@ -160,7 +160,7 @@ import Axios from 'axios'
 
     methods: {
       getColor(active) {
-        if(active == 'Hoạt động') return 'green'
+        if(active) return 'green'
         else return 'gray'
       },
 

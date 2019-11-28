@@ -244,7 +244,7 @@ import Axios from 'axios'
       },
 
       getColor(active) {
-        if(active == true) return 'green'
+        if(active) return 'green'
         else return 'gray'
       },
 
