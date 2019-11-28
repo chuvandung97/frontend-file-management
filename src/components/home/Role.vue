@@ -137,12 +137,12 @@ import Axios from 'axios'
           description: '',
         },
         codeRules: [
-          v => !!v || 'Code is required',
-          v => v.length <= 10 || 'Code must be less than 10 characters',
+          v => !!v || 'Mời bạn nhập mã',
+          v => v.length <= 10 || 'Mã phải ít hơn 10 kí tự',
         ],
         nameRules: [
-          v => !!v || 'Name is required',
-          v => v.length <= 30 || 'Name must be less than 30 characters',
+          v => !!v || 'Mời bạn nhập tên',
+          v => v.length <= 30 || 'Tên phải ít hơn 30 kí tự',
         ],
         search: '',
         selected: [],
@@ -266,8 +266,7 @@ import Axios from 'axios'
       },
 
       async deleteRole() {
-        let roleSelected = this.selected
-        let roleIds = roleSelected.map((currentElArray) => {
+        let roleIds = this.selected.map((currentElArray) => {
           return currentElArray.id
         })
         try {
@@ -278,10 +277,9 @@ import Axios from 'axios'
           })
           this.$store.commit('setNoti', {
             typeNoti: 1,
-            textNoti: res.data.message + res.data.count + ' dữ liệu !',
+            textNoti: res.data.message + res.data.count + ' vai trò !',
             showNoti: true
           })
-          this.getRole()
         } catch (e) {
           this.$store.commit('setNoti', {
             typeNoti: 0,

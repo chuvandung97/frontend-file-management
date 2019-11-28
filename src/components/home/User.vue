@@ -17,7 +17,10 @@
       :items="desserts"
       :search="search"
       item-key="email"
-      :show-select=false
+      :show-select=true
+      :footer-props="{
+        itemsPerPageText: 'Hiển thị',
+      }"
     >
       <template v-slot:item.active="{ item }">
         <v-chip :color="getColor(item.active)" dark>{{ item.active == true ? 'Hoạt động' : 'Không hoạt động' }}</v-chip>
@@ -60,7 +63,7 @@
                           v-model="editedItem.password" 
                           label="Mật khẩu"
                           required
-                          :rules="passwordRules"
+                          :rules="editedIndex == -1 ? passwordRules : []"
                           :append-icon="showPass ? 'mdi-eye' : 'mdi-eye-off'"
                           @click:append="showPass = !showPass"
                         ></v-text-field>
@@ -71,14 +74,22 @@
                           v-model="editedItem.repassword" 
                           label="Nhập lại mật khẩu"
                           required
-                          :rules="passwordRules"
+                          :rules="editedIndex == -1 ? passwordRules : []"
                         ></v-text-field>
                       </v-col>
                       <v-col cols="12" sm="6" md="6">
-                        <v-checkbox v-model="isAdmin" label="Admin"></v-checkbox>
+                        <v-select
+                          v-model="editedItem.role"
+                          :items="roles"
+                          :rules="[v => !!v || 'Mời bạn chọn vai trò']"
+                          label="Vai trò"
+                          item-text="code"
+                          required
+                          return-object
+                        ></v-select>
                       </v-col>
                       <v-col cols="12" sm="6" md="6">
-                        <v-checkbox v-model="isActive"  label="Hoạt động"></v-checkbox>
+                        <v-checkbox v-model="editedItem.active"  label="Hoạt động"></v-checkbox>
                       </v-col>
                     </v-row>
                   </v-form>
@@ -86,27 +97,42 @@
               </v-card-text>
 
               <v-card-actions>
+                <v-btn color="blue darken-1" text @click="close">Đóng</v-btn>
                 <v-spacer></v-spacer>
-                <v-btn color="blue darken-1" text @click="close">Cancel</v-btn>
-                <v-btn color="blue darken-1" text @click="save">Save</v-btn>
+                <v-btn color="blue darken-1" text @click="save">Lưu</v-btn>
               </v-card-actions>
             </v-card>
           </v-dialog>
+          <v-spacer></v-spacer>
+          <v-btn 
+              depressed 
+              text 
+              icon
+              v-if="selected.length > 0"
+              @click="deleteUser()"
+          >
+              <v-badge
+                color="primary"
+                overlap
+                class="align-self-center"
+              >
+                <template v-slot:badge>
+                  <span>{{ selected.length }}</span>
+                </template>
+                <v-icon large>
+                  delete
+                </v-icon>
+              </v-badge>
+          </v-btn>
         </v-toolbar>
       </template>
-      <template v-slot:item.action="{ item }">
+      <template v-slot:item.edit="{ item }">
         <v-icon
             small
             class="mr-2"
             @click="editItem(item)"
         >
             edit
-        </v-icon>
-        <v-icon
-            small
-            @click="deleteItem(item)"
-        >
-            delete
         </v-icon>
       </template>
     </v-data-table>
@@ -121,8 +147,6 @@ import Axios from 'axios'
         useremail: null,
         valid: true,
         dialog: false,
-        isAdmin: false,
-        isActive: true,
         showPass: false,
         //showRePass: false,
         editedIndex: -1,
@@ -131,12 +155,16 @@ import Axios from 'axios'
           email: '',
           password: '',
           repassword: '',
+          active: true,
+          role: []
         },
         defaultItem: {
           name: '',
           email: '',
           password: '',
           repassword: '',
+          active: true,
+          role: []
         },
         nameRules: [
           v => !!v || 'Mời bạn nhập tên',
@@ -148,7 +176,7 @@ import Axios from 'axios'
         ],
         passwordRules: [
           v => !!v || 'Mời bạn nhập mật khẩu',
-          v => (v && v.length >=8) || 'Mật khẩu phải nhiều hơn 8 kí tự',
+          v => (v && v.length >=8) || 'Mật khẩu phải chứa ít nhất 8 kí tự',
         ],
         search: '',
         selected: [],
@@ -156,31 +184,21 @@ import Axios from 'axios'
           {
             text: 'Họ tên',
             align: 'left',
-            sortable: false,
             value: 'name',
           },
           { text: 'Email', value: 'email' },
-          { text: 'Vai trò', value: 'role' },
+          { text: 'Vai trò', value: 'role.code' },
           { text: 'Trạng thái', align: 'center', value: 'active' },
-          { text: 'Chỉnh sửa', value: 'action', sortable: false },
+          { text: 'Chỉnh sửa', value: 'edit', align: 'center', sortable: false },
         ],
         desserts: [],
+        roles: [],
       }
     },
     
     async mounted() {
-      this.useremail = localStorage.getItem('useremail')
-      try {
-        let res = await Axios.get('http://localhost:3000/users/lists', {
-          headers: {
-              
-              Authorization: `Bearer ${localStorage.getItem('jwt_token')}`
-          }
-        })  
-        this.desserts = res.data.body.user_list
-      } catch (error) {
-        console.log(error)
-      }
+      this.getUser()
+      this.getRole()
     },
 
     computed: {
@@ -196,6 +214,35 @@ import Axios from 'axios'
     },
 
     methods: {
+      async getUser() {
+        this.useremail = localStorage.getItem('useremail')
+        try {
+          let res = await Axios.get('http://localhost:3000/users/lists', {
+            headers: {
+                
+                Authorization: `Bearer ${localStorage.getItem('jwt_token')}`
+            }
+          })  
+          this.desserts = res.data.body.user_list
+        } catch (error) {
+          console.log(error)
+        }
+      },
+
+      async getRole() {
+        this.useremail = localStorage.getItem('useremail')
+        try {
+          let res = await Axios.get('http://localhost:3000/roles/lists', {
+            headers: {
+                Authorization: `Bearer ${localStorage.getItem('jwt_token')}`
+            }
+          })  
+          this.roles = res.data.body.role_list
+        } catch (error) {
+          console.log(error)
+        }
+      },
+
       getColor(active) {
         if(active == true) return 'green'
         else return 'gray'
@@ -222,24 +269,83 @@ import Axios from 'axios'
       async save () {
         if(this.$refs.form.validate()) {
           if (this.editedIndex > -1) {
-            console.log(1)
-          } else {
             try {
-              await Axios.post('http://localhost:3000/users/add', {
+              let res = await Axios.post('http://localhost:3000/users/update/' + this.editedItem.id, {
                 name: this.editedItem.name,
                 email: this.editedItem.email,
                 password: this.editedItem.password,
-                role: this.isAdmin == true ? 'ADMIN' : 'GROUP',
-                active: this.isActive
+                role_id: this.editedItem.role.id,
+                active: this.editedItem.active
+              }) 
+              this.$store.commit('setNoti', {
+                typeNoti: 1,
+                textNoti: res.data.message,
+                showNoti: true
               })
             } catch(e) {
-              alert(e)
+              this.$store.commit('setNoti', {
+                typeNoti: 0,
+                textNoti: 'Cập nhật thất bại !',
+                showNoti: true
+              })
+            } finally {
+              this.getUser()
+            }
+          } else {
+            try {
+              let res = await Axios.post('http://localhost:3000/users/add', {
+                name: this.editedItem.name,
+                email: this.editedItem.email,
+                password: this.editedItem.password,
+                role_id: this.editedItem.role.id,
+                active: this.editedItem.active
+              })
+              this.$store.commit('setNoti', {
+                typeNoti: 1,
+                textNoti: res.data.message,
+                showNoti: true
+              })
+            } catch(e) {
+              this.$store.commit('setNoti', {
+                typeNoti: 0,
+                textNoti: 'Thêm mới thất bại !',
+                showNoti: true
+              })
+            } finally {
+              this.getUser()
             }
           }
           this.$refs.form.resetValidation()
           this.close()
         }
       },
+
+      async deleteUser() {
+        let userIds = this.selected.map((currentElArray) => {
+          return currentElArray.id
+        })
+        try {
+          let res = await Axios.delete('http://localhost:3000/users/delete', {
+            params: {
+              userIds: userIds
+            }
+          })
+          this.$store.commit('setNoti', {
+            typeNoti: 1,
+            textNoti: res.data.message + res.data.count + ' người dùng !',
+            showNoti: true
+          })
+        } catch (e) {
+          this.$store.commit('setNoti', {
+            typeNoti: 0,
+            textNoti: 'Xóa thất bại !',
+            showNoti: true
+          })
+        } finally {
+          this.getUser()
+          this.selected = []
+        }
+      }
     }
   }
 </script>

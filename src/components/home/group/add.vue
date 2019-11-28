@@ -47,6 +47,8 @@
             :small-chips="true"
             :clearable="true"
             deletable-chips
+            counter
+            item-text="name"
           >
             <template v-if="noData" v-slot:no-data>
               <v-list-item>
@@ -98,7 +100,22 @@
   export default {
     data () {
       return {
-        items: ['Gaming', 'Programming', 'Vue', 'Vuetify'],
+        //items: ['Gaming', 'Programming', 'Vue', 'Vuetify'],
+        items: [{
+            name: 'Test1',
+            email: 'test1@gmail.com',
+            active: 'Hoạt động',
+          },
+          {
+            name: 'Test2',
+            email: 'test2@gmail.com',
+            active: 'Hoạt động',
+          },
+          {
+            name: 'Test3',
+            email: 'test3@gmail.com',
+            active: 'Không hoạt động',
+          }],
         model: null,
         searchAddMember: null,
         memberList: false,

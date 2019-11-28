@@ -78,7 +78,7 @@ export default new Router({
           component: () => import('./components/home/group/add'),
         },
         {
-          path: 'group/update',
+          path: 'group/update/:groupId',
           name: 'group.update',
           component: () => import('./components/home/group/update'),
         },
