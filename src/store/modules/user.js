@@ -10,7 +10,8 @@ export const moduleUser = {
             localStorage.setItem('userid', payload.id)
             localStorage.setItem('username', payload.name)
             localStorage.setItem('useremail', payload.email)
-        }
+            localStorage.setItem('userrole', payload.role)
+        },
     },
     actions: {},
     

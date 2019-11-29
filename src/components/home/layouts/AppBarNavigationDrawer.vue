@@ -5,8 +5,6 @@
       :clipped="$vuetify.breakpoint.lgAndUp"
       app
     >
-      <!-- <router-link to="/user/test">ddd</router-link> <br>
-      <router-link to="/user/test1">dddeee</router-link> -->
       <v-list dense>
         <template v-for="item in items">
           <v-layout
@@ -77,6 +75,18 @@
             </v-list-item-content>
           </v-list-item>
         </template>
+
+        <v-divider></v-divider>
+        <v-list-item @click="logout()">
+          <v-list-item-action>
+            <v-icon>mdi-logout</v-icon>
+          </v-list-item-action>
+          <v-list-item-content >
+            <v-list-item-title>
+              Đăng xuất
+            </v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
       </v-list>
     </v-navigation-drawer>
     <v-app-bar
@@ -90,10 +100,10 @@
         style="width: 300px"
         class="ml-0 pl-3"
       >
-        <span class="hidden-sm-and-down">File Management</span>
+        <span class="hidden-sm-and-down">Hệ thống quản lý file</span>
       </v-toolbar-title>
       <v-text-field
-        v-if="role == 'user'"
+        v-if="role != 'admin'"
         flat
         solo-inverted
         hide-details
@@ -102,45 +112,91 @@
         class="hidden-sm-and-down"
       ></v-text-field>
       <v-spacer></v-spacer>
-      <!-- <v-btn icon>
-        <v-icon>apps</v-icon>
-      </v-btn> -->
       <v-btn icon>
         <v-icon>notifications</v-icon>
       </v-btn>
-      <v-btn
-        icon
-        large
+      <v-menu
+        min-width="150"
+        bottom
+        left
+        content-class="dropdown-menu"
+        offset-y
+        transition="slide-y-transition"
       >
-        <v-avatar
-          size="32px"
-          item
-        >
-          <v-img
-            src="https://cdn.vuetifyjs.com/images/logos/logo.svg"
-            alt="Vuetify"
+        <template v-slot:activator="{ on }">
+          <v-btn
+            icon
+            large
+            v-on="on"
           >
-          </v-img></v-avatar>
-      </v-btn>
+            <v-avatar>
+              <v-icon dark>mdi-account-circle</v-icon>
+            </v-avatar>
+          </v-btn>
+        </template>
+        <v-card>
+          <v-list dense>
+            <v-list-item to="/user/profile">
+              <v-list-item-title><v-icon class="mr-4">person_outline</v-icon> Hồ sơ</v-list-item-title>
+            </v-list-item>
+            <v-list-item>
+              <v-list-item-title><v-icon class="mr-4">mdi-settings</v-icon> Cài đặt</v-list-item-title>
+            </v-list-item>
+            <v-divider></v-divider>
+            <v-list-item @click="logout()">
+              <v-list-item-title ><v-icon class="mr-4">mdi-logout</v-icon> Đăng xuất</v-list-item-title>
+            </v-list-item>
+          </v-list>
+        </v-card>
+      </v-menu>
     </v-app-bar>
   </div>
 </template>
 
 <script>
+import Axios from 'axios'
   export default {
     data () {
         return {
             drawer: null,
-            role: 'admin',
+            role: null,
             items: [
-                { icon: 'person', text: 'User', link: '/user/info', role: 'admin'},
-                { icon: 'history', text: 'Role', link: '/user/role', role: 'admin'},
-                { icon: 'group', text: 'Group', link: '/user/group', role: 'admin'},
-                { icon: 'folder_open', text: 'File của tôi', link: '/user/drive', role: 'user'},
-                { icon: 'mdi-account-multiple', text: 'Được chia sẻ với tôi', link: '/user/share', role: 'user'},
-                { icon: 'delete', text: 'Thùng rác', link: '/user/trash', role: 'user'},
+                { icon: 'person', text: 'Người dùng', link: '/user/info', role: 'Admin'},
+                { icon: 'history', text: 'Quyền hệ thống', link: '/user/role', role: 'Admin'},
+                { icon: 'group', text: 'Nhóm', link: '/user/group', role: 'Admin'},
+                { icon: 'folder_open', text: 'File của tôi', link: '/user/drive', role: 'User'},
+                { icon: 'mdi-account-multiple', text: 'Được chia sẻ với tôi', link: '/user/share', role: 'User'},
+                { icon: 'delete', text: 'Thùng rác', link: '/user/trash', role: 'User'},
             ],
         }
     },
+
+    mounted() {
+      this.role = localStorage.getItem('userrole')
+    },
+
+    methods: {
+      async logout() {
+        try {
+          await Axios.post('http://localhost:3000/logout', {}, {
+            headers: {
+                Authorization: `Bearer ${localStorage.getItem('jwt_token')}`
+            }
+          })
+          localStorage.removeItem('jwt_token')
+          localStorage.removeItem('userid')
+          localStorage.removeItem('username')
+          localStorage.removeItem('useremail')
+          localStorage.removeItem('userrole')
+          this.$router.push('/')
+        } catch (error) {
+          this.$store.commit('setNoti', {
+              typeNoti: 0,
+              textNoti: 'Đăng xuất thất bại !',
+              showNoti: true
+          })
+        }
+      }
+    }
   }
 </script>

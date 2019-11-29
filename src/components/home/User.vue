@@ -1,7 +1,7 @@
 <template>
   <v-card flat>
     <v-card-title>
-      Danh sách người dùng {{useremail}}
+      Danh sách người dùng 
       <v-spacer></v-spacer>
       <v-text-field
         v-model="search"
@@ -144,7 +144,6 @@ import Axios from 'axios'
   export default {
     data () {
       return {
-        useremail: null,
         valid: true,
         dialog: false,
         showPass: false,
@@ -215,7 +214,6 @@ import Axios from 'axios'
 
     methods: {
       async getUser() {
-        this.useremail = localStorage.getItem('useremail')
         try {
           let res = await Axios.get('http://localhost:3000/users/lists', {
             headers: {
@@ -230,7 +228,6 @@ import Axios from 'axios'
       },
 
       async getRole() {
-        this.useremail = localStorage.getItem('useremail')
         try {
           let res = await Axios.get('http://localhost:3000/roles/lists', {
             headers: {

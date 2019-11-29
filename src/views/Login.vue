@@ -42,7 +42,7 @@
 </template>
 
 <script>
-  import axios from 'axios'
+  import Axios from 'axios'
   export default {
     data: () => ({
         email: null,
@@ -61,7 +61,7 @@
         if(this.$refs.form.validate()) {
           this.valid = false
           try {
-            let response = await axios.post('http://localhost:3000/login', {
+            let response = await Axios.post('http://localhost:3000/login', {
               email: this.email,
               password: this.password
             })

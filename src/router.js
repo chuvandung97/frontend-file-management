@@ -27,7 +27,11 @@ export default new Router({
             })
             if(res.data.code == 200) {
               store.commit('setUser', res.data.body)
-              next('/user/info')
+              if(res.data.body.role == "Admin") {
+                next('/user/info')
+              } else {
+                next('/user/drive')
+              }
             } else {
               next('/login')
             }
@@ -62,6 +66,10 @@ export default new Router({
         {
           path: 'info',
           component: () => import('./components/home/User.vue'),
+        },
+        {
+          path: 'profile',
+          component: () => import('./components/home/Profile.vue'),
         },
         {
           path: 'role',
