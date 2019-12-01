@@ -20,7 +20,7 @@
       :show-select=true
     >
         <template v-slot:item.icon="{ item }">
-            <v-icon>{{item.icon}}</v-icon>
+            <v-icon class="ml-n5">{{item.icon}}</v-icon>
         </template>
         <template v-slot:item.active="{ item }">
             <v-chip :color="getColor(item.active)" dark>{{ item.active == true ? 'Hoạt động' : 'Không hoạt động' }}</v-chip>
@@ -250,7 +250,7 @@ import Axios from 'axios'
                 })
                 this.$store.commit('setNoti', {
                     typeNoti: 1,
-                    textNoti: res.data.message + res.data.count + ' nhóm !',
+                    textNoti: res.data.message + res.data.count + ' chức năng !',
                     showNoti: true
                 })
             } catch (e) {
