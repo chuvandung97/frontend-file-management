@@ -76,6 +76,16 @@ export default new Router({
           component: () => import('./components/home/Role.vue')
         },
         {
+          path: 'menu',
+          name: 'menu',
+          component: () => import('./components/home/system/menu/index')
+        },
+        {
+          path: 'menu/update/:menuId',
+          name: 'menu.update',
+          component: () => import('./components/home/system/menu/update')
+        },
+        {
           path: 'group',
           name: 'group',
           component: () => import('./components/home/group/index'),

@@ -30,7 +30,7 @@
           </v-layout>
           <v-list-group
             v-else-if="item.children"
-            :key="item.text"
+            :key="item.name"
             v-model="item.model"
             :prepend-icon="item.model ? item.icon : item['icon-alt']"
             append-icon=""
@@ -39,7 +39,7 @@
               <v-list-item>
                 <v-list-item-content>
                   <v-list-item-title>
-                    {{ item.text }}
+                    {{ item.name }}
                   </v-list-item-title>
                 </v-list-item-content>
               </v-list-item>
@@ -54,15 +54,15 @@
               </v-list-item-action>
               <v-list-item-content>
                 <v-list-item-title>
-                  {{ child.text }}
+                  {{ child.name }}
                 </v-list-item-title>
               </v-list-item-content>
             </v-list-item>
           </v-list-group>
           <v-list-item
-            v-else-if="item.role == role"
-            :key="item.text"
-            :to="item.link"
+            v-else-if="item.active"
+            :key="item.name"
+            :to="item.router_link"
             color="primary"
           >
             <v-list-item-action>
@@ -70,7 +70,7 @@
             </v-list-item-action>
             <v-list-item-content>
               <v-list-item-title>
-                {{ item.text }}
+                {{ item.name }}
               </v-list-item-title>
             </v-list-item-content>
           </v-list-item>
@@ -103,7 +103,6 @@
         <span class="hidden-sm-and-down">Hệ thống quản lý file</span>
       </v-toolbar-title>
       <v-text-field
-        v-if="role != 'admin'"
         flat
         solo-inverted
         hide-details
@@ -159,23 +158,28 @@ import Axios from 'axios'
     data () {
         return {
             drawer: null,
-            role: null,
-            items: [
-                { icon: 'person', text: 'Người dùng', link: '/user/info', role: 'Admin'},
-                { icon: 'history', text: 'Quyền hệ thống', link: '/user/role', role: 'Admin'},
-                { icon: 'group', text: 'Nhóm', link: '/user/group', role: 'Admin'},
-                { icon: 'folder_open', text: 'File của tôi', link: '/user/drive', role: 'User'},
-                { icon: 'mdi-account-multiple', text: 'Được chia sẻ với tôi', link: '/user/share', role: 'User'},
-                { icon: 'delete', text: 'Thùng rác', link: '/user/trash', role: 'User'},
-            ],
+            items: [],
         }
     },
 
     mounted() {
-      this.role = localStorage.getItem('userrole')
+      this.getMenu()
     },
 
     methods: {
+      async getMenu() {
+        try {
+            let res = await Axios.get('http://localhost:3000/menus/lists/role', {
+              params: {
+                role: localStorage.getItem('userrole')
+              }
+            })  
+            this.items = res.data.body.menu_list
+        } catch (error) {
+            console.log(error)
+        }
+      },
+
       async logout() {
         try {
           await Axios.post('http://localhost:3000/logout', {}, {
@@ -197,6 +201,8 @@ import Axios from 'axios'
           })
         }
       }
+
+      
     }
   }
 </script>
