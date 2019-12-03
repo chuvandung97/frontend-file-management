@@ -5,6 +5,90 @@
       :clipped="$vuetify.breakpoint.lgAndUp"
       app
     >
+      <v-card flat class="mb-1">
+        <v-card-title class="d-flex justify-center">
+          <v-avatar >
+            <img
+              src="https://cdn.vuetifyjs.com/images/john.jpg"
+              class="mx-auto d-block"
+            >
+          </v-avatar>
+        </v-card-title>
+        <v-card-text class="text-center">
+            <h5 class="category text-gray font-weight-bold">{{ roleDescription }}</h5>
+            <h4 class="card-title font-weight-light">{{ name }}</h4>
+        </v-card-text>
+        <v-card-actions class="d-flex justify-center" v-if="roleDescription != 'Admin'">
+          <v-menu
+            bottom
+            origin="center center"
+            transition="scale-transition"
+            close-on-content-click
+          >
+            <template v-slot:activator="{ on }">
+              <v-btn
+                color="primary"
+                dark
+                rounded
+                class="text-none px-12"
+                v-on="on"
+              >
+                Tạo mới
+              </v-btn>
+            </template>
+
+            <v-list min-width="250">
+              <v-list-item @click.stop="dialog = true">
+                <v-list-item-icon><v-icon>create_new_folder</v-icon></v-list-item-icon>
+                <v-list-item-title class="body-2 font-weight-medium ml-n3">Thư mục</v-list-item-title>
+              </v-list-item>
+              <v-dialog v-model="dialog" width="400" persistent>
+                <v-card>
+                  <v-card-title
+                    class="headline primary white--text"
+                    primary-title
+                  >
+                    Tạo mới thư mục
+                  </v-card-title>
+
+                  <v-card-text>
+                    <v-text-field
+                      v-model="name_folder"
+                      label="Tên"
+                      required
+                      class="mt-3"
+                      :rules="[v => !!v || 'Mời bạn nhập tên']"
+                    >
+                    </v-text-field>
+                  </v-card-text>
+                  <v-card-actions class="mt-n3">
+                    <v-btn
+                      @click="cancelCreateFolder()"
+                      class="text-none"
+                    >
+                      Hủy
+                    </v-btn>
+                    <v-spacer></v-spacer>
+                    <v-btn
+                      color="primary"
+                      @click="createFolder()"
+                      class="text-none"
+                      :disabled="name_folder == '' ? true : false"
+                    >
+                      Tạo
+                    </v-btn>
+                  </v-card-actions>
+                </v-card>
+              </v-dialog>
+              <v-list-item class="file-upload" @click="showUploadFile()">
+                <v-list-item-icon><v-icon>cloud_upload</v-icon></v-list-item-icon>
+                <v-list-item-title class="body-2 font-weight-medium ml-n3">Tải tệp lên</v-list-item-title>
+                <input style="display: none" type="file" id="file" ref="file" accept=".doc,.docx, application/msword, application/pdf,image/*, video/*" v-on:change="handleFileUpload()"/>
+              </v-list-item>
+            </v-list>
+          </v-menu>
+        </v-card-actions>
+      </v-card>
       <v-list dense>
         <template v-for="item in items">
           <v-layout
@@ -159,11 +243,17 @@ import Axios from 'axios'
         return {
             drawer: null,
             items: [],
+            roleDescription: null, 
+            name: null,
+            dialog: false,
+            name_folder: 'Thư mục mới',
         }
     },
 
     mounted() {
       this.getMenu()
+      this.name = localStorage.getItem('username')
+      this.roleDescription = localStorage.getItem('userrole')
     },
 
     methods: {
@@ -187,11 +277,10 @@ import Axios from 'axios'
                 Authorization: `Bearer ${localStorage.getItem('jwt_token')}`
             }
           })
-          localStorage.removeItem('jwt_token')
-          localStorage.removeItem('userid')
-          localStorage.removeItem('username')
-          localStorage.removeItem('useremail')
-          localStorage.removeItem('userrole')
+          let storage = ['jwt_token', 'userid', 'username', 'useremail', 'userrole', 'bucketid', 'bucketname']
+          storage.map((elCurrent) => {
+            return localStorage.removeItem(elCurrent)
+          })
           this.$router.push('/')
         } catch (error) {
           this.$store.commit('setNoti', {
@@ -200,9 +289,88 @@ import Axios from 'axios'
               showNoti: true
           })
         }
-      }
+      },
 
-      
+      async handleFileUpload(){
+        this.file = this.$refs.file.files[0];
+        let formData = new FormData();
+        formData.append('file', this.file);
+        try {
+          let res = await Axios.post('http://localhost:3000/upload', formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data'
+            }, 
+            params: {
+              bucket_name: localStorage.getItem('bucketname')
+            }
+          })
+          this.$store.commit('setNoti', {
+              typeNoti: 1,
+              textNoti: res.data.message,
+              showNoti: true
+          })
+        } catch (error) {
+          this.$store.commit('setNoti', {
+              typeNoti: 0,
+              textNoti: 'Tải file thất bại !',
+              showNoti: true
+          })
+        }
+      },
+
+      async downloadFile() {
+        try {
+          let res = await Axios.get('http://localhost:3000/download', {
+            params: {
+                bucket_name: localStorage.getItem('bucketname'),
+                name: 'Hệ thống quản lý tài liệu - Google Chrome 2019-10-28 21-51-05.mp4'
+            }
+          })
+          window.location.href = res.data.body.url
+        } catch (error) {
+          console.log(error)
+          this.$store.commit('setNoti', {
+              typeNoti: 0,
+              textNoti: 'Tải xuống thất bại !',
+              showNoti: true
+          })
+        }
+      },
+
+      showUploadFile() {
+        const btn_upload = document.getElementById('file')
+        btn_upload.click()
+      },
+
+      cancelCreateFolder() {
+        this.dialog = false,
+        this.name_folder ="Thư mục mới"
+      },
+
+      async createFolder() {
+        try {
+          let res = await Axios.post('http://localhost:3000/folders/add', {
+            parent_id: this.$route.params ? this.$route.params.id : null,
+            name: this.name_folder,
+            storage_id: localStorage.getItem('bucketid'),
+            created_by: localStorage.getItem('userid')
+          })
+          this.$store.commit('setNoti', {
+              typeNoti: 1,
+              textNoti: res.data.message,
+              showNoti: true
+          })
+        } catch (error) {
+          this.$store.commit('setNoti', {
+              typeNoti: 1,
+              textNoti: 'Tạo mới thư mục thất bại',
+              showNoti: true
+          })
+        } finally {
+          this.dialog = false
+          this.name_folder = "Thư mục mới"
+        }
+      }
     }
   }
 </script>

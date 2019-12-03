@@ -66,6 +66,8 @@
               password: this.password
             })
             localStorage.setItem('jwt_token', response.data.body.token)
+            localStorage.setItem('bucketid', response.data.body.bucket.id)
+            localStorage.setItem('bucketname', response.data.body.bucket.name)
             this.$router.push('/')
           } catch(e) {
             this.$store.commit('setNoti', {

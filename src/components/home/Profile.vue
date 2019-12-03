@@ -63,6 +63,7 @@
                                     item-text="code"
                                     required
                                     return-object
+                                    :disabled="role.code != 'Admin' ? true : false"
                                 >
                                 </v-select>
                             </v-col>
@@ -184,7 +185,11 @@ export default {
                     textNoti: res.data.message,
                     showNoti: true
                 })
-                this.$router.push('/user/info')
+                if(this.role.code == 'Admin') {
+                    this.$router.push('/user/info')
+                } else {
+                    this.$router.push('/user/drive')
+                }
             } catch(e) {
                 this.$store.commit('setNoti', {
                     typeNoti: 0,
