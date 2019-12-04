@@ -27,7 +27,7 @@ export default new Router({
             })
             if(res.data.code == 200) {
               store.commit('setUser', res.data.body)
-              if(res.data.body.role == "Admin") {
+              if(res.data.body.role == "Admin" || res.data.body.role == "Sysadmin") {
                 next('/user/info')
               } else {
                 next('/user/drive')
@@ -104,6 +104,11 @@ export default new Router({
           path: 'drive',
           name: 'user.drive',
           component: () => import('./components/home/my-drive/index'),
+        },
+        {
+          path: 'folder/:folderId',
+          name: 'user.detailfolder',
+          component: () => import('./components/home/my-drive/detail'),
         },
         {
           path: 'share',

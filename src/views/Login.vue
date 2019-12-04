@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <v-app>
     <v-content>
       <v-container fluid fill-height>
         <v-layout align-center justify-center>
@@ -38,7 +38,7 @@
       </v-container>
       
     </v-content>
-  </div>
+  </v-app>
 </template>
 
 <script>
@@ -66,8 +66,7 @@
               password: this.password
             })
             localStorage.setItem('jwt_token', response.data.body.token)
-            localStorage.setItem('bucketid', response.data.body.bucket.id)
-            localStorage.setItem('bucketname', response.data.body.bucket.name)
+            localStorage.setItem('bucket', response.data.body.bucket)
             this.$router.push('/')
           } catch(e) {
             this.$store.commit('setNoti', {

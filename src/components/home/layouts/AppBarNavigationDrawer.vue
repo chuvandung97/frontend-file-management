@@ -18,7 +18,7 @@
             <h5 class="category text-gray font-weight-bold">{{ roleDescription }}</h5>
             <h4 class="card-title font-weight-light">{{ name }}</h4>
         </v-card-text>
-        <v-card-actions class="d-flex justify-center" v-if="roleDescription != 'Admin'">
+        <v-card-actions class="d-flex justify-center" v-if="roleDescription != 'Admin' && roleDescription != 'Sysadmin'">
           <v-menu
             bottom
             origin="center center"
@@ -277,7 +277,7 @@ import Axios from 'axios'
                 Authorization: `Bearer ${localStorage.getItem('jwt_token')}`
             }
           })
-          let storage = ['jwt_token', 'userid', 'username', 'useremail', 'userrole', 'bucketid', 'bucketname']
+          let storage = ['jwt_token', 'userid', 'username', 'useremail', 'userrole', 'bucket']
           storage.map((elCurrent) => {
             return localStorage.removeItem(elCurrent)
           })
@@ -301,7 +301,7 @@ import Axios from 'axios'
                 'Content-Type': 'multipart/form-data'
             }, 
             params: {
-              bucket_name: localStorage.getItem('bucketname')
+              bucket_name: localStorage.getItem('bucket')
             }
           })
           this.$store.commit('setNoti', {
@@ -322,7 +322,7 @@ import Axios from 'axios'
         try {
           let res = await Axios.get('http://localhost:3000/download', {
             params: {
-                bucket_name: localStorage.getItem('bucketname'),
+                bucket_name: localStorage.getItem('bucket'),
                 name: 'Hệ thống quản lý tài liệu - Google Chrome 2019-10-28 21-51-05.mp4'
             }
           })
@@ -352,7 +352,7 @@ import Axios from 'axios'
           let res = await Axios.post('http://localhost:3000/folders/add', {
             parent_id: this.$route.params ? this.$route.params.id : null,
             name: this.name_folder,
-            storage_id: localStorage.getItem('bucketid'),
+            storage_id: localStorage.getItem('bucket'),
             created_by: localStorage.getItem('userid')
           })
           this.$store.commit('setNoti', {
@@ -362,7 +362,7 @@ import Axios from 'axios'
           })
         } catch (error) {
           this.$store.commit('setNoti', {
-              typeNoti: 1,
+              typeNoti: 0,
               textNoti: 'Tạo mới thư mục thất bại',
               showNoti: true
           })

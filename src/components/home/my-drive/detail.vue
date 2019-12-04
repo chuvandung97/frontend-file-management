@@ -91,7 +91,6 @@
 </template>
 
 <script>
-import Axios from 'axios';
 import moment from 'moment'
 import Vue from 'vue'
 
@@ -163,16 +162,7 @@ export default {
         },
 
         async getFolderList() {
-            try {
-                let res = await Axios.get('http://localhost:3000/folders/lists', {
-                    params: {
-                        storage_id: localStorage.getItem('bucket')
-                    }
-                })
-                this.desserts = res.data.body.folder_list
-            } catch (error) {
-                console.log(error)
-            }
+    
         }
     }
   }
