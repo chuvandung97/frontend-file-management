@@ -38,48 +38,10 @@
             </template>
 
             <v-list min-width="250">
-              <v-list-item @click.stop="dialog = true">
+              <v-list-item @click="dialog = true">
                 <v-list-item-icon><v-icon>create_new_folder</v-icon></v-list-item-icon>
                 <v-list-item-title class="body-2 font-weight-medium ml-n3">Thư mục</v-list-item-title>
               </v-list-item>
-              <v-dialog v-model="dialog" width="400" persistent>
-                <v-card>
-                  <v-card-title
-                    class="headline primary white--text"
-                    primary-title
-                  >
-                    Tạo mới thư mục
-                  </v-card-title>
-
-                  <v-card-text>
-                    <v-text-field
-                      v-model="name_folder"
-                      label="Tên"
-                      required
-                      class="mt-3"
-                      :rules="[v => !!v || 'Mời bạn nhập tên']"
-                    >
-                    </v-text-field>
-                  </v-card-text>
-                  <v-card-actions class="mt-n3">
-                    <v-btn
-                      @click="cancelCreateFolder()"
-                      class="text-none"
-                    >
-                      Hủy
-                    </v-btn>
-                    <v-spacer></v-spacer>
-                    <v-btn
-                      color="primary"
-                      @click="createFolder()"
-                      class="text-none"
-                      :disabled="name_folder == '' ? true : false"
-                    >
-                      Tạo
-                    </v-btn>
-                  </v-card-actions>
-                </v-card>
-              </v-dialog>
               <v-list-item class="file-upload" @click="showUploadFile()">
                 <v-list-item-icon><v-icon>cloud_upload</v-icon></v-list-item-icon>
                 <v-list-item-title class="body-2 font-weight-medium ml-n3">Tải tệp lên</v-list-item-title>
@@ -87,6 +49,44 @@
               </v-list-item>
             </v-list>
           </v-menu>
+          <v-dialog v-model="dialog" width="400" persistent>
+            <v-card>
+              <v-card-title
+                class="headline primary white--text"
+                primary-title
+              >
+                Tạo mới thư mục
+              </v-card-title>
+
+              <v-card-text>
+                <v-text-field
+                  v-model="name_folder"
+                  label="Tên"
+                  required
+                  class="mt-3"
+                  :rules="[v => !!v || 'Mời bạn nhập tên']"
+                >
+                </v-text-field>
+              </v-card-text>
+              <v-card-actions class="mt-n6">
+                <v-btn
+                  @click="cancelCreateFolder()"
+                  class="text-none"
+                >
+                  Hủy
+                </v-btn>
+                <v-spacer></v-spacer>
+                <v-btn
+                  color="primary"
+                  @click="createFolder()"
+                  class="text-none"
+                  :disabled="name_folder == '' ? true : false"
+                >
+                  Tạo
+                </v-btn>
+              </v-card-actions>
+            </v-card>
+          </v-dialog>
         </v-card-actions>
       </v-card>
       <v-list dense>
@@ -350,7 +350,7 @@ import Axios from 'axios'
       async createFolder() {
         try {
           let res = await Axios.post('http://localhost:3000/folders/add', {
-            parent_id: this.$route.params ? this.$route.params.id : null,
+            parent_id: this.$route.params ? this.$route.params.folderId : null,
             name: this.name_folder,
             storage_id: localStorage.getItem('bucket'),
             created_by: localStorage.getItem('userid')

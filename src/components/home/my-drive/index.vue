@@ -26,11 +26,10 @@
             sort-by="name"
             v-if="viewFile"
             :class="'view_list'"
-            
-        >
+        >   
             <template v-slot:body=" { items } ">
                 <tbody>
-                    <tr v-for="item in items" :key="item.name" @dblclick="showDetailFolder(item)">
+                    <tr v-for="item in items" :key="item.name" @dblclick="showDetailFolder(item)" @contextmenu="showSelectMenu($event, item)">
                         <td><v-icon class="mr-2">mdi-folder</v-icon> {{ item.name }}</td>
                         <td>{{ item.User.name }}</td>
                         <td>{{ item.updatedAt | formatDate }}</td>
@@ -52,29 +51,12 @@
             <v-card-title>Thư mục</v-card-title>
             <v-card-text>
                 <v-row>
-                    <v-col v-for="dessert in desserts" cols="3" :key="dessert.name">
-                        <v-card outlined class="pa-3" :to="'/user/drive'"  @contextmenu="abc">
+                    <v-col v-for="dessert in desserts" cols="6" sm="4" md="3" xl="1" :key="dessert.name">
+                        <v-card outlined class="pa-3" :to="'/user/drive'"  @dblclick="showDetailFolder(dessert)" @contextmenu="showSelectMenu($event, dessert)">
                             <v-icon class="mr-2">mdi-folder</v-icon> {{ dessert.name }}    
                         </v-card>
                     </v-col>
                 </v-row>
-                <v-menu
-                    v-model="show"
-                    :position-x="x"
-                    :position-y="y"
-                    absolute
-                    offset-y
-                    transition="scale-transition"
-                >
-                    <v-list>
-                        <v-list-item
-                            v-for="(item, i) in itemsss"
-                            :key="i"
-                        >
-                            <v-list-item-title>{{ item.title }}</v-list-item-title>
-                        </v-list-item>
-                    </v-list>
-                </v-menu>
             </v-card-text>
             <v-card-title>File</v-card-title>
             <v-card-text>
@@ -87,6 +69,141 @@
                 </v-row>
             </v-card-text>
         </template>
+        <v-menu
+            v-model="show"
+            :position-x="x"
+            :position-y="y"
+            absolute
+            offset-y
+            transition="scale-transition"
+        >
+            <v-list width="200">
+                <v-list-item @click="dialog2 = true">
+                    <v-list-item-title><v-icon>mdi-eye</v-icon> Xem chi tiết</v-list-item-title>
+                </v-list-item>
+                <v-list-item @click="dialog = true, overlay = true">
+                    <v-list-item-title><v-icon>mdi-pencil</v-icon> Đổi tên</v-list-item-title>
+                </v-list-item>
+                
+                <v-list-item>
+                    <v-list-item-title><v-icon>mdi-folder-move</v-icon> Di chuyển</v-list-item-title>
+                </v-list-item>
+                <v-list-item @click="removeFolderToTrash()">
+                    <v-list-item-title><v-icon>mdi-delete</v-icon> Xóa</v-list-item-title>
+                </v-list-item>
+            </v-list>
+        </v-menu>
+        <v-dialog v-model="dialog2" fullscreen hide-overlay transition="dialog-bottom-transition">
+            <v-card>
+                <v-toolbar dark color="primary">
+                    <v-btn icon dark @click="dialog2 = false">
+                        <v-icon>mdi-close</v-icon>
+                    </v-btn>
+                    <v-toolbar-title>Chi tiết</v-toolbar-title>
+                </v-toolbar>
+                <v-row>
+                    <v-col cols="7">
+                        <v-timeline dense clipped>
+                        
+                        <v-timeline-item
+                            class="mb-6"
+                            hide-dot
+                        >
+                            <span>TODAY</span>
+                        </v-timeline-item>
+
+                        <v-timeline-item
+                            class="mb-4"
+                            color="grey"
+                            icon-color="grey lighten-2"
+                            small
+                        >
+                            <v-row justify="space-between">
+                            <v-col cols="7">This order was archived.</v-col>
+                            <v-col cols="5">15:26</v-col>
+                            </v-row>
+                        </v-timeline-item>
+
+                        <v-timeline-item
+                            class="mb-4"
+                            small
+                        >
+                            <v-row justify="space-between">
+                            <v-col cols="7">
+                                Digital Downloads fulfilled 1 item.
+                            </v-col>
+                            <v-col cols="5">15:25</v-col>
+                            </v-row>
+                        </v-timeline-item>
+
+                        <v-timeline-item
+                            class="mb-4"
+                            color="grey"
+                            small
+                        >
+                            <v-row justify="space-between">
+                            <v-col cols="7">
+                                Order confirmation email was sent to John Leider (john@vuetifyjs.com).
+                            </v-col>
+                            <v-col cols="5">15:25</v-col>
+                            </v-row>
+                        </v-timeline-item>
+
+                        <v-timeline-item
+                            class="mb-4"
+                            color="grey"
+                            small
+                        >
+                            <v-row justify="space-between">
+                            <v-col cols="7">
+                                A $15.00 USD payment was processed on PayPal Express Checkout
+                            </v-col>
+                            <v-col cols="5">15:25</v-col>
+                            </v-row>
+                        </v-timeline-item>
+                        </v-timeline>
+                    </v-col>
+                    <v-divider vertical inset></v-divider>
+                    <v-col class="text-center" cols="5"></v-col>
+                </v-row>
+            </v-card>
+        </v-dialog>    
+        <v-dialog v-model="dialog" width="400" persistent>
+            <v-card>
+                <v-card-title
+                    class="headline primary white--text"
+                    primary-title
+                >
+                    Đổi tên thư mục
+                </v-card-title>
+
+                <v-card-text>
+                    <v-text-field
+                        v-model="new_name_folder"
+                        label="Tên"
+                        required
+                        class="mt-3"
+                        :rules="[v => !!v || 'Mời bạn nhập tên']"
+                        @keypress.enter="formSubmit()"
+                        autofocus
+                    >
+                    </v-text-field>
+                </v-card-text>
+                <v-card-actions class="mt-n6">
+                    <v-btn
+                        @click="dialog = false, overlay = false"
+                        class="text-none"
+                    >Hủy</v-btn>
+                    <v-spacer></v-spacer>
+                    <v-btn
+                        color="primary"
+                        @click="updateName()"
+                        class="text-none"
+                        :disabled="new_name_folder == '' ? true : false"
+                    >Lưu</v-btn>
+                </v-card-actions>
+            </v-card>
+        </v-dialog>
     </v-card>
 </template>
 
@@ -102,32 +219,22 @@ Vue.filter('formatDate', function(value) {
 })
 export default {
     data: () => ({
-        itemsss: [
-            { title: 'Click Me' },
-            { title: 'Click Me' },
-            { title: 'Click Me' },
-            { title: 'Click Me 2' },
-        ],
+        overlay: false,
+        old_name_folder: null,
+        new_name_folder: null,
+        folder_id: null,
+        dialog: false,
+        dialog2: false,
         show: false,
         x: 0,
         y: 0,
         viewFile: true,
         items: [
             {
-                text: 'Dashboard',
+                text: 'Tất cả file',
                 disabled: false,
-                href: 'breadcrumbs_dashboard',
-            },
-            {
-                text: 'Link 1',
-                disabled: false,
-                href: 'breadcrumbs_link_1',
-            },
-            {
-                text: 'Link 2',
-                disabled: true,
-                href: 'breadcrumbs_link_2',
-            },
+                to: '/user/drive'
+            }
         ],
 
         headers: [
@@ -150,13 +257,17 @@ export default {
     methods: {
         showDetailFolder(item) {
             this.$router.push('/user/folder/' + item.id)
+            this.getFolderList()
         },
 
-        abc(e) {
+        showSelectMenu(e, item) {
             e.preventDefault();
             this.show = false;
             this.x = e.clientX;
             this.y = e.clientY;
+            this.new_name_folder = item.name
+            this.old_name_folder = this.new_name_folder
+            this.folder_id = item.id
             this.$nextTick(() => {
                 this.show = true;
             });
@@ -166,13 +277,69 @@ export default {
             try {
                 let res = await Axios.get('http://localhost:3000/folders/lists', {
                     params: {
-                        storage_id: localStorage.getItem('bucket')
+                        storage_id: localStorage.getItem('bucket'),
+                        active: 1
                     }
                 })
                 this.desserts = res.data.body.folder_list
             } catch (error) {
                 console.log(error)
             }
+        },
+
+        async updateName() {
+            if(this.new_name_folder == this.old_name_folder) {
+                this.$store.commit('setNoti', {
+                    typeNoti: 1,
+                    textNoti: 'Đổi tên thư mục thành công',
+                    showNoti: true
+                })
+                this.dialog = false
+            } else { 
+                try {
+                    let res = await Axios.post('http://localhost:3000/folders/update/' + this.folder_id, {
+                        name: this.new_name_folder,
+                    })
+                    this.$store.commit('setNoti', {
+                        typeNoti: 1,
+                        textNoti: res.data.message,
+                        showNoti: true
+                    })
+                } catch (error) {
+                    this.$store.commit('setNoti', {
+                        typeNoti: 0,
+                        textNoti: 'Đổi tên thư mục thất bại',
+                        showNoti: true
+                    })
+                } finally {
+                    this.dialog = false
+                    this.overlay = false
+                    this.getFolderList()
+                }
+            }
+        },
+
+        async removeFolderToTrash() {
+            try {
+                await Axios.post('http://localhost:3000/folders/remove/trash/' + this.folder_id)
+                this.$store.commit('setNoti', {
+                    typeNoti: 1,
+                    textNoti: 'Thư mục đã được chuyển đến thùng rác',
+                    showNoti: true
+                })
+            } catch (error) {
+                this.$store.commit('setNoti', {
+                    typeNoti: 0,
+                    textNoti: 'Xóa thư mục thất bại',
+                    showNoti: true
+                })
+            } finally {
+                this.getFolderList()
+            }
+        },
+
+        formSubmit() {
+            this.updateName()
         }
     }
   }

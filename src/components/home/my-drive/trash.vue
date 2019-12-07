@@ -27,8 +27,8 @@
                 <v-btn 
                     text 
                     class="float-right mr-n6 text-none"
-                    @click="''"
                     v-else
+                    @click="dialog1 = true"
                 >
                 Xóa vĩnh viễn
                 </v-btn>
@@ -58,6 +58,12 @@
             <template v-slot:item.name="{ item }">
                 <v-icon class="mr-2">mdi-folder</v-icon> {{ item.name }}
             </template> 
+            <template v-slot:item.created_by="{ item }">
+                {{ item.User.name }}
+            </template>
+            <template v-slot:item.updatedAt="{ item }">
+                {{ item.updatedAt | formatDate }}
+            </template>
         </v-data-table>
         <template v-if="!viewFile">
             <v-card-title>Thư mục</v-card-title>
@@ -69,188 +75,148 @@
                         </v-card>
                     </v-col>
                 </v-row>
-                <v-menu
-                    v-model="show"
-                    :position-x="x"
-                    :position-y="y"
-                    absolute
-                    offset-y
-                    transition="scale-transition"
-                >
-                    <v-list>
-                        <v-list-item
-                            v-for="(item, i) in itemsss"
-                            :key="i"
-                            @click="aa"
-                        >
-                            <v-list-item-title>{{ item.title }}</v-list-item-title>
-                        </v-list-item>
-                    </v-list>
-                </v-menu>
             </v-card-text>
             <v-card-title>File</v-card-title>
             <v-card-text>
                 <v-row>
-                    <v-col v-for="folder in folders" cols="3" :key="folder.name">
+                    <v-col v-for="dessert in desserts" cols="3" :key="dessert.name">
                         <v-card outlined class="pa-3" :to="'/user/drive'">
-                            {{ folder.name }}
+                            {{ dessert.name }}
                         </v-card>
                     </v-col>
                 </v-row>
             </v-card-text>
         </template>
+        <v-dialog v-model="dialog1" width="400" persistent>
+            <v-card>
+                <v-card-title
+                    class="headline primary white--text"
+                    primary-title
+                >
+                    Xóa thư mục
+                </v-card-title>
+
+                <v-card-text class="red--text mt-3">
+                    Chú ý: Điều này sẽ xóa toàn bộ file và thư mục bên trong thư mục này
+                </v-card-text>
+                <v-card-actions class="mt-n3">
+                    <v-btn
+                        @click="dialog1 = false"
+                        class="text-none"
+                    >Hủy</v-btn>
+                    <v-spacer></v-spacer>
+                    <v-btn
+                        color="primary"
+                        @click="deletePermanently()"
+                        class="text-none"
+                    >Xóa</v-btn>
+                </v-card-actions>
+            </v-card>
+        </v-dialog>
     </v-card>
 </template>
 
 <script>
-  export default {
-    data: () => ({
-        showSelectTable: false,
-        itemsss: [
-            { title: 'Click Me' },
-            { title: 'Click Me' },
-            { title: 'Click Me' },
-            { title: 'Click Me 2' },
-        ],
-        show: false,
-        x: 0,
-        y: 0,
-        viewFile: true,
-        selected: [],
-        folders: [
-            {
-                name: 'Dashboard',
-            },
-            {
-                name: 'Dashboard1',
-            },
-            {
-                name: 'Dashboard2',
-            },
-            {
-                name: 'Dashboard3',
-            },
-            {
-                name: 'Dashboard4',
-            },
-            {
-                name: 'Dashboard5',
-            },
-            {
-                name: 'Dashboard6',
-            },
-            {
-                name: 'Dashboard7',
-            },
-            {
-                name: 'Dashboard8',
-            },
-            {
-                name: 'Dashboard9',
-            },
-        ],
-        items: [
-            {
-                text: 'Thùng rác',
-                disabled: false,
-                href: 'breadcrumbs_dashboard',
-            },
-        ],
+    import Axios from 'axios'
+    import moment from 'moment'
+    import Vue from 'vue'
 
-        headers: [
-            {
-                text: 'Tên',
-                align: 'left',
-                value: 'name',
-            },
-            { text: 'Người tải lên', value: 'user_upload' },
-            { text: 'Cập nhật lần cuối', value: 'updated_at' },
-            { text: 'Kích cỡ', value: 'size' },
-        ],
-        desserts: [
-            {
-                name: 'Frozen Yogurthhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh',
-                user_upload: 159,
-                updated_at: 6.0,
-                size: 24,
-            },
-            {
-                name: 'Ice cream sandwich',
-                user_upload: 237,
-                updated_at: 9.0,
-                size: 37,
-            },
-            {
-                name: 'Eclair',
-                user_upload: 262,
-                updated_at: 16.0,
-                size: 23,
-            },
-            {
-                name: 'Cupcake',
-                user_upload: 305,
-                updated_at: 3.7,
-                size: 67,
-            },
-            {
-                name: 'Gingerbread',
-                user_upload: 356,
-                updated_at: 16.0,
-                size: 49,
-            },
-            {
-                name: 'Jelly bean',
-                user_upload: 375,
-                updated_at: 0.0,
-                size: 94,
-            },
-            {
-                name: 'Lollipop',
-                user_upload: 392,
-                updated_at: 0.2,
-                size: 98,
-            },
-            {
-                name: 'Honeycomb',
-                user_upload: 408,
-                updated_at: 3.2,
-                size: 87,
-            },
-            {
-                name: 'Donut',
-                user_upload: 452,
-                updated_at: 25.0,
-                size: 51,
-            },
-            {
-                name: 'KitKat',
-                user_upload: 518,
-                updated_at: 26.0,
-                size: 65,
-            },
-            {
-                name: 'KitKat3',
-                user_upload: 518,
-                updated_at: 26.0,
-                size: 65,
-            },
-        ],
-    }),
+    Vue.filter('formatDate', function(value) {
+        if (value) {
+            return moment(String(value)).format('DD/MM/YYYY')
+        }
+    })
+    export default {
+        data: () => ({
+            showSelectTable: false,
+            show: false,
+            dialog1: false,
+            x: 0,
+            y: 0,
+            viewFile: true,
+            selected: [],
+            folders: [],
+            items: [
+                {
+                    text: 'Thùng rác',
+                    disabled: false,
+                    href: 'breadcrumbs_dashboard',
+                },
+            ],
 
-    methods: {
-        abc(e) {
-            e.preventDefault();
-            this.show = false;
-            this.x = e.clientX;
-            this.y = e.clientY;
-            this.$nextTick(() => {
-                this.show = true;
-            });
+            headers: [
+                {
+                    text: 'Tên',
+                    align: 'left',
+                    value: 'name',
+                },
+                { text: 'Người tải lên', value: 'created_by' },
+                { text: 'Cập nhật lần cuối', value: 'updatedAt' },
+                { text: 'Kích cỡ', value: 'size' },
+            ],
+            desserts: [],
+        }),
+
+        mounted() {
+            this.getFolderList()
         },
 
-        aa() {
-            console.log(123)
+        methods: {
+            abc(e) {
+                e.preventDefault();
+                this.show = false;
+                this.x = e.clientX;
+                this.y = e.clientY;
+                this.$nextTick(() => {
+                    this.show = true;
+                });
+            },
+
+            aa() {
+                console.log(123)
+            },
+
+            async getFolderList() {
+                try {
+                    let res = await Axios.get('http://localhost:3000/folders/lists', {
+                        params: {
+                            storage_id: localStorage.getItem('bucket'),
+                            active: 0
+                        }
+                    })
+                    this.desserts = res.data.body.folder_list
+                } catch (error) {
+                    console.log(error)
+                }
+            },
+
+            async deletePermanently() {
+                let folderId = this.selected.map((currentElArray) => {
+                    return currentElArray.id
+                })
+                try {
+                    let res = await Axios.delete('http://localhost:3000/folders/delete', {
+                        params: {
+                            folderId: folderId
+                        }
+                    })
+                    this.$store.commit('setNoti', {
+                        typeNoti: 1,
+                        textNoti: res.data.message + res.data.count + ' mục !',
+                        showNoti: true
+                    })
+                } catch (e) {
+                    this.$store.commit('setNoti', {
+                        typeNoti: 0,
+                        textNoti: 'Xóa thất bại !',
+                        showNoti: true
+                    })
+                } finally {
+                    this.dialog1 = false
+                    this.getFolderList()
+                    this.selected = []
+                }
+            }
         }
     }
-  }
 </script>

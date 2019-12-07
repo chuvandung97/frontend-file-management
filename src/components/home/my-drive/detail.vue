@@ -93,6 +93,7 @@
 <script>
 import moment from 'moment'
 import Vue from 'vue'
+import Axios from 'axios'
 
 Vue.filter('formatDate', function(value) {
     if (value) {
@@ -113,9 +114,9 @@ export default {
         viewFile: true,
         items: [
             {
-                text: 'Dashboard',
+                text: 'Tất cả file',
                 disabled: false,
-                href: 'breadcrumbs_dashboard',
+                to: '/user/drive'
             },
             {
                 text: 'Link 1',
@@ -162,7 +163,17 @@ export default {
         },
 
         async getFolderList() {
-    
+            try {
+                let res = await Axios.get('http://localhost:3000/folders/lists/subfolder', {
+                    params: {
+                        storage_id: localStorage.getItem('bucket'),
+                        parent_id: this.$route.params.folderId
+                    }
+                })
+                this.desserts = res.data.body.folder_list
+            } catch (error) {
+                console.log(error)
+            }
         }
     }
   }

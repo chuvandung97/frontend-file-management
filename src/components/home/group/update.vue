@@ -64,6 +64,7 @@
           deletable-chips
           item-text="name"
           return-object
+          :rules="[v => !!v || 'Mời bạn chọn thành viên']"
         >
           <template v-if="noData" v-slot:no-data>
             <v-list-item>
