@@ -9,29 +9,48 @@
                 </v-breadcrumbs>
             </v-col>
             <v-col cols="5" md="5">
-                <v-tooltip bottom v-if="selected.length == 0">
+                <v-tooltip bottom v-if="selected.length > 0">
                     <template v-slot:activator="{ on }">
                         <v-btn 
                             depressed 
                             text 
                             icon
-                            class="float-right mr-n6"
+                            class="float-right mr-n4"
                             v-on="on"
-                            @click="showSelectTable = !showSelectTable"
+                            @click="dialog1 = true"
+                            
                         >
-                            <v-icon>delete</v-icon>
+                            <v-badge
+                                color="primary"
+                                overlap
+                                class="align-self-center"
+                            >
+                                <template v-slot:badge>
+                                <span>{{ selected.length }}</span>
+                                </template>
+                                <v-icon>
+                                delete
+                                </v-icon>
+                            </v-badge>
                         </v-btn>
                     </template>
                     <span>Xóa</span>
                 </v-tooltip>
-                <v-btn 
-                    text 
-                    class="float-right mr-n6 text-none"
-                    v-else
-                    @click="dialog1 = true"
-                >
-                Xóa vĩnh viễn
-                </v-btn>
+                <v-tooltip bottom v-if="selected.length > 0">
+                    <template v-slot:activator="{ on }">
+                        <v-btn 
+                            depressed 
+                            text 
+                            icon
+                            class="float-right"
+                            v-on="on"
+                            @click="restore()"                            
+                        >
+                            <v-icon>mdi-backup-restore</v-icon>
+                        </v-btn>
+                    </template>
+                    <span>Khôi phục</span>
+                </v-tooltip>
             </v-col>
             <v-col cols="2" md="1">
                 <v-btn 
@@ -53,7 +72,7 @@
             v-if="viewFile"
             :class="'view_list'"
             item-key="name"
-            :show-select="showSelectTable"
+            show-select
         >
             <template v-slot:item.name="{ item }">
                 <v-icon class="mr-2">mdi-folder</v-icon> {{ item.name }}
@@ -187,6 +206,31 @@
                     this.desserts = res.data.body.folder_list
                 } catch (error) {
                     console.log(error)
+                }
+            },
+
+            async restore() {
+                let folderIds = this.selected.map((currentElArray) => {
+                    return currentElArray.id
+                })
+                try {
+                    let res = await Axios.post('http://localhost:3000/folders/restore', {
+                        folderIds: folderIds
+                    })
+                    this.$store.commit('setNoti', {
+                        typeNoti: 1,
+                        textNoti: res.data.message + res.data.count + ' mục !',
+                        showNoti: true
+                    })
+                } catch (e) {
+                    this.$store.commit('setNoti', {
+                        typeNoti: 0,
+                        textNoti: 'Khôi phục thất bại !',
+                        showNoti: true
+                    })
+                } finally {
+                    this.getFolderList()
+                    this.selected = []
                 }
             },
 

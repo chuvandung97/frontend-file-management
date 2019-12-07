@@ -84,9 +84,14 @@
                 <v-list-item @click="dialog = true, overlay = true">
                     <v-list-item-title><v-icon>mdi-pencil</v-icon> Đổi tên</v-list-item-title>
                 </v-list-item>
-                
                 <v-list-item>
                     <v-list-item-title><v-icon>mdi-folder-move</v-icon> Di chuyển</v-list-item-title>
+                </v-list-item>
+                <v-list-item>
+                    <v-list-item-title><v-icon>mdi-share</v-icon> Chia sẻ</v-list-item-title>
+                </v-list-item>
+                <v-list-item>
+                    <v-list-item-title><v-icon>mdi-download</v-icon> Tải xuống</v-list-item-title>
                 </v-list-item>
                 <v-list-item @click="removeFolderToTrash()">
                     <v-list-item-title><v-icon>mdi-delete</v-icon> Xóa</v-list-item-title>
