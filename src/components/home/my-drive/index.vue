@@ -23,15 +23,22 @@
             :items="desserts"
             hide-default-footer
             :items-per-page="999"
-            sort-by="name"
             v-if="viewFile"
             :class="'view_list'"
         >   
             <template v-slot:body=" { items } ">
                 <tbody>
                     <tr v-for="item in items" :key="item.name" @dblclick="showDetailFolder(item)" @contextmenu="showSelectMenu($event, item)">
-                        <td><v-icon class="mr-2">mdi-folder</v-icon> {{ item.name }}</td>
-                        <td>{{ item.User.name }}</td>
+                        <td>
+                            <v-icon class="mr-2" v-if="item.type == 'image/png'" color="primary">mdi-file-image</v-icon>
+                            <v-icon class="mr-2" v-else-if="item.type == 'application/docx'" color="blue">mdi-file-word</v-icon> 
+                            <v-icon class="mr-2" v-else-if="item.type == 'application/pdf'" color="red">mdi-file-pdf</v-icon>
+                            <v-icon class="mr-2" v-else-if="item.type == 'application/xlsx'" color="green">mdi-file-excel</v-icon>
+                            <v-icon class="mr-2" v-else-if="item.type == 'application/pptx'" color="orange">mdi-file-powerpoint</v-icon>
+                            <v-icon class="mr-2" v-else>mdi-folder</v-icon> 
+                            {{ item.name }}
+                        </td>
+                        <td>{{ item.User ? item.User.name : '' }}</td>
                         <td>{{ item.updatedAt | formatDate }}</td>
                         <td></td>
                     </tr>
@@ -256,13 +263,14 @@ export default {
     }),
 
     mounted() {
-        this.getFolderList()
+        this.getFolderFileList()
+        //this.getFileList()
     },
 
     methods: {
         showDetailFolder(item) {
             this.$router.push('/user/folder/' + item.id)
-            this.getFolderList()
+            this.getFolderFileList()
         },
 
         showSelectMenu(e, item) {
@@ -278,15 +286,41 @@ export default {
             });
         },
 
-        async getFolderList() {
+        async getFolderFileList() {
             try {
-                let res = await Axios.get('http://localhost:3000/folders/lists', {
+                let [res, res1] = await Axios.all([
+                    Axios.get('http://localhost:3000/folders/lists', {
+                        params: {
+                            storage_id: localStorage.getItem('bucket'),
+                            active: 1
+                        }
+                    }),
+                    Axios.get('http://localhost:3000/files/lists', {
+                        params: {
+                            storage_id: localStorage.getItem('bucket'),
+                            active: 1
+                        }
+                    })
+                ])
+                this.desserts = res.data.body.folder_list
+                let arr = res1.data.body.file_list
+                arr.forEach(element => {
+                    this.desserts.push(element)
+                })
+            } catch (error) {
+                console.log(error)
+            }
+        },
+
+        async getFileList() {
+            try {
+                let res = await Axios.get('http://localhost:3000/files/lists', {
                     params: {
                         storage_id: localStorage.getItem('bucket'),
                         active: 1
                     }
                 })
-                this.desserts = res.data.body.folder_list
+                this.desserts = (res.data.body.file_list)
             } catch (error) {
                 console.log(error)
             }
@@ -319,7 +353,7 @@ export default {
                 } finally {
                     this.dialog = false
                     this.overlay = false
-                    this.getFolderList()
+                    this.getFolderFileList()
                 }
             }
         },
@@ -339,7 +373,7 @@ export default {
                     showNoti: true
                 })
             } finally {
-                this.getFolderList()
+                this.getFolderFileList()
             }
         },
 

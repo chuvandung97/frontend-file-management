@@ -45,7 +45,7 @@
               <v-list-item class="file-upload" @click="showUploadFile()">
                 <v-list-item-icon><v-icon>cloud_upload</v-icon></v-list-item-icon>
                 <v-list-item-title class="body-2 font-weight-medium ml-n3">Tải tệp lên</v-list-item-title>
-                <input style="display: none" type="file" id="file" ref="file" accept=".doc,.docx, application/msword, application/pdf,image/*, video/*" v-on:change="handleFileUpload()"/>
+                <input style="display: none" type="file" id="file" ref="file" accept=".doc,.docx,.xlsx,.xsl,.pptx,application/*,image/*, video/*, audio/*, font/*, text/*" v-on:change="handleFileUpload()"/>
               </v-list-item>
             </v-list>
           </v-menu>
@@ -292,16 +292,18 @@ import Axios from 'axios'
       },
 
       async handleFileUpload(){
+        console.log(12)
         this.file = this.$refs.file.files[0];
         let formData = new FormData();
         formData.append('file', this.file);
         try {
-          let res = await Axios.post('http://localhost:3000/upload', formData, {
+          let res = await Axios.post('http://localhost:3000/files/upload', formData, {
             headers: {
                 'Content-Type': 'multipart/form-data'
             }, 
             params: {
-              bucket_name: localStorage.getItem('bucket')
+              bucket_name: localStorage.getItem('bucket'),
+              created_by: localStorage.getItem('userid')
             }
           })
           this.$store.commit('setNoti', {
@@ -320,7 +322,7 @@ import Axios from 'axios'
 
       async downloadFile() {
         try {
-          let res = await Axios.get('http://localhost:3000/download', {
+          let res = await Axios.get('http://localhost:3000/files/download', {
             params: {
                 bucket_name: localStorage.getItem('bucket'),
                 name: 'Hệ thống quản lý tài liệu - Google Chrome 2019-10-28 21-51-05.mp4'
