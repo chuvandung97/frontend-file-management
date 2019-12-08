@@ -31,16 +31,17 @@
                     <tr v-for="item in items" :key="item.name" @dblclick="showDetailFolder(item)" @contextmenu="showSelectMenu($event, item)">
                         <td>
                             <v-icon class="mr-2" v-if="item.type == 'image/png'" color="primary">mdi-file-image</v-icon>
-                            <v-icon class="mr-2" v-else-if="item.type == 'application/docx'" color="blue">mdi-file-word</v-icon> 
-                            <v-icon class="mr-2" v-else-if="item.type == 'application/pdf'" color="red">mdi-file-pdf</v-icon>
-                            <v-icon class="mr-2" v-else-if="item.type == 'application/xlsx'" color="green">mdi-file-excel</v-icon>
-                            <v-icon class="mr-2" v-else-if="item.type == 'application/pptx'" color="orange">mdi-file-powerpoint</v-icon>
+                            <v-icon class="mr-2" v-else-if="item.type == 'application/docx'" color="blue">mdi-file-word-box</v-icon> 
+                            <v-icon class="mr-2" v-else-if="item.type == 'application/pdf'" color="red">mdi-file-pdf-box</v-icon>
+                            <v-icon class="mr-2" v-else-if="item.type == 'application/xlsx'" color="green">mdi-file-excel-box</v-icon>
+                            <v-icon class="mr-2" v-else-if="item.type == 'application/pptx'" color="orange">mdi-file-powerpoint-box</v-icon>
+                            <v-icon class="mr-2" v-else-if="item.type == 'video/mp4'" color="red">mdi-file-video</v-icon>
                             <v-icon class="mr-2" v-else>mdi-folder</v-icon> 
                             {{ item.name }}
                         </td>
                         <td>{{ item.User ? item.User.name : '' }}</td>
                         <td>{{ item.updatedAt | formatDate }}</td>
-                        <td></td>
+                        <td>{{ item.size }}</td>
                     </tr>
                 </tbody>
             </template>
@@ -58,9 +59,9 @@
             <v-card-title>Thư mục</v-card-title>
             <v-card-text>
                 <v-row>
-                    <v-col v-for="dessert in desserts" cols="6" sm="4" md="3" xl="1" :key="dessert.name">
-                        <v-card outlined class="pa-3" :to="'/user/drive'"  @dblclick="showDetailFolder(dessert)" @contextmenu="showSelectMenu($event, dessert)">
-                            <v-icon class="mr-2">mdi-folder</v-icon> {{ dessert.name }}    
+                    <v-col v-for="folder in folders" cols="6" sm="4" md="3" xl="1" :key="folder.name">
+                        <v-card outlined class="pa-3" :to="'/user/drive'"  @dblclick="showDetailFolder(folder)" @contextmenu="showSelectMenu($event, folder)">
+                            <v-icon class="mr-2">mdi-folder</v-icon> {{ folder.name }}    
                         </v-card>
                     </v-col>
                 </v-row>
@@ -68,9 +69,9 @@
             <v-card-title>File</v-card-title>
             <v-card-text>
                 <v-row>
-                    <v-col v-for="dessert in desserts" cols="3" :key="dessert.name">
+                    <v-col v-for="file in files" cols="6" sm="4" md="3" xl="1" :key="file.name" @contextmenu="showSelectMenu($event, file)">
                         <v-card outlined class="pa-3" :to="'/user/drive'">
-                            {{ dessert.name }}
+                            {{ file.name }}
                         </v-card>
                     </v-col>
                 </v-row>
@@ -260,6 +261,8 @@ export default {
             { text: 'Kích cỡ', value: 'size' },
         ],
         desserts: [],
+        folders: [],
+        files: []
     }),
 
     mounted() {
@@ -269,8 +272,10 @@ export default {
 
     methods: {
         showDetailFolder(item) {
-            this.$router.push('/user/folder/' + item.id)
-            this.getFolderFileList()
+            if(!item.type) {
+                this.$router.push('/user/folder/' + item.id)
+                this.getFolderFileList()
+            }
         },
 
         showSelectMenu(e, item) {
@@ -302,6 +307,8 @@ export default {
                         }
                     })
                 ])
+                this.folders = res.data.body.folder_list
+                this.files = res1.data.body.file_list
                 this.desserts = res.data.body.folder_list
                 let arr = res1.data.body.file_list
                 arr.forEach(element => {
