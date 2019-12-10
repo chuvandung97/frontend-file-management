@@ -1,23 +1,5 @@
 <template>
     <v-card flat>
-        <v-row>
-            <v-col cols="10" md="11" class="pa-0">
-                <v-breadcrumbs :items="items" large>
-                    <template v-slot:divider>
-                        <v-icon>mdi-chevron-right</v-icon>
-                    </template>
-                </v-breadcrumbs>
-            </v-col>
-            <v-col cols="2" md="1">
-                <v-btn 
-                    depressed 
-                    text 
-                    icon
-                    @click="viewFile = !viewFile"
-                ><v-icon>view_list</v-icon></v-btn>
-            </v-col>
-        </v-row>
-        <v-divider></v-divider>
         <v-data-table
             :headers="headers"
             :items="desserts"
@@ -94,6 +76,7 @@
 import moment from 'moment'
 import Vue from 'vue'
 import Axios from 'axios'
+import { mapState } from 'vuex'
 
 Vue.filter('formatDate', function(value) {
     if (value) {
@@ -111,7 +94,6 @@ export default {
         show: false,
         x: 0,
         y: 0,
-        viewFile: true,
         items: [
             {
                 text: 'Tất cả file',
@@ -145,6 +127,12 @@ export default {
 
     mounted() {
         this.getFolderList()
+    },
+
+    computed: {
+        ...mapState ([
+            'viewFile',
+        ])
     },
 
     methods: {

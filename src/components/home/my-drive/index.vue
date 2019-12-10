@@ -1,23 +1,5 @@
 <template>
     <v-card flat>
-        <v-row>
-            <v-col cols="10" md="11" class="pa-0">
-                <v-breadcrumbs :items="items" large>
-                    <template v-slot:divider>
-                        <v-icon>mdi-chevron-right</v-icon>
-                    </template>
-                </v-breadcrumbs>
-            </v-col>
-            <v-col cols="2" md="1">
-                <v-btn 
-                    depressed 
-                    text 
-                    icon
-                    @click="viewFile = !viewFile"
-                ><v-icon>view_list</v-icon></v-btn>
-            </v-col>
-        </v-row>
-        <v-divider></v-divider>
         <v-data-table
             :headers="headers"
             :items="desserts"
@@ -29,7 +11,7 @@
             <template v-slot:body=" { items } ">
                 <tbody>
                     <tr v-for="item in items" :key="item.name" @dblclick="showDetailFolder(item)" @contextmenu="showSelectMenu($event, item)">
-                        <td>
+                        <td :title="item.name" style="width: 40%">
                             <v-icon class="mr-2" v-if="item.type == 'image/png'" color="primary">mdi-file-image</v-icon>
                             <v-icon class="mr-2" v-else-if="item.type == 'application/docx'" color="blue">mdi-file-word-box</v-icon> 
                             <v-icon class="mr-2" v-else-if="item.type == 'application/pdf'" color="red">mdi-file-pdf-box</v-icon>
@@ -37,7 +19,7 @@
                             <v-icon class="mr-2" v-else-if="item.type == 'application/pptx'" color="orange">mdi-file-powerpoint-box</v-icon>
                             <v-icon class="mr-2" v-else-if="item.type == 'video/mp4'" color="red">mdi-file-video</v-icon>
                             <v-icon class="mr-2" v-else>mdi-folder</v-icon> 
-                            {{ item.name }}
+                            {{ item.name.length >=40 ? item.name.substring(0,40) + '...' : item.name }}
                         </td>
                         <td>{{ item.User ? item.User.name : '' }}</td>
                         <td>{{ item.updatedAt | formatDate }}</td>
@@ -224,6 +206,7 @@
 import Axios from 'axios';
 import moment from 'moment'
 import Vue from 'vue'
+import { mapState } from 'vuex'
 
 Vue.filter('formatDate', function(value) {
     if (value) {
@@ -241,15 +224,6 @@ export default {
         show: false,
         x: 0,
         y: 0,
-        viewFile: true,
-        items: [
-            {
-                text: 'Tất cả file',
-                disabled: false,
-                to: '/user/drive'
-            }
-        ],
-
         headers: [
             {
                 text: 'Tên',
@@ -267,7 +241,16 @@ export default {
 
     mounted() {
         this.getFolderFileList()
+        this.$store.commit('setSelectedTrash', {
+            selectedCount: null
+        })
         //this.getFileList()
+    },
+
+    computed: {
+        ...mapState ([
+            'viewFile',
+        ])
     },
 
     methods: {
@@ -293,7 +276,7 @@ export default {
 
         async getFolderFileList() {
             try {
-                let [res, res1] = await Axios.all([
+                let res = await Axios.all([
                     Axios.get('http://localhost:3000/folders/lists', {
                         params: {
                             storage_id: localStorage.getItem('bucket'),
@@ -307,10 +290,8 @@ export default {
                         }
                     })
                 ])
-                this.folders = res.data.body.folder_list
-                this.files = res1.data.body.file_list
-                this.desserts = res.data.body.folder_list
-                let arr = res1.data.body.file_list
+                this.desserts = res[0].data.body.folder_list
+                let arr = res[1].data.body.file_list
                 arr.forEach(element => {
                     this.desserts.push(element)
                 })

@@ -8,7 +8,11 @@ function defaultState() {
   return {
     typeNoti: null,
     textNoti: null, 
-    showNoti: false
+    showNoti: false,
+    viewFile: true,
+    selectedCount: null,
+    dialogDeleteTrash: false,
+    restoreTrash: false
   }
 }
 export default new Vuex.Store({
@@ -19,7 +23,18 @@ export default new Vuex.Store({
       state.textNoti = payload.textNoti
       state.showNoti = payload.showNoti
     },
-
+    setViewFile(state, payload) {
+      state.viewFile = payload.viewFile
+    },
+    setSelectedTrash(state, payload) {
+      state.selectedCount = payload.selectedCount
+    },
+    setDialogDeleteTrash(state, payload) {
+      state.dialogDeleteTrash = payload
+    },
+    setRestoreTrash(state, payload) {
+      state.restoreTrash = payload
+    },
     updateShowNoti(state, payload) {
       state.showNoti = payload
     }

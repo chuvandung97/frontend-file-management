@@ -1,67 +1,5 @@
 <template>
     <v-card flat>
-        <v-row>
-            <v-col cols="5" md="6" class="pa-0">
-                <v-breadcrumbs :items="items" large>
-                    <template v-slot:divider>
-                        <v-icon>mdi-chevron-right</v-icon>
-                    </template>
-                </v-breadcrumbs>
-            </v-col>
-            <v-col cols="5" md="5">
-                <v-tooltip bottom v-if="selected.length > 0">
-                    <template v-slot:activator="{ on }">
-                        <v-btn 
-                            depressed 
-                            text 
-                            icon
-                            class="float-right mr-n4"
-                            v-on="on"
-                            @click="dialog1 = true"
-                            
-                        >
-                            <v-badge
-                                color="primary"
-                                overlap
-                                class="align-self-center"
-                            >
-                                <template v-slot:badge>
-                                <span>{{ selected.length }}</span>
-                                </template>
-                                <v-icon>
-                                delete
-                                </v-icon>
-                            </v-badge>
-                        </v-btn>
-                    </template>
-                    <span>Xóa</span>
-                </v-tooltip>
-                <v-tooltip bottom v-if="selected.length > 0">
-                    <template v-slot:activator="{ on }">
-                        <v-btn 
-                            depressed 
-                            text 
-                            icon
-                            class="float-right"
-                            v-on="on"
-                            @click="restore()"                            
-                        >
-                            <v-icon>mdi-backup-restore</v-icon>
-                        </v-btn>
-                    </template>
-                    <span>Khôi phục</span>
-                </v-tooltip>
-            </v-col>
-            <v-col cols="2" md="1">
-                <v-btn 
-                    depressed 
-                    text 
-                    icon
-                    @click="viewFile = !viewFile"
-                ><v-icon>view_list</v-icon></v-btn>
-            </v-col>
-        </v-row>
-        <v-divider></v-divider>
         <v-data-table
             v-model="selected"
             :headers="headers"
@@ -106,7 +44,7 @@
                 </v-row>
             </v-card-text>
         </template>
-        <v-dialog v-model="dialog1" width="400" persistent>
+        <v-dialog v-model="dialogDeleteTrash" width="400" persistent>
             <v-card>
                 <v-card-title
                     class="headline primary white--text"
@@ -120,7 +58,7 @@
                 </v-card-text>
                 <v-card-actions class="mt-n3">
                     <v-btn
-                        @click="dialog1 = false"
+                        @click="dialogDeleteTrash = false"
                         class="text-none"
                     >Hủy</v-btn>
                     <v-spacer></v-spacer>
@@ -139,6 +77,7 @@
     import Axios from 'axios'
     import moment from 'moment'
     import Vue from 'vue'
+    import { mapState } from 'vuex'
 
     Vue.filter('formatDate', function(value) {
         if (value) {
@@ -149,10 +88,8 @@
         data: () => ({
             showSelectTable: false,
             show: false,
-            dialog1: false,
             x: 0,
             y: 0,
-            viewFile: true,
             selected: [],
             folders: [],
             items: [
@@ -178,6 +115,41 @@
 
         mounted() {
             this.getFolderList()
+        },
+
+        computed: {
+            dialogDeleteTrash: {
+                get() {
+                    return this.$store.state.dialogDeleteTrash
+                },
+                set() {
+                    this.$store.commit('setDialogDeleteTrash', false)
+                }
+            },
+
+            restoreTrash: {
+                get() {
+                    return this.$store.state.restoreTrash
+                },
+                set() {
+                    this.$store.commit('setRestoreTrash', false)
+                }
+            },
+
+            ...mapState ([
+                'viewFile'
+            ]),
+        },
+
+        watch: {
+            selected: function() {
+                this.$store.commit('setSelectedTrash', {
+                    selectedCount: this.selected.length
+                })
+            },
+            restoreTrash: function() {
+                this.restore()
+            }
         },
 
         methods: {
@@ -219,7 +191,7 @@
                     })
                     this.$store.commit('setNoti', {
                         typeNoti: 1,
-                        textNoti: res.data.message + res.data.count + ' mục !',
+                        textNoti: res.data.message,
                         showNoti: true
                     })
                 } catch (e) {
@@ -229,6 +201,7 @@
                         showNoti: true
                     })
                 } finally {
+                    this.$store.commit('setRestoreTrash', false)
                     this.getFolderList()
                     this.selected = []
                 }
@@ -256,7 +229,7 @@
                         showNoti: true
                     })
                 } finally {
-                    this.dialog1 = false
+                    this.$store.commit('setDialogDeleteTrash', false)
                     this.getFolderList()
                     this.selected = []
                 }
