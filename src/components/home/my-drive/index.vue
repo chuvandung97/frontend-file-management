@@ -249,8 +249,15 @@ export default {
 
     computed: {
         ...mapState ([
-            'viewFile',
+            'viewFile', 'reloadDrive'
         ])
+    },
+
+    watch: {
+        reloadDrive: function() {
+            this.getFolderFileList()
+            this.$store.commit('setReloadIndexDrive', false)
+        }
     },
 
     methods: {

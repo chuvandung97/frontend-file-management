@@ -292,7 +292,6 @@ import Axios from 'axios'
       },
 
       async handleFileUpload(){
-        console.log(12)
         this.file = this.$refs.file.files[0];
         let formData = new FormData();
         formData.append('file', this.file);
@@ -317,6 +316,8 @@ import Axios from 'axios'
               textNoti: 'Tải file thất bại !',
               showNoti: true
           })
+        } finally {
+          this.$store.commit('setReloadIndexDrive', true)
         }
       },
 
@@ -369,6 +370,7 @@ import Axios from 'axios'
               showNoti: true
           })
         } finally {
+          this.$store.commit('setReloadIndexDrive', true)
           this.dialog = false
           this.name_folder = "Thư mục mới"
         }

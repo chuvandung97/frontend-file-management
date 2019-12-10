@@ -12,7 +12,8 @@ function defaultState() {
     viewFile: true,
     selectedCount: null,
     dialogDeleteTrash: false,
-    restoreTrash: false
+    restoreTrash: false,
+    reloadDrive: false
   }
 }
 export default new Vuex.Store({
@@ -34,6 +35,9 @@ export default new Vuex.Store({
     },
     setRestoreTrash(state, payload) {
       state.restoreTrash = payload
+    },
+    setReloadIndexDrive(state, payload) {
+      state.reloadDrive = payload
     },
     updateShowNoti(state, payload) {
       state.showNoti = payload
