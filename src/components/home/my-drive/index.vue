@@ -83,7 +83,7 @@
                 <v-list-item>
                     <v-list-item-title><v-icon>mdi-download</v-icon> Tải xuống</v-list-item-title>
                 </v-list-item>
-                <v-list-item @click="removeFolderToTrash()">
+                <v-list-item @click="removeToTrash()">
                     <v-list-item-title><v-icon>mdi-delete</v-icon> Xóa</v-list-item-title>
                 </v-list-item>
             </v-list>
@@ -174,7 +174,7 @@
 
                 <v-card-text>
                     <v-text-field
-                        v-model="new_name_folder"
+                        v-model="new_name"
                         label="Tên"
                         required
                         class="mt-3"
@@ -194,7 +194,7 @@
                         color="primary"
                         @click="updateName()"
                         class="text-none"
-                        :disabled="new_name_folder == '' ? true : false"
+                        :disabled="new_name == '' ? true : false"
                     >Lưu</v-btn>
                 </v-card-actions>
             </v-card>
@@ -216,9 +216,7 @@ Vue.filter('formatDate', function(value) {
 export default {
     data: () => ({
         overlay: false,
-        old_name_folder: null,
-        new_name_folder: null,
-        folder_id: null,
+        new_name: null,
         dialog: false,
         dialog2: false,
         show: false,
@@ -235,6 +233,7 @@ export default {
             { text: 'Kích cỡ', value: 'size' },
         ],
         desserts: [],
+        detailItem: {}
     }),
 
     mounted() {
@@ -281,9 +280,8 @@ export default {
             this.show = false;
             this.x = e.clientX;
             this.y = e.clientY;
-            this.new_name_folder = item.name
-            this.old_name_folder = this.new_name_folder
-            this.folder_id = item.id
+            this.detailItem = Object.assign({}, item)
+            this.new_name = item.name
             this.$nextTick(() => {
                 this.show = true;
             });
@@ -330,17 +328,22 @@ export default {
         },
 
         async updateName() {
-            if(this.new_name_folder == this.old_name_folder) {
+            if(this.new_name == this.detailItem.name) {
                 this.$store.commit('setNoti', {
                     typeNoti: 1,
-                    textNoti: 'Đổi tên thư mục thành công',
+                    textNoti: 'Đổi tên thành công',
                     showNoti: true
                 })
                 this.dialog = false
             } else { 
                 try {
-                    let res = await Axios.post('http://localhost:3000/folders/update/' + this.folder_id, {
-                        name: this.new_name_folder,
+                    if(this.detailItem.type === undefined) {
+                        var url = 'http://localhost:3000/folders/update/'
+                    } else {
+                        var url = 'http://localhost:3000/files/update/'
+                    }
+                    let res = await Axios.post(url + this.detailItem.id, {
+                        name: this.new_name,
                     })
                     this.$store.commit('setNoti', {
                         typeNoti: 1,
@@ -348,9 +351,10 @@ export default {
                         showNoti: true
                     })
                 } catch (error) {
+                    console.log(error)
                     this.$store.commit('setNoti', {
                         typeNoti: 0,
-                        textNoti: 'Đổi tên thư mục thất bại',
+                        textNoti: 'Đổi tên thất bại',
                         showNoti: true
                     })
                 } finally {
@@ -361,18 +365,23 @@ export default {
             }
         },
 
-        async removeFolderToTrash() {
+        async removeToTrash() {
             try {
-                await Axios.post('http://localhost:3000/folders/remove/trash/' + this.folder_id)
+                if(this.detailItem.type === undefined) {
+                    var url = 'http://localhost:3000/folders/remove/trash/'
+                } else {
+                    var url = 'http://localhost:3000/files/remove/trash/'
+                }
+                await Axios.post(url + this.detailItem.id)
                 this.$store.commit('setNoti', {
                     typeNoti: 1,
-                    textNoti: 'Thư mục đã được chuyển đến thùng rác',
+                    textNoti: 'Chuyển đến thùng rác thành công',
                     showNoti: true
                 })
             } catch (error) {
                 this.$store.commit('setNoti', {
                     typeNoti: 0,
-                    textNoti: 'Xóa thư mục thất bại',
+                    textNoti: 'Xóa thất bại',
                     showNoti: true
                 })
             } finally {

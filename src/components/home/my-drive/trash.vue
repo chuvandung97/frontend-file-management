@@ -114,7 +114,7 @@
         }),
 
         mounted() {
-            this.getFolderList()
+            this.getFolderFileList()
         },
 
         computed: {
@@ -167,31 +167,57 @@
                 console.log(123)
             },
 
-            async getFolderList() {
+            async getFolderFileList() {
                 try {
-                    let res = await Axios.get('http://localhost:3000/folders/lists', {
-                        params: {
-                            storage_id: localStorage.getItem('bucket'),
-                            active: 0
-                        }
+                    let res = await Axios.all([
+                        Axios.get('http://localhost:3000/folders/lists', {
+                            params: {
+                                storage_id: localStorage.getItem('bucket'),
+                                active: 0
+                            }
+                        }),
+                        Axios.get('http://localhost:3000/files/lists', {
+                            params: {
+                                storage_id: localStorage.getItem('bucket'),
+                                active: 0
+                            }
+                        })
+                    ])
+                    this.desserts = res[0].data.body.folder_list
+                    let arr = res[1].data.body.file_list
+                    arr.forEach(element => {
+                        this.desserts.push(element)
                     })
-                    this.desserts = res.data.body.folder_list
                 } catch (error) {
                     console.log(error)
                 }
             },
 
             async restore() {
-                let folderIds = this.selected.map((currentElArray) => {
-                    return currentElArray.id
-                })
+                let folderIds = this.selected.filter(el => !el.type).map(currentElArray => currentElArray.id)
+                let fileIds = this.selected.filter(el => el.type).map(currentElArray => currentElArray.id)
                 try {
-                    let res = await Axios.post('http://localhost:3000/folders/restore', {
-                        folderIds: folderIds
-                    })
+                    if(folderIds.length == 0) {
+                        await Axios.post('http://localhost:3000/files/restore', {
+                            fileIds: fileIds
+                        })
+                    } else if(fileIds.length == 0) {
+                        await Axios.post('http://localhost:3000/folders/restore', {
+                            folderIds: folderIds
+                        })
+                    } else {
+                        await Axios.all([
+                            Axios.post('http://localhost:3000/folders/restore', {
+                                folderIds: folderIds
+                            }),
+                            Axios.post('http://localhost:3000/files/restore', {
+                                fileIds: fileIds
+                            })
+                        ])
+                    }
                     this.$store.commit('setNoti', {
                         typeNoti: 1,
-                        textNoti: res.data.message,
+                        textNoti: 'Khôi phục thành công !',
                         showNoti: true
                     })
                 } catch (e) {
@@ -202,24 +228,44 @@
                     })
                 } finally {
                     this.$store.commit('setRestoreTrash', false)
-                    this.getFolderList()
+                    this.getFolderFileList()
                     this.selected = []
                 }
             },
 
             async deletePermanently() {
-                let folderId = this.selected.map((currentElArray) => {
-                    return currentElArray.id
-                })
+                let folderIds = this.selected.filter(el => !el.type).map(currentElArray => currentElArray.id)
+                let fileIds = this.selected.filter(el => el.type).map(currentElArray => currentElArray.id)
                 try {
-                    let res = await Axios.delete('http://localhost:3000/folders/delete', {
-                        params: {
-                            folderId: folderId
-                        }
-                    })
+                    if(folderIds.length == 0) {
+                        await Axios.delete('http://localhost:3000/files/delete', {
+                            params: {
+                                fileIds: fileIds
+                            }
+                        })
+                    } else if(fileIds.length == 0) {
+                        await Axios.delete('http://localhost:3000/folders/delete', {
+                            params: {
+                                folderIds: folderIds
+                            }
+                        })
+                    } else {
+                        await Axios.all([
+                            Axios.delete('http://localhost:3000/folders/delete', {
+                                params: {
+                                    folderIds: folderIds
+                                }
+                            }),
+                            Axios.delete('http://localhost:3000/files/delete', {
+                                params: {
+                                    fileIds: fileIds
+                                }
+                            })
+                        ])
+                    }
                     this.$store.commit('setNoti', {
                         typeNoti: 1,
-                        textNoti: res.data.message + res.data.count + ' mục !',
+                        textNoti: 'Xóa thành công !',
                         showNoti: true
                     })
                 } catch (e) {
@@ -230,7 +276,7 @@
                     })
                 } finally {
                     this.$store.commit('setDialogDeleteTrash', false)
-                    this.getFolderList()
+                    this.getFolderFileList()
                     this.selected = []
                 }
             }
