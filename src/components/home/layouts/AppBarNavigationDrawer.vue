@@ -302,7 +302,8 @@ import Axios from 'axios'
             }, 
             params: {
               bucket_name: localStorage.getItem('bucket'),
-              created_by: localStorage.getItem('userid')
+              created_by: localStorage.getItem('userid'),
+              folder_id: this.$route.params ? this.$route.params.folderId : null
             }
           })
           this.$store.commit('setNoti', {
@@ -311,6 +312,7 @@ import Axios from 'axios'
               showNoti: true
           })
         } catch (error) {
+          console.log(error)
           this.$store.commit('setNoti', {
               typeNoti: 0,
               textNoti: 'Tải file thất bại !',

@@ -38,26 +38,30 @@
             </template> -->
         </v-data-table>
         <template v-if="!viewFile">
-            <v-card-title>Thư mục</v-card-title>
-            <v-card-text>
-                <v-row>
-                    <v-col v-for="folder in folderLists" cols="6" sm="4" md="3" xl="1" :key="folder.name">
-                        <v-card outlined class="pa-3" :to="'/user/drive'"  @dblclick="showDetailFolder(folder)" @contextmenu="showSelectMenu($event, folder)">
-                            <v-icon class="mr-2">mdi-folder</v-icon> {{ folder.name }}    
-                        </v-card>
-                    </v-col>
-                </v-row>
-            </v-card-text>
-            <v-card-title>File</v-card-title>
-            <v-card-text>
-                <v-row>
-                    <v-col v-for="file in fileLists" cols="6" sm="4" md="3" xl="1" :key="file.name" @contextmenu="showSelectMenu($event, file)">
-                        <v-card outlined class="pa-3" :to="'/user/drive'">
-                            {{ file.name }}
-                        </v-card>
-                    </v-col>
-                </v-row>
-            </v-card-text>
+            <v-card flat v-if="folderLists.length > 0">
+                <v-card-title>Thư mục</v-card-title>
+                <v-card-text>
+                    <v-row>
+                        <v-col v-for="folder in folderLists" cols="6" sm="4" md="3" xl="1" :key="folder.name">
+                            <v-card outlined class="pa-3" :to="'/user/drive'"  @dblclick="showDetailFolder(folder)" @contextmenu="showSelectMenu($event, folder)">
+                                <v-icon class="mr-2">mdi-folder</v-icon> {{ folder.name }}    
+                            </v-card>
+                        </v-col>
+                    </v-row>
+                </v-card-text>
+            </v-card>
+            <v-card flat v-if="fileLists.length > 0">
+                <v-card-title>File</v-card-title>
+                <v-card-text>
+                    <v-row>
+                        <v-col v-for="file in fileLists" cols="6" sm="4" md="3" xl="1" :key="file.name" @contextmenu="showSelectMenu($event, file)">
+                            <v-card outlined class="pa-3" :to="'/user/drive'">
+                                {{ file.name }}
+                            </v-card>
+                        </v-col>
+                    </v-row>
+                </v-card-text>
+            </v-card>
         </template>
         <v-menu
             v-model="show"
@@ -304,7 +308,7 @@ export default {
                     })
                 ])
                 this.desserts = res[0].data.body.folder_list
-                let arr = res[1].data.body.file_list
+                let arr = res[1].data.body.file_list.filter(el => el.folders == 0)
                 arr.forEach(element => {
                     this.desserts.push(element)
                 })
@@ -337,10 +341,11 @@ export default {
                 this.dialog = false
             } else { 
                 try {
+                    var url = ''
                     if(this.detailItem.type === undefined) {
-                        var url = 'http://localhost:3000/folders/update/'
+                        url = 'http://localhost:3000/folders/update/'
                     } else {
-                        var url = 'http://localhost:3000/files/update/'
+                        url = 'http://localhost:3000/files/update/'
                     }
                     let res = await Axios.post(url + this.detailItem.id, {
                         name: this.new_name,
@@ -367,10 +372,11 @@ export default {
 
         async removeToTrash() {
             try {
+                var url = ''
                 if(this.detailItem.type === undefined) {
-                    var url = 'http://localhost:3000/folders/remove/trash/'
+                    url = 'http://localhost:3000/folders/remove/trash/'
                 } else {
-                    var url = 'http://localhost:3000/files/remove/trash/'
+                    url = 'http://localhost:3000/files/remove/trash/'
                 }
                 await Axios.post(url + this.detailItem.id)
                 this.$store.commit('setNoti', {

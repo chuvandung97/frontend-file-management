@@ -13,7 +13,14 @@
             show-select
         >
             <template v-slot:item.name="{ item }">
-                <v-icon class="mr-2">mdi-folder</v-icon> {{ item.name }}
+                <v-icon class="mr-2" v-if="item.type == 'image/png'" color="primary">mdi-file-image</v-icon>
+                <v-icon class="mr-2" v-else-if="item.type == 'application/docx'" color="blue">mdi-file-word-box</v-icon> 
+                <v-icon class="mr-2" v-else-if="item.type == 'application/pdf'" color="red">mdi-file-pdf-box</v-icon>
+                <v-icon class="mr-2" v-else-if="item.type == 'application/xlsx'" color="green">mdi-file-excel-box</v-icon>
+                <v-icon class="mr-2" v-else-if="item.type == 'application/pptx'" color="orange">mdi-file-powerpoint-box</v-icon>
+                <v-icon class="mr-2" v-else-if="item.type == 'video/mp4'" color="red">mdi-file-video</v-icon>
+                <v-icon class="mr-2" v-else>mdi-folder</v-icon>
+                {{ item.name }}
             </template> 
             <template v-slot:item.created_by="{ item }">
                 {{ item.User.name }}
@@ -27,7 +34,7 @@
             <v-card-text>
                 <v-row>
                     <v-col v-for="folder in folders" cols="3" :key="folder.name">
-                        <v-card outlined class="pa-3" :to="'/user/drive'"  @contextmenu="abc">
+                        <v-card outlined class="pa-3" :to="'/user/drive'">
                             <v-icon class="mr-2">mdi-folder</v-icon> {{ folder.name }}    
                         </v-card>
                     </v-col>
@@ -153,24 +160,10 @@
         },
 
         methods: {
-            abc(e) {
-                e.preventDefault();
-                this.show = false;
-                this.x = e.clientX;
-                this.y = e.clientY;
-                this.$nextTick(() => {
-                    this.show = true;
-                });
-            },
-
-            aa() {
-                console.log(123)
-            },
-
             async getFolderFileList() {
                 try {
                     let res = await Axios.all([
-                        Axios.get('http://localhost:3000/folders/lists', {
+                        Axios.get('http://localhost:3000/folders/lists/trash', {
                             params: {
                                 storage_id: localStorage.getItem('bucket'),
                                 active: 0

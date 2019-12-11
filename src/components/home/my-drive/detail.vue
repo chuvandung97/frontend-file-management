@@ -12,11 +12,20 @@
         >
             <template v-slot:body=" { items } ">
                 <tbody>
-                    <tr v-for="item in items" :key="item.name" @dblclick="showDetailFolder(item)">
-                        <td><v-icon class="mr-2">mdi-folder</v-icon> {{ item.name }}</td>
-                        <td>{{ item.User.name }}</td>
+                    <tr v-for="item in items" :key="item.name" @dblclick="showDetailFolder(item)" @contextmenu="showSelectMenu($event, item)">
+                        <td :title="item.name" style="width: 40%">
+                            <v-icon class="mr-2" v-if="item.type == 'image/png'" color="primary">mdi-file-image</v-icon>
+                            <v-icon class="mr-2" v-else-if="item.type == 'application/docx'" color="blue">mdi-file-word-box</v-icon> 
+                            <v-icon class="mr-2" v-else-if="item.type == 'application/pdf'" color="red">mdi-file-pdf-box</v-icon>
+                            <v-icon class="mr-2" v-else-if="item.type == 'application/xlsx'" color="green">mdi-file-excel-box</v-icon>
+                            <v-icon class="mr-2" v-else-if="item.type == 'application/pptx'" color="orange">mdi-file-powerpoint-box</v-icon>
+                            <v-icon class="mr-2" v-else-if="item.type == 'video/mp4'" color="red">mdi-file-video</v-icon>
+                            <v-icon class="mr-2" v-else>mdi-folder</v-icon> 
+                            {{ item.name.length >=40 ? item.name.substring(0,40) + '...' : item.name }}
+                        </td>
+                        <td>{{ item.User ? item.User.name : '' }}</td>
                         <td>{{ item.updatedAt | formatDate }}</td>
-                        <td></td>
+                        <td>{{ item.size }}</td>
                     </tr>
                 </tbody>
             </template>
@@ -31,44 +40,96 @@
             </template> -->
         </v-data-table>
         <template v-if="!viewFile">
-            <v-card-title>Thư mục</v-card-title>
-            <v-card-text>
-                <v-row>
-                    <v-col v-for="dessert in desserts" cols="3" :key="dessert.name">
-                        <v-card outlined class="pa-3" :to="'/user/drive'"  @contextmenu="abc">
-                            <v-icon class="mr-2">mdi-folder</v-icon> {{ dessert.name }}    
-                        </v-card>
-                    </v-col>
-                </v-row>
-                <v-menu
-                    v-model="show"
-                    :position-x="x"
-                    :position-y="y"
-                    absolute
-                    offset-y
-                    transition="scale-transition"
-                >
-                    <v-list>
-                        <v-list-item
-                            v-for="(item, i) in itemsss"
-                            :key="i"
-                        >
-                            <v-list-item-title>{{ item.title }}</v-list-item-title>
-                        </v-list-item>
-                    </v-list>
-                </v-menu>
-            </v-card-text>
-            <v-card-title>File</v-card-title>
-            <v-card-text>
-                <v-row>
-                    <v-col v-for="dessert in desserts" cols="3" :key="dessert.name">
-                        <v-card outlined class="pa-3" :to="'/user/drive'">
-                            {{ dessert.name }}
-                        </v-card>
-                    </v-col>
-                </v-row>
-            </v-card-text>
+            <v-card flat v-if="folderLists.length > 0">
+                <v-card-title>Thư mục</v-card-title>
+                <v-card-text>
+                    <v-row>
+                        <v-col v-for="folder in folderLists" cols="6" sm="4" md="3" xl="1" :key="folder.name">
+                            <v-card outlined class="pa-3" :to="'/user/drive'"  @dblclick="showDetailFolder(folder)" @contextmenu="showSelectMenu($event, folder)">
+                                <v-icon class="mr-2">mdi-folder</v-icon> {{ folder.name }}    
+                            </v-card>
+                        </v-col>
+                    </v-row>
+                </v-card-text>
+            </v-card>
+            <v-card flat v-if="fileLists.length > 0">
+                <v-card-title>File</v-card-title>
+                <v-card-text>
+                    <v-row>
+                        <v-col v-for="file in fileLists" cols="6" sm="4" md="3" xl="1" :key="file.name" @contextmenu="showSelectMenu($event, file)">
+                            <v-card outlined class="pa-3" :to="'/user/drive'">
+                                {{ file.name }}
+                            </v-card>
+                        </v-col>
+                    </v-row>
+                </v-card-text>
+            </v-card>
         </template>
+        <v-menu
+            v-model="show"
+            :position-x="x"
+            :position-y="y"
+            absolute
+            offset-y
+            transition="scale-transition"
+        >
+            <v-list width="200">
+                <v-list-item @click="dialog2 = true">
+                    <v-list-item-title><v-icon>mdi-eye</v-icon> Xem chi tiết</v-list-item-title>
+                </v-list-item>
+                <v-list-item @click="dialog = true, overlay = true">
+                    <v-list-item-title><v-icon>mdi-pencil</v-icon> Đổi tên</v-list-item-title>
+                </v-list-item>
+                <v-list-item>
+                    <v-list-item-title><v-icon>mdi-folder-move</v-icon> Di chuyển</v-list-item-title>
+                </v-list-item>
+                <v-list-item>
+                    <v-list-item-title><v-icon>mdi-share</v-icon> Chia sẻ</v-list-item-title>
+                </v-list-item>
+                <v-list-item>
+                    <v-list-item-title><v-icon>mdi-download</v-icon> Tải xuống</v-list-item-title>
+                </v-list-item>
+                <v-list-item @click="removeToTrash()">
+                    <v-list-item-title><v-icon>mdi-delete</v-icon> Xóa</v-list-item-title>
+                </v-list-item>
+            </v-list>
+        </v-menu>
+        <v-dialog v-model="dialog" width="400" persistent>
+            <v-card>
+                <v-card-title
+                    class="headline primary white--text"
+                    primary-title
+                >
+                    Đổi tên thư mục
+                </v-card-title>
+
+                <v-card-text>
+                    <v-text-field
+                        v-model="new_name"
+                        label="Tên"
+                        required
+                        class="mt-3"
+                        :rules="[v => !!v || 'Mời bạn nhập tên']"
+                        @keypress.enter="formSubmit()"
+                        autofocus
+                    >
+                    </v-text-field>
+                </v-card-text>
+                <v-card-actions class="mt-n6">
+                    <v-btn
+                        @click="dialog = false, overlay = false"
+                        class="text-none"
+                    >Hủy</v-btn>
+                    <v-spacer></v-spacer>
+                    <v-btn
+                        color="primary"
+                        @click="updateName()"
+                        class="text-none"
+                        :disabled="new_name == '' ? true : false"
+                    >Lưu</v-btn>
+                </v-card-actions>
+            </v-card>
+        </v-dialog>
     </v-card>
 </template>
 
@@ -85,33 +146,13 @@ Vue.filter('formatDate', function(value) {
 })
 export default {
     data: () => ({
-        itemsss: [
-            { title: 'Click Me' },
-            { title: 'Click Me' },
-            { title: 'Click Me' },
-            { title: 'Click Me 2' },
-        ],
+        overlay: false,
+        new_name: null,
+        dialog: false,
+        dialog2: false,
         show: false,
         x: 0,
         y: 0,
-        items: [
-            {
-                text: 'Tất cả file',
-                disabled: false,
-                to: '/user/drive'
-            },
-            {
-                text: 'Link 1',
-                disabled: false,
-                href: 'breadcrumbs_link_1',
-            },
-            {
-                text: 'Link 2',
-                disabled: true,
-                href: 'breadcrumbs_link_2',
-            },
-        ],
-
         headers: [
             {
                 text: 'Tên',
@@ -123,45 +164,151 @@ export default {
             { text: 'Kích cỡ', value: 'size' },
         ],
         desserts: [],
+        detailItem: {}
     }),
 
     mounted() {
-        this.getFolderList()
+        this.getFolderFileList()
+        this.$store.commit('setSelectedTrash', {
+            selectedCount: null
+        })
     },
 
     computed: {
         ...mapState ([
-            'viewFile',
-        ])
+            'viewFile', 'reloadDrive'
+        ]),
+        folderLists: function() {
+            return this.desserts.filter((el) => {
+                return !el.type
+            })
+        },
+        fileLists: function() {
+            return this.desserts.filter((el) => {
+                return el.type
+            })
+        }
+    },
+
+    watch: {
+        reloadDrive: function() {
+            this.getFolderFileList()
+            this.$store.commit('setReloadIndexDrive', false)
+        }
     },
 
     methods: {
         showDetailFolder(item) {
-            this.$router.push('/user/folder/' + item.id)
+            if(!item.type) {
+                this.$router.push('/user/folder/' + item.id)
+                this.getFolderFileList()
+            }
         },
 
-        abc(e) {
+        showSelectMenu(e, item) {
             e.preventDefault();
             this.show = false;
             this.x = e.clientX;
             this.y = e.clientY;
+            this.detailItem = Object.assign({}, item)
+            this.new_name = item.name
             this.$nextTick(() => {
                 this.show = true;
             });
         },
 
-        async getFolderList() {
+        async getFolderFileList() {
             try {
-                let res = await Axios.get('http://localhost:3000/folders/lists/subfolder', {
-                    params: {
-                        storage_id: localStorage.getItem('bucket'),
-                        parent_id: this.$route.params.folderId
-                    }
+                let res = await Axios.all([
+                    Axios.get('http://localhost:3000/folders/lists/subfolder', {
+                        params: {
+                            folder_id: this.$route.params.folderId, 
+                            active: 1
+                        }
+                    }),
+                    Axios.get('http://localhost:3000/files/lists/parentfolder', {
+                        params: {
+                            folder_id: this.$route.params.folderId, 
+                            active: 1
+                        }
+                    })
+                ])
+                this.desserts = res[0].data.body.folder_list
+                let arr = res[1].data.body.file_list
+                arr.forEach(element => {
+                    this.desserts.push(element)
                 })
-                this.desserts = res.data.body.folder_list
             } catch (error) {
                 console.log(error)
             }
+        },
+
+        async updateName() {
+            if(this.new_name == this.detailItem.name) {
+                this.$store.commit('setNoti', {
+                    typeNoti: 1,
+                    textNoti: 'Đổi tên thành công',
+                    showNoti: true
+                })
+                this.dialog = false
+            } else { 
+                try {
+                    var url = ''
+                    if(this.detailItem.type === undefined) {
+                        url = 'http://localhost:3000/folders/update/'
+                    } else {
+                        url = 'http://localhost:3000/files/update/'
+                    }
+                    let res = await Axios.post(url + this.detailItem.id, {
+                        name: this.new_name,
+                    })
+                    this.$store.commit('setNoti', {
+                        typeNoti: 1,
+                        textNoti: res.data.message,
+                        showNoti: true
+                    })
+                } catch (error) {
+                    console.log(error)
+                    this.$store.commit('setNoti', {
+                        typeNoti: 0,
+                        textNoti: 'Đổi tên thất bại',
+                        showNoti: true
+                    })
+                } finally {
+                    this.dialog = false
+                    this.overlay = false
+                    this.getFolderFileList()
+                }
+            }
+        },
+
+        async removeToTrash() {
+            try {
+                var url = ''
+                if(this.detailItem.type === undefined) {
+                    url = 'http://localhost:3000/folders/remove/trash/'
+                } else {
+                    url = 'http://localhost:3000/files/remove/trash/'
+                }
+                await Axios.post(url + this.detailItem.id)
+                this.$store.commit('setNoti', {
+                    typeNoti: 1,
+                    textNoti: 'Chuyển đến thùng rác thành công',
+                    showNoti: true
+                })
+            } catch (error) {
+                this.$store.commit('setNoti', {
+                    typeNoti: 0,
+                    textNoti: 'Xóa thất bại',
+                    showNoti: true
+                })
+            } finally {
+                this.getFolderFileList()
+            }
+        },
+
+        formSubmit() {
+            this.updateName()
         }
     }
   }
