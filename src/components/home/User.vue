@@ -239,7 +239,7 @@ import Axios from 'axios'
                 Authorization: `Bearer ${localStorage.getItem('jwt_token')}`
             }
           })  
-          this.roles = res.data.body.role_list
+          this.roles = res.data.body.role_list.filter(el => el.code != 'User')
         } catch (error) {
           console.log(error)
         }
