@@ -32,12 +32,11 @@
               <v-btn color="primary" dark class="mb-2" v-on="on">Thêm mới</v-btn>
             </template>
             <v-card>
-              <v-card-title>
+              <v-card-title class="headline primary white--text" primary-title>
                 <span class="headline">{{ formTitle }}</span>
               </v-card-title>
 
               <v-card-text>
-                <v-container>
                   <v-form ref="form" lazy-validation v-model="valid">
                     <v-row>
                       <v-col cols="12" sm="6" md="6">
@@ -93,13 +92,19 @@
                       </v-col>
                     </v-row>
                   </v-form>
-                </v-container>
               </v-card-text>
 
-              <v-card-actions>
-                <v-btn color="blue darken-1" text @click="close">Đóng</v-btn>
+              <v-card-actions class="mt-n6 mr-4">
                 <v-spacer></v-spacer>
-                <v-btn color="blue darken-1" text @click="save">Lưu</v-btn>
+                <v-btn 
+                  color="primary" 
+                  text 
+                  @click="close"
+                  class="text-none"
+                  depressed
+                  outlined
+                  >Hủy</v-btn>
+                <v-btn color="primary" depressed class="text-none" @click="save">Lưu</v-btn>
               </v-card-actions>
             </v-card>
           </v-dialog>

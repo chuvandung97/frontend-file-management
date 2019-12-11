@@ -91,11 +91,6 @@ export default new Router({
           component: () => import('./components/home/group/index'),
         },
         {
-          path: 'group/add',
-          name: 'group.add',
-          component: () => import('./components/home/group/add'),
-        },
-        {
           path: 'group/update/:groupId',
           name: 'group.update',
           component: () => import('./components/home/group/update'),

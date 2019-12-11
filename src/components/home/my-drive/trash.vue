@@ -63,16 +63,21 @@
                 <v-card-text class="red--text mt-3">
                     Chú ý: Điều này sẽ xóa toàn bộ file và thư mục bên trong thư mục này
                 </v-card-text>
-                <v-card-actions class="mt-n3">
+                <v-card-actions class="mt-n3 mr-4">
+                    <v-spacer></v-spacer>
                     <v-btn
                         @click="dialogDeleteTrash = false"
                         class="text-none"
+                        depressed
+                        text
+                        color="primary"
+                        outlined
                     >Hủy</v-btn>
-                    <v-spacer></v-spacer>
                     <v-btn
                         color="primary"
                         @click="deletePermanently()"
                         class="text-none"
+                        depressed
                     >Xóa</v-btn>
                 </v-card-actions>
             </v-card>

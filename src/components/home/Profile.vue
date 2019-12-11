@@ -185,7 +185,7 @@ export default {
                     textNoti: res.data.message,
                     showNoti: true
                 })
-                if(this.role.code == 'Admin') {
+                if(this.role.code == 'Admin' || this.role.code == 'Sysadmin') {
                     this.$router.push('/user/info')
                 } else {
                     this.$router.push('/user/drive')

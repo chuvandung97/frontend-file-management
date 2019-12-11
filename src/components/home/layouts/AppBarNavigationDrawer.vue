@@ -68,18 +68,23 @@
                 >
                 </v-text-field>
               </v-card-text>
-              <v-card-actions class="mt-n6">
+              <v-card-actions class="mt-n6 mr-4">
+                <v-spacer></v-spacer>
                 <v-btn
                   @click="cancelCreateFolder()"
                   class="text-none"
+                  depressed
+                  text
+                  color="primary"
+                  outlined
                 >
                   Hủy
                 </v-btn>
-                <v-spacer></v-spacer>
                 <v-btn
                   color="primary"
                   @click="createFolder()"
                   class="text-none"
+                  depressed
                   :disabled="name_folder == '' ? true : false"
                 >
                   Tạo

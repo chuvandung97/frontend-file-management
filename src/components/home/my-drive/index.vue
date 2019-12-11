@@ -188,16 +188,21 @@
                     >
                     </v-text-field>
                 </v-card-text>
-                <v-card-actions class="mt-n6">
+                <v-card-actions class="mt-n6 mr-4">
+                    <v-spacer></v-spacer>
                     <v-btn
                         @click="dialog = false, overlay = false"
                         class="text-none"
+                        depressed
+                        text
+                        color="primary"
+                        outlined
                     >Hủy</v-btn>
-                    <v-spacer></v-spacer>
                     <v-btn
                         color="primary"
                         @click="updateName()"
                         class="text-none"
+                        depressed
                         :disabled="new_name == '' ? true : false"
                     >Lưu</v-btn>
                 </v-card-actions>
