@@ -41,7 +41,7 @@
             <v-card-title>Thư mục</v-card-title>
             <v-card-text>
                 <v-row>
-                    <v-col v-for="folder in folders" cols="6" sm="4" md="3" xl="1" :key="folder.name">
+                    <v-col v-for="folder in folderLists" cols="6" sm="4" md="3" xl="1" :key="folder.name">
                         <v-card outlined class="pa-3" :to="'/user/drive'"  @dblclick="showDetailFolder(folder)" @contextmenu="showSelectMenu($event, folder)">
                             <v-icon class="mr-2">mdi-folder</v-icon> {{ folder.name }}    
                         </v-card>
@@ -51,7 +51,7 @@
             <v-card-title>File</v-card-title>
             <v-card-text>
                 <v-row>
-                    <v-col v-for="file in files" cols="6" sm="4" md="3" xl="1" :key="file.name" @contextmenu="showSelectMenu($event, file)">
+                    <v-col v-for="file in fileLists" cols="6" sm="4" md="3" xl="1" :key="file.name" @contextmenu="showSelectMenu($event, file)">
                         <v-card outlined class="pa-3" :to="'/user/drive'">
                             {{ file.name }}
                         </v-card>
@@ -235,8 +235,6 @@ export default {
             { text: 'Kích cỡ', value: 'size' },
         ],
         desserts: [],
-        folders: [],
-        files: []
     }),
 
     mounted() {
@@ -250,7 +248,17 @@ export default {
     computed: {
         ...mapState ([
             'viewFile', 'reloadDrive'
-        ])
+        ]),
+        folderLists: function() {
+            return this.desserts.filter((el) => {
+                return !el.type
+            })
+        },
+        fileLists: function() {
+            return this.desserts.filter((el) => {
+                return el.type
+            })
+        }
     },
 
     watch: {

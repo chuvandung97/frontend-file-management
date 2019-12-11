@@ -3,7 +3,7 @@
         <AppBarNavigationDrawer />
         <v-content>
             <v-card flat v-if="userrole == 'User' || userrole == 'Group'">
-                <v-row>
+                <v-row v-if="$route.fullPath != '/user/profile'">
                     <v-col cols="5" md="6" class="pa-0">
                         <v-breadcrumbs :items="items" large>
                             <template v-slot:divider>
@@ -92,10 +92,12 @@ export default {
         ],
         userrole: null,
         viewFile: true,
+        fullPath: null,
     }),
 
     mounted() {
         this.userrole = localStorage.getItem('userrole')
+        this.fullPath = this.$route.fullPath
     },
 
     watch: {
