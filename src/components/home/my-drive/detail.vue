@@ -75,22 +75,52 @@
         >
             <v-list width="200">
                 <v-list-item @click="dialog2 = true">
-                    <v-list-item-title><v-icon>mdi-eye</v-icon> Xem chi tiết</v-list-item-title>
+                    <v-list-item-action>
+                        <v-icon>mdi-eye</v-icon>
+                    </v-list-item-action>
+                    <v-list-item-content>
+                        <v-list-item-title>Xem chi tiết</v-list-item-title>
+                    </v-list-item-content>
                 </v-list-item>
                 <v-list-item @click="dialog = true, overlay = true">
-                    <v-list-item-title><v-icon>mdi-pencil</v-icon> Đổi tên</v-list-item-title>
+                    <v-list-item-action>
+                        <v-icon>mdi-pencil</v-icon>
+                    </v-list-item-action>
+                    <v-list-item-content>
+                        <v-list-item-title>Đổi tên</v-list-item-title>
+                    </v-list-item-content>
                 </v-list-item>
                 <v-list-item @click="dialog1 = true">
-                    <v-list-item-title><v-icon>mdi-folder-move</v-icon> Di chuyển</v-list-item-title>
+                    <v-list-item-action>
+                        <v-icon>mdi-folder-move</v-icon>
+                    </v-list-item-action>
+                    <v-list-item-content>
+                        <v-list-item-title>Di chuyển</v-list-item-title>
+                    </v-list-item-content>
                 </v-list-item>
                 <v-list-item>
-                    <v-list-item-title><v-icon>mdi-share</v-icon> Chia sẻ</v-list-item-title>
+                    <v-list-item-action>
+                        <v-icon>mdi-share</v-icon>
+                    </v-list-item-action>
+                    <v-list-item-content>
+                        <v-list-item-title>Chia sẻ</v-list-item-title>
+                    </v-list-item-content>
                 </v-list-item>
                 <v-list-item>
-                    <v-list-item-title><v-icon>mdi-download</v-icon> Tải xuống</v-list-item-title>
+                    <v-list-item-action>
+                        <v-icon>mdi-download</v-icon>
+                    </v-list-item-action>
+                    <v-list-item-content>
+                        <v-list-item-title>Tải xuống</v-list-item-title>
+                    </v-list-item-content>
                 </v-list-item>
                 <v-list-item @click="removeToTrash()">
-                    <v-list-item-title><v-icon>mdi-delete</v-icon> Xóa</v-list-item-title>
+                    <v-list-item-action>
+                        <v-icon>mdi-delete</v-icon>
+                    </v-list-item-action>
+                    <v-list-item-content>
+                        <v-list-item-title>Xóa</v-list-item-title>
+                    </v-list-item-content>
                 </v-list-item>
             </v-list>
         </v-menu>
@@ -152,6 +182,7 @@
                         activatable
                         item-disabled="locked"
                         return-object
+                        dense
                     >
                         <template v-slot:prepend=" { items, active } ">
                             <v-icon style="margin-left: -90px">mdi_folder</v-icon>
