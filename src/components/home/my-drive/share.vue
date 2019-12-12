@@ -12,6 +12,9 @@
             <template v-slot:item.name="{ item }">
                 <v-icon class="mr-2">folder_shared</v-icon> {{ item.name }}
             </template> 
+            <template v-slot:item.size="{ item }">
+                {{ item.size | formatSize }}
+            </template>
         </v-data-table>
         <template v-if="!viewFile">
             <v-card-title>Thư mục</v-card-title>
@@ -39,7 +42,24 @@
 </template>
 
 <script>
+import moment from 'moment'
+import Vue from 'vue'
+import Axios from 'axios'
 import { mapState } from 'vuex'
+import numeral from 'numeral'
+
+Vue.filter('formatDate', function(value) {
+    if (value) {
+        return moment(String(value)).format('DD/MM/YYYY')
+    }
+})
+
+Vue.filter('formatSize', function(value) {
+    if(value) {
+        return numeral(value).format('0.0 ib')
+    }
+})
+
   export default {
     data: () => ({
         folders: [

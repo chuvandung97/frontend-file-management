@@ -25,7 +25,7 @@
                         </td>
                         <td>{{ item.User ? item.User.name : '' }}</td>
                         <td>{{ item.updatedAt | formatDate }}</td>
-                        <td>{{ item.size }}</td>
+                        <td>{{ item.size | formatSize }}</td>
                     </tr>
                 </tbody>
             </template>
@@ -143,10 +143,17 @@ import moment from 'moment'
 import Vue from 'vue'
 import Axios from 'axios'
 import { mapState } from 'vuex'
+import numeral from 'numeral'
 
 Vue.filter('formatDate', function(value) {
     if (value) {
         return moment(String(value)).format('DD/MM/YYYY')
+    }
+})
+
+Vue.filter('formatSize', function(value) {
+    if(value) {
+        return numeral(value).format('0.0 ib')
     }
 })
 export default {
