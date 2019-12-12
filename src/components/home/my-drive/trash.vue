@@ -8,7 +8,7 @@
             :items-per-page="999"
             sort-by="name"
             v-if="viewFile"
-            :class="'view_list'"
+            :class="'view_list unselectable'"
             item-key="name"
             show-select
         >

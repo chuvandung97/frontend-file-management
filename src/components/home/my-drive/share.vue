@@ -7,7 +7,7 @@
             :items-per-page="999"
             sort-by="name"
             v-if="viewFile"
-            :class="'view_list'"
+            :class="'view_list unselectable'"
         >
             <template v-slot:item.name="{ item }">
                 <v-icon class="mr-2">folder_shared</v-icon> {{ item.name }}
