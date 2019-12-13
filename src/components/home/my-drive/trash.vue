@@ -236,11 +236,14 @@
             async deletePermanently() {
                 let folderIds = this.selected.filter(el => !el.type).map(currentElArray => currentElArray.id)
                 let fileIds = this.selected.filter(el => el.type).map(currentElArray => currentElArray.id)
+                let fileNames = this.selected.filter(el => el.type).map(currentElArray => currentElArray.name)
                 try {
                     if(folderIds.length == 0) {
                         await Axios.delete('http://localhost:3000/files/delete', {
                             params: {
-                                fileIds: fileIds
+                                fileIds: fileIds,
+                                fileNames: fileNames,
+                                storage: localStorage.getItem('bucket')
                             }
                         })
                     } else if(fileIds.length == 0) {
