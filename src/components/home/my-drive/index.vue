@@ -104,7 +104,7 @@
                         <v-list-item-title>Chia sẻ</v-list-item-title>
                     </v-list-item-content>
                 </v-list-item>
-                <v-list-item>
+                <v-list-item @click.prevent="downloadFile()">
                     <v-list-item-action>
                         <v-icon>mdi-download</v-icon>
                     </v-list-item-action>
@@ -511,6 +511,31 @@ export default {
                     this.dialog1 = false,
                     this.getFolderFileList()
                 }
+            }
+        },
+
+        async downloadFile() {
+            try {
+                let res = await Axios.get('http://localhost:3000/files/download', {
+                    params: {
+                        bucket_name: localStorage.getItem('bucket'),
+                        name: this.detailItem.name
+                    }, 
+                    responseType: 'blob'
+                })
+                const link = document.createElement('a')
+                link.href = window.URL.createObjectURL(new Blob([res.data]))
+                link.setAttribute('download', this.detailItem.name) 
+                document.body.appendChild(link);
+                link.click()
+                document.body.removeChild(link);
+            } catch (error) {
+                console.log(error)
+                this.$store.commit('setNoti', {
+                    typeNoti: 0,
+                    textNoti: 'Tải xuống thất bại !',
+                    showNoti: true
+                })
             }
         },
 
