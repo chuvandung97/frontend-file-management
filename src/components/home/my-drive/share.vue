@@ -44,7 +44,6 @@
 <script>
 import moment from 'moment'
 import Vue from 'vue'
-import Axios from 'axios'
 import { mapState } from 'vuex'
 import numeral from 'numeral'
 
@@ -94,19 +93,6 @@ Vue.filter('formatSize', function(value) {
                 name: 'Dashboard9',
             },
         ],
-        items: [
-            {
-                text: 'Được chia sẻ với tôi',
-                disabled: false,
-                href: 'breadcrumbs_dashboard',
-            },
-            {
-                text: 'Link 1',
-                disabled: false,
-                href: 'breadcrumbs_link_1',
-            },
-        ],
-
         headers: [
             {
                 text: 'Tên',

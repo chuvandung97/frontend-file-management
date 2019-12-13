@@ -247,7 +247,10 @@
                     Di chuyển thư mục
                 </v-card-title>
 
-                <v-card-text class="unselectable">
+                <v-card-text class="red--text mt-3" v-if="folderLists.length == 0">
+                    Không có thư mục nào để di chuyển !
+                </v-card-text>
+                <v-card-text class="unselectable" v-else>
                     <v-treeview
                         :active.sync="selection"
                         :items="folderLists"

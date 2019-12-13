@@ -168,10 +168,12 @@
         <v-dialog v-model="dialog1" width="400" max-height="200" persistent>
             <v-card>
                 <v-card-title
-                    class="headline primary white--text"
+                    class="primary white--text"
                     primary-title
                 >
-                    Di chuyển thư mục
+                <v-btn text icon dark depressed>
+                    <v-icon>mdi-keyboard-backspace</v-icon> 
+                </v-btn>{{folderLists[0].parent.name}}
                 </v-card-title>
 
                 <v-card-text class="unselectable">

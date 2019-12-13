@@ -114,14 +114,6 @@
             y: 0,
             selected: [],
             folders: [],
-            items: [
-                {
-                    text: 'Thùng rác',
-                    disabled: false,
-                    href: 'breadcrumbs_dashboard',
-                },
-            ],
-
             headers: [
                 {
                     text: 'Tên',
