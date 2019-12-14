@@ -65,7 +65,7 @@
                     </v-row>
                 </v-form>
                 <v-card-actions>
-                    <v-btn class="mb-2 ml-n2" color="primary" depressed text outlined :to="{ name: 'menu' }"><v-icon>mdi-arrow-left</v-icon>Quay lại</v-btn>
+                    <v-btn class="mb-2 ml-n2" color="primary" exact depressed text outlined :to="{ name: 'menu' }"><v-icon>mdi-arrow-left</v-icon>Quay lại</v-btn>
                     <v-spacer></v-spacer>
                     <v-btn color="primary" depressed dark class="mb-2" @click="updateMenu()">Cập nhật</v-btn>
                 </v-card-actions>

@@ -81,14 +81,22 @@
                                     clearable
                                     dense/>
                             </v-col>
-                            <v-col
-                                cols="12"
-                                xs="12"
-                                text-xs-right
-                            >
+                            <v-col>
                                 <v-btn
-                                    class="mx-0 font-weight-light text-none"
+                                    class="mx-0"
                                     color="primary"
+                                    outlined
+                                    exact depressed text
+                                    :to="role.code == 'User' || role.code == 'Group' ? '/user/drive' : '/user/info'"
+                                >
+                                    <v-icon>mdi-arrow-left</v-icon> Quay lại
+                                </v-btn>
+                            </v-col>
+                            <v-col class="d-flex justify-end">
+                                <v-btn
+                                    class="mx-0"
+                                    color="primary"
+                                    depressed
                                     @click="updateUser()"
                                 >
                                     Cập nhật hồ sơ

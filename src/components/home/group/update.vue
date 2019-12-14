@@ -40,7 +40,7 @@
       </v-form>
     </v-card-text>
     <v-card-actions>
-      <v-btn class="mb-2 ml-3" color="primary" depressed text outlined :to="{ name: 'group' }"><v-icon>mdi-arrow-left</v-icon>Quay lại</v-btn>
+      <v-btn class="mb-2 ml-3" color="primary" exact depressed text outlined :to="{ name: 'group' }"><v-icon>mdi-arrow-left</v-icon>Quay lại</v-btn>
       <v-spacer></v-spacer>
       <v-btn color="primary" depressed class="mb-2" v-if="!memberList" @click="memberList = !memberList">Danh sách thành viên</v-btn>
       <v-btn color="primary" depressed class="mb-2" v-else @click="memberList = !memberList">Ẩn danh sách</v-btn>
