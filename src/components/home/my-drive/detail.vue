@@ -41,11 +41,11 @@
         </v-data-table>
         <template v-if="!viewFile">
             <v-card flat v-if="folderLists.length > 0">
-                <v-card-title>Thư mục</v-card-title>
-                <v-card-text>
+                <v-subheader>Thư mục</v-subheader>
+                <v-card-text class="mt-n5 unselectable">
                     <v-row>
                         <v-col v-for="folder in folderLists" cols="6" sm="4" md="3" xl="1" :key="folder.name">
-                            <v-card outlined class="pa-3" :to="'/user/drive'"  @dblclick="showDetailFolder(folder)" @contextmenu="showSelectMenu($event, folder)">
+                            <v-card outlined class="pa-3" @dblclick="showDetailFolder(folder)" @contextmenu="showSelectMenu($event, folder)">
                                 <v-icon class="mr-2">mdi-folder</v-icon> {{ folder.name }}    
                             </v-card>
                         </v-col>
@@ -53,11 +53,11 @@
                 </v-card-text>
             </v-card>
             <v-card flat v-if="fileLists.length > 0">
-                <v-card-title>File</v-card-title>
-                <v-card-text>
+                <v-subheader>File</v-subheader>
+                <v-card-text class="mt-n5 unselectable">
                     <v-row>
                         <v-col v-for="file in fileLists" cols="6" sm="4" md="3" xl="1" :key="file.name" @contextmenu="showSelectMenu($event, file)">
-                            <v-card outlined class="pa-3" :to="'/user/drive'">
+                            <v-card outlined class="pa-3">
                                 {{ file.name }}
                             </v-card>
                         </v-col>
