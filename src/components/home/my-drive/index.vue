@@ -118,13 +118,14 @@
                     </v-list-item-content>
                 </v-list-item>
                 <v-divider></v-divider>
-                <v-list-item @click="''" :disabled="detailItem.type ? false : true"> 
+                <v-list-item class="file-upload" @click="showUploadFile()" :disabled="detailItem.type ? false : true"> 
                     <v-list-item-action>
-                        <v-icon>mdi-upload</v-icon>
+                        <v-icon :disabled="detailItem.type ? false : true">mdi-upload</v-icon>
                     </v-list-item-action>
                     <v-list-item-content>
                         <v-list-item-title>Tải lên bản thay thế</v-list-item-title>
                     </v-list-item-content>
+                    <input style="display: none" type="file" id="file" name="file" ref="file" accept=".doc,.docx,.xlsx,.xsl,.pptx,application/*,image/*, video/*, audio/*, font/*, text/*" v-on:change="replaceFileUpload()"/>
                 </v-list-item>
                 <v-list-item @click.prevent="downloadFile()">
                     <v-list-item-action>
@@ -566,6 +567,47 @@ export default {
                 })
             }
         },
+
+        showUploadFile() {
+            const btn_upload = document.getElementById('file')
+            btn_upload.click()
+        },
+
+        async replaceFileUpload() {
+            this.file = this.$refs.file.files[0];
+            let formData = new FormData();
+            formData.append('file', this.file); // coi như là name="file"
+            try {
+                let res = await Axios.post('http://localhost:3000/files/upload/replace/' + this.detailItem.id, formData, {
+                    headers: {
+                        'Content-Type': 'multipart/form-data'
+                    }, 
+                    params: {
+                        bucket_name: localStorage.getItem('bucket'),
+                        created_by: localStorage.getItem('userid'),
+                        updated_by: localStorage.getItem('userid')
+                    },
+                    onUploadProgress: function( progressEvent ) {
+                        console.log( progressEvent.loaded);
+                    }
+                })
+                this.$store.commit('setNoti', {
+                    typeNoti: 1,
+                    textNoti: res.data.message,
+                    showNoti: true
+                })
+            } catch (error) {
+                console.log(error)
+                this.$store.commit('setNoti', {
+                    typeNoti: 0,
+                    textNoti: 'Tải file thất bại !',
+                    showNoti: true
+                })
+            } finally {
+                this.$store.commit('setReloadIndexDrive', true)
+            }
+        },
+
 
         formSubmit() {
             this.updateName()
