@@ -57,8 +57,21 @@
                 <v-card-text class="mt-n5 unselectable">
                     <v-row>
                         <v-col v-for="file in fileLists" cols="6" sm="4" md="3" xl="1" :key="file.name" @contextmenu="showSelectMenu($event, file)">
-                            <v-card outlined class="pa-3">
-                                {{ file.name }}
+                            <v-card outlined class="pa-3 test" :title="file.name">
+                                <v-icon color="primary" v-if="file.type == 'image/png'" size="100" class="d-flex justify-center py-8">mdi-file-image</v-icon>
+                                <v-icon color="blue" v-if="file.type == 'application/docx'" size="100" class="d-flex justify-center py-8">mdi-file-word-box</v-icon>
+                                <v-icon color="red" v-if="file.type == 'application/pdf'" size="100" class="d-flex justify-center py-8">mdi-file-pdf-box</v-icon>
+                                <v-icon color="green" v-if="file.type == 'application/xlsx'" size="100" class="d-flex justify-center py-8">mdi-file-excel-box</v-icon>
+                                <v-icon color="orange" v-if="file.type == 'application/pptx'" size="100" class="d-flex justify-center py-8">mdi-file-powerpoint-box</v-icon>
+                                <v-icon color="red" v-if="file.type == 'video/mp4'" size="100" class="d-flex justify-center py-8">mdi-file-video</v-icon>
+
+                                <v-icon class="mr-2" v-if="file.type == 'image/png'" color="primary">mdi-file-image</v-icon>
+                                <v-icon class="mr-2" v-else-if="file.type == 'application/docx'" color="blue">mdi-file-word-box</v-icon> 
+                                <v-icon class="mr-2" v-else-if="file.type == 'application/pdf'" color="red">mdi-file-pdf-box</v-icon>
+                                <v-icon class="mr-2" v-else-if="file.type == 'application/xlsx'" color="green">mdi-file-excel-box</v-icon>
+                                <v-icon class="mr-2" v-else-if="file.type == 'application/pptx'" color="orange">mdi-file-powerpoint-box</v-icon>
+                                <v-icon class="mr-2" v-else-if="file.type == 'video/mp4'" color="red">mdi-file-video</v-icon>
+                                {{ file.name.length >=25 ? file.name.substring(0,25) + '...' : file.name }}
                             </v-card>
                         </v-col>
                     </v-row>
