@@ -84,7 +84,7 @@
             offset-y
             transition="scale-transition"
         >
-            <v-list width="200">
+            <v-list width="300">
                 <v-list-item @click="dialog2 = true">
                     <v-list-item-action>
                         <v-icon>mdi-eye</v-icon>
@@ -117,6 +117,15 @@
                         <v-list-item-title>Chia sẻ</v-list-item-title>
                     </v-list-item-content>
                 </v-list-item>
+                <v-divider></v-divider>
+                <v-list-item @click="''" :disabled="detailItem.type ? false : true"> 
+                    <v-list-item-action>
+                        <v-icon>mdi-upload</v-icon>
+                    </v-list-item-action>
+                    <v-list-item-content>
+                        <v-list-item-title>Tải lên bản thay thế</v-list-item-title>
+                    </v-list-item-content>
+                </v-list-item>
                 <v-list-item @click.prevent="downloadFile()">
                     <v-list-item-action>
                         <v-icon>mdi-download</v-icon>
@@ -125,6 +134,7 @@
                         <v-list-item-title>Tải xuống</v-list-item-title>
                     </v-list-item-content>
                 </v-list-item>
+                <v-divider></v-divider>
                 <v-list-item @click="removeToTrash()">
                     <v-list-item-action>
                         <v-icon>mdi-delete</v-icon>
@@ -439,6 +449,7 @@ export default {
                     }
                     let res = await Axios.post(url + this.detailItem.id, {
                         name: this.new_name,
+                        user_id: localStorage.getItem('userid')
                     })
                     this.$store.commit('setNoti', {
                         typeNoti: 1,
@@ -468,7 +479,9 @@ export default {
                 } else {
                     url = 'http://localhost:3000/files/remove/trash/'
                 }
-                await Axios.post(url + this.detailItem.id)
+                await Axios.post(url + this.detailItem.id, {
+                    user_id: localStorage.getItem('userid')
+                })
                 this.$store.commit('setNoti', {
                     typeNoti: 1,
                     textNoti: 'Chuyển đến thùng rác thành công',
@@ -496,7 +509,8 @@ export default {
                 try {
                     if(this.detailItem.type === undefined) {
                         let res = await Axios.post('http://localhost:3000/folders/move/' + this.detailItem.id, {
-                            folderId: this.selection[0].id
+                            folderId: this.selection[0].id,
+                            user_id: localStorage.getItem('userid')
                         })
                         this.$store.commit('setNoti', {
                             typeNoti: 1,
@@ -507,6 +521,7 @@ export default {
                         let res = await Axios.post('http://localhost:3000/files/move/' + this.detailItem.id, {
                             oldFolderId: this.$route.params ? this.$route.params.folderId : null,
                             newFolderId: this.selection[0].id,
+                            user_id: localStorage.getItem('userid')
                         })
                         this.$store.commit('setNoti', {
                             typeNoti: 1,

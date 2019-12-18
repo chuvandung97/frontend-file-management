@@ -43,7 +43,7 @@
                                 <v-list-item-title class="body-2 font-weight-medium ml-n3">Thư mục</v-list-item-title>
                             </v-list-item>
                             <v-list-item class="file-upload" @click="showUploadFile()">
-                                <v-list-item-icon><v-icon>cloud_upload</v-icon></v-list-item-icon>
+                                <v-list-item-icon><v-icon>mdi-upload</v-icon></v-list-item-icon>
                                 <v-list-item-title class="body-2 font-weight-medium ml-n3">Tải tệp lên</v-list-item-title>
                                 <input style="display: none" type="file" id="file" name="file" ref="file" accept=".doc,.docx,.xlsx,.xsl,.pptx,application/*,image/*, video/*, audio/*, font/*, text/*" v-on:change="handleFileUpload()"/>
                             </v-list-item>
@@ -300,7 +300,8 @@ export default {
                     params: {
                         bucket_name: localStorage.getItem('bucket'),
                         created_by: localStorage.getItem('userid'),
-                        folder_id: this.$route.params ? this.$route.params.folderId : null
+                        folder_id: this.$route.params ? this.$route.params.folderId : null,
+                        updated_by: localStorage.getItem('userid')
                     },
                     onUploadProgress: function( progressEvent ) {
                         console.log( progressEvent.loaded);
@@ -339,7 +340,8 @@ export default {
                     parent_id: this.$route.params ? this.$route.params.folderId : null,
                     name: this.name_folder,
                     storage_id: localStorage.getItem('bucket'),
-                    created_by: localStorage.getItem('userid')
+                    created_by: localStorage.getItem('userid'),
+                    updated_by: localStorage.getItem('userid')
                 })
                 this.$store.commit('setNoti', {
                     typeNoti: 1,
