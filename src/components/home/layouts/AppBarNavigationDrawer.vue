@@ -191,6 +191,8 @@
                 :search-input.sync="search"
                 hide-no-data
                 solo-inverted
+                return-object
+                item-text="name"
                 clearable
                 hide-details
                 prepend-inner-icon="search"
@@ -274,11 +276,17 @@ export default {
 
     watch: {
         search (val) {
-            if(val.length == 0) {
-                this.itemSearches = []
-            }
             val && val !== this.textSearch && this.querySelections(val)        
         },
+        textSearch (val) {
+            if (val.parent_id) {
+                this.$router.push('/user/folder/' + val.parent_id)
+                this.itemSearches = []
+            } else if (val.folders.length > 0) {
+                this.$router.push('/user/folder/' + val.folders[0].id)
+                this.itemSearches = []
+            }
+        }
     },
 
     methods: {
@@ -300,7 +308,7 @@ export default {
             setTimeout(() => {
                 this.itemSearches = this.desserts.filter(e => {
                     return (e.name || '').toLowerCase().indexOf((v || '').toLowerCase()) > -1
-                }).map(el => el.name)
+                })
                 this.loading = false
             }, 500)
         },
