@@ -183,14 +183,20 @@
             >
                 <span class="hidden-sm-and-down">Hệ thống quản lý file</span>
             </v-toolbar-title>
-            <v-text-field
+            <v-autocomplete
+                v-model="textSearch"
                 flat
+                :items="itemSearches"
+                :loading="loading"
+                :search-input.sync="search"
+                hide-no-data
                 solo-inverted
+                clearable
                 hide-details
                 prepend-inner-icon="search"
                 label="Tìm kiếm"
-                class="hidden-sm-and-down"
-            ></v-text-field>
+                v-if="roleDescription != 'Sysadmin' && roleDescription != 'Admin'"
+            ></v-autocomplete>
             <v-spacer></v-spacer>
             <v-btn icon>
                 <v-icon>notifications</v-icon>
@@ -244,13 +250,35 @@ export default {
             name: null,
             dialog: false,
             name_folder: 'Thư mục mới',
+            search: null,
+            itemSearches: [],
+            desserts: [],
+            textSearch: null,
+            loading: false
         }
     },
 
-    mounted() {
+    async mounted() {
         this.getMenu()
         this.name = localStorage.getItem('username')
         this.roleDescription = localStorage.getItem('userrole')
+        let res = await Axios.get('http://localhost:3000/folderfiles/lists', {
+            params: {
+                storage_id: localStorage.getItem('bucket'),
+                active: 1,
+                search: true
+            }
+        })
+        this.desserts = res.data.body.folder_file_list
+    },
+
+    watch: {
+        search (val) {
+            if(val.length == 0) {
+                this.itemSearches = []
+            }
+            val && val !== this.textSearch && this.querySelections(val)        
+        },
     },
 
     methods: {
@@ -265,6 +293,16 @@ export default {
             } catch (error) {
                 console.log(error)
             }
+        },
+
+        querySelections (v) {
+            this.loading = true
+            setTimeout(() => {
+                this.itemSearches = this.desserts.filter(e => {
+                    return (e.name || '').toLowerCase().indexOf((v || '').toLowerCase()) > -1
+                }).map(el => el.name)
+                this.loading = false
+            }, 500)
         },
 
         async logout() {

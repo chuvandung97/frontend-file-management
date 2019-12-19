@@ -6,7 +6,6 @@
             :items="desserts"
             hide-default-footer
             :items-per-page="999"
-            sort-by="name"
             v-if="viewFile"
             :class="'view_list unselectable'"
             item-key="name"
@@ -186,25 +185,13 @@
         methods: {
             async getFolderFileList() {
                 try {
-                    let res = await Axios.all([
-                        Axios.get('http://localhost:3000/folders/lists/trash', {
-                            params: {
-                                storage_id: localStorage.getItem('bucket'),
-                                active: 0
-                            }
-                        }),
-                        Axios.get('http://localhost:3000/files/lists', {
-                            params: {
-                                storage_id: localStorage.getItem('bucket'),
-                                active: 0
-                            }
-                        })
-                    ])
-                    this.desserts = res[0].data.body.folder_list
-                    let arr = res[1].data.body.file_list
-                    arr.forEach(element => {
-                        this.desserts.push(element)
+                     let res = await Axios.get('http://localhost:3000/folderfiles/lists', {
+                        params: {
+                            storage_id: localStorage.getItem('bucket'),
+                            active: 0,
+                        }
                     })
+                    this.desserts = res.data.body.folder_file_list
                 } catch (error) {
                     console.log(error)
                 }
@@ -213,6 +200,8 @@
             async restore() {
                 let folderIds = this.selected.filter(el => !el.type).map(currentElArray => currentElArray.id)
                 let fileIds = this.selected.filter(el => el.type).map(currentElArray => currentElArray.id)
+                console.log(this.selected.filter(el => !el.type))
+                console.log(folderIds)
                 try {
                     if(folderIds.length == 0) {
                         await Axios.post('http://localhost:3000/files/restore', {

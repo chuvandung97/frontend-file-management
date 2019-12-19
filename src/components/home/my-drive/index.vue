@@ -21,7 +21,7 @@
                             <v-icon class="mr-2" v-else>mdi-folder</v-icon> 
                             {{ item.name.length >=40 ? item.name.substring(0,40) + '...' : item.name }}
                         </td>
-                        <td>{{ item.User ? item.User.name : '' }}</td>
+                        <td>{{ item.User ? (item.User.id == userId ? 'tôi' : item.User.name) : '' }}</td>
                         <td>{{ item.updatedAt | formatDate }}</td>
                         <td>{{ item.size | formatSize  }}</td>
                     </tr>
@@ -117,6 +117,14 @@
                         <v-list-item-title>Chia sẻ</v-list-item-title>
                     </v-list-item-content>
                 </v-list-item>
+                <v-list-item v-if="detailItem.filehistories && detailItem.filehistories.length != 0" @click="dialog3 = true">
+                    <v-list-item-action>
+                        <v-icon>mdi-history</v-icon>
+                    </v-list-item-action>
+                    <v-list-item-content>
+                        <v-list-item-title>Quản lý phiên bản</v-list-item-title>
+                    </v-list-item-content>
+                </v-list-item>
                 <v-divider></v-divider>
                 <v-list-item class="file-upload" @click="showUploadFile()" :disabled="detailItem.type ? false : true"> 
                     <v-list-item-action>
@@ -157,63 +165,20 @@
                 <v-row>
                     <v-col cols="7">
                         <v-timeline dense clipped>
-                        
-                        <v-timeline-item
-                            class="mb-6"
-                            hide-dot
-                        >
-                            <span>TODAY</span>
-                        </v-timeline-item>
-
-                        <v-timeline-item
-                            class="mb-4"
-                            color="grey"
-                            icon-color="grey lighten-2"
-                            small
-                        >
-                            <v-row justify="space-between">
-                            <v-col cols="7">This order was archived.</v-col>
-                            <v-col cols="5">15:26</v-col>
-                            </v-row>
-                        </v-timeline-item>
-
-                        <v-timeline-item
-                            class="mb-4"
-                            small
-                        >
-                            <v-row justify="space-between">
-                            <v-col cols="7">
-                                Digital Downloads fulfilled 1 item.
-                            </v-col>
-                            <v-col cols="5">15:25</v-col>
-                            </v-row>
-                        </v-timeline-item>
-
-                        <v-timeline-item
-                            class="mb-4"
-                            color="grey"
-                            small
-                        >
-                            <v-row justify="space-between">
-                            <v-col cols="7">
-                                Order confirmation email was sent to John Leider (john@vuetifyjs.com).
-                            </v-col>
-                            <v-col cols="5">15:25</v-col>
-                            </v-row>
-                        </v-timeline-item>
-
-                        <v-timeline-item
-                            class="mb-4"
-                            color="grey"
-                            small
-                        >
-                            <v-row justify="space-between">
-                            <v-col cols="7">
-                                A $15.00 USD payment was processed on PayPal Express Checkout
-                            </v-col>
-                            <v-col cols="5">15:25</v-col>
-                            </v-row>
-                        </v-timeline-item>
+                            <v-timeline-item
+                                hide-dot
+                            >
+                                <span>TODAY</span>
+                            </v-timeline-item>
+                            <v-timeline-item
+                                icon-color="grey lighten-2"
+                                small
+                            >
+                                <v-row justify="space-between">
+                                <v-col cols="7">This order was archived.</v-col>
+                                <v-col cols="5">15:26</v-col>
+                                </v-row>
+                            </v-timeline-item>
                         </v-timeline>
                     </v-col>
                     <v-divider vertical inset></v-divider>
@@ -262,7 +227,7 @@
                 </v-card-actions>
             </v-card>
         </v-dialog>
-        <v-dialog v-model="dialog1" width="400" max-height="200" persistent>
+        <v-dialog v-model="dialog1" max-width="400" scrollable persistent>
             <v-card>
                 <v-card-title
                     class="headline primary white--text"
@@ -271,7 +236,7 @@
                     Di chuyển thư mục
                 </v-card-title>
 
-                <v-card-text class="red--text mt-3" v-if="folderLists.length == 0">
+                <v-card-text class="red--text mt-3" v-if="folderLists.length == 0" style="height: 150px;">
                     Không có thư mục nào để di chuyển !
                 </v-card-text>
                 <v-card-text class="unselectable" v-else>
@@ -309,6 +274,60 @@
                 </v-card-actions>
             </v-card>
         </v-dialog>
+        <v-dialog v-model="dialog3" width="600" scrollable>
+            <v-card>
+                <v-card-title
+                    class="headline primary white--text"
+                    primary-title
+                >
+                    Quản lý phiên bản
+                    <v-spacer></v-spacer>
+                    <v-btn depressed text icon>
+                        <v-icon color="white" @click="dialog3 = false">mdi-close</v-icon>
+                    </v-btn>
+                </v-card-title>
+
+                <v-card-text style="height: 600px;">
+                    <v-expansion-panels
+                        multiple
+                        focusable
+                        class="mt-3" 
+                    >
+                        <v-expansion-panel
+                            v-for="(item,i) in fileHistories"
+                            :key="i"
+                        >
+                            <v-expansion-panel-header class="pa-1" disable-icon-rotate>
+                                <v-icon class="mr-2" style="flex: 0" v-if="item.type == 'image/png'" color="primary">mdi-file-image</v-icon>
+                                <v-icon class="mr-2" style="flex: 0" v-else-if="item.type == 'application/docx'" color="blue">mdi-file-word-box</v-icon> 
+                                <v-icon class="mr-2" style="flex: 0" v-else-if="item.type == 'application/pdf'" color="red">mdi-file-pdf-box</v-icon>
+                                <v-icon class="mr-2" style="flex: 0" v-else-if="item.type == 'application/xlsx'" color="green">mdi-file-excel-box</v-icon>
+                                <v-icon class="mr-2" style="flex: 0" v-else-if="item.type == 'application/pptx'" color="orange">mdi-file-powerpoint-box</v-icon>
+                                <v-icon class="mr-2" style="flex: 0" v-else-if="item.type == 'video/mp4'" color="red">mdi-file-video</v-icon>
+                                {{ item.name }}<v-subheader>Phiên bản {{fileHistories.length - i}}</v-subheader>
+                                <template v-slot:actions>
+                                    <v-btn text icon depressed @click.stop="downloadFile(item.name)"><v-icon color="teal">mdi-download</v-icon></v-btn>
+                                </template>
+                            </v-expansion-panel-header>
+                            <v-expansion-panel-content>
+                                <v-subheader>Kích cỡ: {{item.size | formatSize}}</v-subheader>
+                                <v-subheader class="mt-n3">Được tải lên bởi: {{item.updated_by == userId ? 'tôi' : item.User.name}} vào lúc {{item.updatedAt | formatTime}} ngày {{item.updatedAt | formatDate}}</v-subheader>
+                                <v-divider></v-divider>
+                            </v-expansion-panel-content>
+                        </v-expansion-panel>
+                    </v-expansion-panels>
+                </v-card-text>
+                <v-card-actions class="mr-4">
+                    <v-spacer></v-spacer>
+                    <v-btn
+                        @click="dialog3 = false"
+                        class="text-none"
+                        depressed
+                        color="primary"
+                    >Đóng</v-btn>
+                </v-card-actions>
+            </v-card>
+        </v-dialog>
     </v-card>
 </template>
 
@@ -322,6 +341,13 @@ import numeral from 'numeral'
 Vue.filter('formatDate', function(value) {
     if (value) {
         return moment(String(value)).format('DD/MM/YYYY')
+    }
+})
+
+
+Vue.filter('formatTime', function(value) {
+    if (value) {
+        return moment(String(value)).format('HH:mm')
     }
 })
 
@@ -339,6 +365,7 @@ export default {
         dialog: false,
         dialog1: false,
         dialog2: false,
+        dialog3: false,
         show: false,
         x: 0,
         y: 0,
@@ -376,6 +403,12 @@ export default {
             return this.desserts.filter((el) => {
                 return el.type
             })
+        },
+        fileHistories: function() {
+            return this.detailItem.filehistories
+        },
+        userId: function() {
+            return localStorage.getItem('userid')
         }
     },
 
@@ -408,25 +441,13 @@ export default {
 
         async getFolderFileList() {
             try {
-                let res = await Axios.all([
-                    Axios.get('http://localhost:3000/folders/lists', {
-                        params: {
-                            storage_id: localStorage.getItem('bucket'),
-                            active: 1
-                        }
-                    }),
-                    Axios.get('http://localhost:3000/files/lists', {
-                        params: {
-                            storage_id: localStorage.getItem('bucket'),
-                            active: 1
-                        }
-                    })
-                ])
-                this.desserts = res[0].data.body.folder_list
-                let arr = res[1].data.body.file_list.filter(el => el.folders == 0)
-                arr.forEach(element => {
-                    this.desserts.push(element)
+                let res = await Axios.get('http://localhost:3000/folderfiles/lists', {
+                    params: {
+                        storage_id: localStorage.getItem('bucket'),
+                        active: 1,
+                    }
                 })
+                this.desserts = res.data.body.folder_file_list
             } catch (error) {
                 console.log(error)
             }
@@ -543,18 +564,18 @@ export default {
             }
         },
 
-        async downloadFile() {
+        async downloadFile(name = null) {
             try {
                 let res = await Axios.get('http://localhost:3000/files/download', {
                     params: {
                         bucket_name: localStorage.getItem('bucket'),
-                        name: this.detailItem.name
+                        name: name ? name : this.detailItem.name
                     }, 
                     responseType: 'blob'
                 })
                 const link = document.createElement('a')
                 link.href = window.URL.createObjectURL(new Blob([res.data]))
-                link.setAttribute('download', this.detailItem.name) 
+                link.setAttribute('download', name ? name : this.detailItem.name) 
                 document.body.appendChild(link);
                 link.click()
                 document.body.removeChild(link);

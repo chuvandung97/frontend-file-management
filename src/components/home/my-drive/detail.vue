@@ -5,7 +5,6 @@
             :items="desserts"
             hide-default-footer
             :items-per-page="999"
-            sort-by="name"
             v-if="viewFile"
             :class="'view_list unselectable'"
             
@@ -337,11 +336,8 @@ export default {
                         }
                     })
                 ])
-                this.desserts = res[0].data.body.folder_list
-                let arr = res[1].data.body.file_list
-                arr.forEach(element => {
-                    this.desserts.push(element)
-                })
+                let folder_list = res[0].data.body.folder_list
+                this.desserts = folder_list.concat(res[1].data.body.file_list)
             } catch (error) {
                 console.log(error)
             }
