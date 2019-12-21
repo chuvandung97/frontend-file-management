@@ -9,7 +9,7 @@
             v-if="viewFile"
             :class="'view_list unselectable'"
             item-key="name"
-            show-select
+            :show-select="rolegroup == 'READ' ? false : true"
         >
             <template v-slot:item.name="{ item }">
                 <v-icon class="mr-2" v-if="item.type == 'image/png'" color="primary">mdi-file-image</v-icon>
@@ -167,7 +167,7 @@
             },
 
             ...mapState ([
-                'viewFile'
+                'viewFile', 'rolegroup'
             ]),
         },
 

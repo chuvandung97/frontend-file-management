@@ -11,6 +11,9 @@ export const moduleUser = {
             localStorage.setItem('username', payload.name)
             localStorage.setItem('useremail', payload.email)
             localStorage.setItem('userrole', payload.role)
+            if(payload.rolegroup != null) {
+                localStorage.setItem('rolegroup', payload.rolegroup)
+            }
         },
     },
     actions: {},

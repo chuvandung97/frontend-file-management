@@ -239,7 +239,7 @@ import Axios from 'axios'
                 Authorization: `Bearer ${localStorage.getItem('jwt_token')}`
             }
           })  
-          this.roles = res.data.body.role_list.filter(el => el.code != 'User')
+          this.roles = res.data.body.role_list.filter(el => el.code != 'User' && el.code != 'Sysadmin')
         } catch (error) {
           console.log(error)
         }
@@ -300,6 +300,7 @@ import Axios from 'axios'
                 email: this.editedItem.email,
                 password: this.editedItem.password,
                 role_id: this.editedItem.role.id,
+                role_code: this.editedItem.role.code,
                 active: this.editedItem.active
               })
               this.$store.commit('setNoti', {

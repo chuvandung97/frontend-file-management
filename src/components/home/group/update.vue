@@ -115,6 +115,12 @@
           </v-btn>
         </v-toolbar>
       </template>
+      <template v-slot:item.role_group="{ item }">
+        <v-btn-toggle color="red" dense mandatory borderless v-model="item.rolegroup.code" @change="updateRoleCode(item.rolegroup.code, item.id)">
+          <v-btn class="text-none" :value="'READWRITE'">Đọc ghi</v-btn>
+          <v-btn class="text-none" :value="'READ'">Đọc</v-btn>
+        </v-btn-toggle>
+      </template>
       <template v-slot:item.active="{ item }">
         <v-chip :color="getColor(item.active)" dark>{{ item.active == true ? 'Hoạt động' : 'Không hoạt động' }}</v-chip>
       </template>
@@ -146,6 +152,7 @@ import Axios from 'axios'
             value: 'name',
           },
           { text: 'Email', value: 'email' },
+          { text: 'Vai trò trong nhóm', sortable: false, align: 'center', value: 'role_group'},
           { text: 'Trạng thái', align: 'center', value: 'active' },
         ],
         desserts: [],
@@ -261,7 +268,21 @@ import Axios from 'axios'
           this.getUserCodeIsGroup()
           this.selected = []
         }
-      }
+      },
+
+      async updateRoleCode(codeId, id) {
+        try {
+          await Axios.post('http://localhost:3000/users/update/rolegroup/' + id, {
+            code: codeId
+          }) 
+        } catch (error) {
+          this.$store.commit('setNoti', {
+            typeNoti: 0,
+            textNoti: 'Thất bại !',
+            showNoti: true
+          })
+        }
+      },
     }
   }
 </script>

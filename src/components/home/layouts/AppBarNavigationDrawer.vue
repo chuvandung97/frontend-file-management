@@ -38,12 +38,12 @@
                         </template>
 
                         <v-list min-width="250">
-                            <v-list-item @click="dialog = true">
-                                <v-list-item-icon><v-icon>create_new_folder</v-icon></v-list-item-icon>
+                            <v-list-item @click="dialog = true" :disabled="rolegroup == 'READ' ? true : false">
+                                <v-list-item-icon><v-icon :disabled="rolegroup == 'READ' ? true : false">create_new_folder</v-icon></v-list-item-icon>
                                 <v-list-item-title class="body-2 font-weight-medium ml-n3">Thư mục</v-list-item-title>
                             </v-list-item>
-                            <v-list-item class="file-upload" @click="showUploadFile()">
-                                <v-list-item-icon><v-icon>mdi-upload</v-icon></v-list-item-icon>
+                            <v-list-item class="file-upload" @click="showUploadFile()" :disabled="rolegroup == 'READ' ? true : false">
+                                <v-list-item-icon><v-icon :disabled="rolegroup == 'READ' ? true : false">mdi-upload</v-icon></v-list-item-icon>
                                 <v-list-item-title class="body-2 font-weight-medium ml-n3">Tải tệp lên</v-list-item-title>
                                 <input style="display: none" type="file" id="file" name="file" ref="file" accept=".doc,.docx,.xlsx,.xsl,.pptx,application/*,image/*, video/*, audio/*, font/*, text/*" v-on:change="handleFileUpload()"/>
                             </v-list-item>
@@ -176,73 +176,166 @@
             color="blue darken-3"
             dark
         >
+        
             <v-app-bar-nav-icon @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
-            <v-toolbar-title
-                style="width: 300px"
-                class="ml-0 pl-3"
-            >
-                <span class="hidden-sm-and-down">Hệ thống quản lý file</span>
-            </v-toolbar-title>
-            <v-autocomplete
-                v-model="textSearch"
-                flat
-                :items="itemSearches"
-                :loading="loading"
-                :search-input.sync="search"
-                hide-no-data
-                solo-inverted
-                return-object
-                item-text="name"
-                clearable
-                hide-details
-                prepend-inner-icon="search"
-                label="Tìm kiếm"
-                v-if="roleDescription != 'Sysadmin' && roleDescription != 'Admin'"
-            ></v-autocomplete>
-            <v-spacer></v-spacer>
-            <v-btn icon>
-                <v-icon>notifications</v-icon>
-            </v-btn>
-            <v-menu
-                min-width="150"
-                bottom
-                left
-                content-class="dropdown-menu"
-                offset-y
-                transition="slide-y-transition"
-            >
-                <template v-slot:activator="{ on }">
-                    <v-btn
-                        icon
-                        large
-                        v-on="on"
-                    >
-                        <v-avatar>
-                        <v-icon dark>mdi-account-circle</v-icon>
-                        </v-avatar>
-                    </v-btn>
-                </template>
-                <v-card>
-                    <v-list dense>
-                        <v-list-item to="/user/profile">
-                            <v-list-item-title><v-icon class="mr-4">person_outline</v-icon> Hồ sơ</v-list-item-title>
-                        </v-list-item>
+            <v-col cols="3" md="3" class="hidden-sm-and-down">
+                <v-toolbar-title
+                    class="ml-0 pl-3"
+                >
+                    <span>Hệ thống quản lý file</span>
+                </v-toolbar-title>
+            </v-col>
+            <v-col cols="9" md="5">
+                <v-autocomplete
+                    v-model="textSearch"
+                    flat
+                    :items="itemSearches"
+                    :loading="loading"
+                    :search-input.sync="search"
+                    hide-no-data
+                    solo-inverted
+                    return-object
+                    item-text="name"
+                    clearable
+                    hide-details
+                    prepend-inner-icon="search"
+                    label="Tìm kiếm"
+                    color="primary"
+                    v-if="roleDescription != 'Sysadmin' && roleDescription != 'Admin'"
+                >
+                    <!-- <template v-slot:no-data>
                         <v-list-item>
-                            <v-list-item-title><v-icon class="mr-4">mdi-settings</v-icon> Cài đặt</v-list-item-title>
+                            <v-list-item-title>
+                                Không tìm thấy kết quả cho
+                                <strong>{{search}}</strong>
+                            </v-list-item-title>
                         </v-list-item>
-                        <v-divider></v-divider>
-                        <v-list-item @click="logout()">
-                            <v-list-item-title ><v-icon class="mr-4">mdi-logout</v-icon> Đăng xuất</v-list-item-title>
-                        </v-list-item>
-                    </v-list>
-                </v-card>
-            </v-menu>
+                    </template> -->
+
+                    <template v-slot:item="{ item }">
+                        <v-icon class="mr-3" v-if="item.type == 'image/png'" color="primary">mdi-file-image</v-icon>
+                        <v-icon class="mr-3" v-else-if="item.type == 'application/docx'" color="blue">mdi-file-word-box</v-icon> 
+                        <v-icon class="mr-3" v-else-if="item.type == 'application/pdf'" color="red">mdi-file-pdf-box</v-icon>
+                        <v-icon class="mr-3" v-else-if="item.type == 'application/xlsx'" color="green">mdi-file-excel-box</v-icon>
+                        <v-icon class="mr-3" v-else-if="item.type == 'application/pptx'" color="orange">mdi-file-powerpoint-box</v-icon>
+                        <v-icon class="mr-3" v-else-if="item.type == 'video/mp4'" color="red">mdi-file-video</v-icon>
+                        <v-icon class="mr-3" v-else>mdi-folder</v-icon> 
+                        <v-list-item-content>
+                            <v-list-item-title v-text="item.name"></v-list-item-title>
+                            <v-list-item-subtitle>{{item.User.name}}</v-list-item-subtitle>
+                        </v-list-item-content>
+                    </template>
+                    <template v-slot:append>
+                        <v-menu 
+                            min-width="525"
+                            open-delay="500"
+                            nudge-right="12"
+                            bottom
+                            left
+                            content-class="dropdown-menu"
+                            offset-y
+                            transition="slide-y-transition"
+                        >
+                            <template v-slot:activator="{ on }">
+                                <v-btn text icon depressed small v-on="on">
+                                    <v-icon>mdi-menu-down</v-icon> 
+                                </v-btn>   
+                            </template>
+                            <v-card>
+                                <v-card-text>
+                                    <v-list dense>
+                                    <v-list-item>
+                                        <v-list-item-action>
+                                            Loại
+                                        </v-list-item-action>
+                                        <v-list-item-content>
+                                            <v-select :items="itemss"></v-select>
+                                        </v-list-item-content>
+                                    </v-list-item>
+                                    <v-list-item>
+                                        <v-list-item-action>
+                                            Loại
+                                        </v-list-item-action>
+                                        <v-list-item-content>
+                                            <v-select></v-select>
+                                        </v-list-item-content>
+                                    </v-list-item>
+                                    </v-list>
+                                </v-card-text>
+                                <v-card-actions>
+                                    <v-btn
+                                        @click="''"
+                                        class="text-none"
+                                        depressed
+                                        text
+                                        color="primary"
+                                        outlined
+                                    >Đặt lại</v-btn>
+                                    <v-spacer></v-spacer>
+                                    <v-btn
+                                        color="primary"
+                                        @click="''"
+                                        class="text-none"
+                                        depressed
+                                    >Tìm kiếm</v-btn>
+                                </v-card-actions>
+                            </v-card>
+                        </v-menu>
+                    </template>
+                </v-autocomplete>
+            </v-col>
+            <v-col cols="2" md="2" class="hidden-sm-and-down">
+                <v-spacer></v-spacer>
+            </v-col>
+            <v-col cols="2" md="2">
+                <div class="float-right">
+                <v-btn icon>
+                    <v-icon>notifications</v-icon>
+                </v-btn>
+                <v-menu
+                    min-width="150"
+                    bottom
+                    left
+                    content-class="dropdown-menu"
+                    offset-y
+                    transition="slide-y-transition"
+                >
+                    <template v-slot:activator="{ on }">
+                        <v-btn
+                            icon
+                            large
+                            v-on="on"
+                            class="hidden-sm-and-down"
+                        >
+                            <v-avatar>
+                            <v-icon dark>mdi-account-circle</v-icon>
+                            </v-avatar>
+                        </v-btn>
+                    </template>
+                    <v-card>
+                        <v-list dense>
+                            <v-list-item to="/user/profile">
+                                <v-list-item-title><v-icon class="mr-4">person_outline</v-icon> Hồ sơ</v-list-item-title>
+                            </v-list-item>
+                            <v-list-item>
+                                <v-list-item-title><v-icon class="mr-4">mdi-settings</v-icon> Cài đặt</v-list-item-title>
+                            </v-list-item>
+                            <v-divider></v-divider>
+                            <v-list-item @click="logout()">
+                                <v-list-item-title ><v-icon class="mr-4">mdi-logout</v-icon> Đăng xuất</v-list-item-title>
+                            </v-list-item>
+                        </v-list>
+                    </v-card>
+                </v-menu>
+                </div>
+            </v-col>
         </v-app-bar>
     </div>
 </template>
 
 <script>
 import Axios from 'axios'
+import { mapState } from 'vuex'
 export default {
     data () {
         return {
@@ -256,7 +349,8 @@ export default {
             itemSearches: [],
             desserts: [],
             textSearch: null,
-            loading: false
+            loading: false,
+            itemss: ['Foo', 'Bar', 'Fizz', 'Buzz'],
         }
     },
 
@@ -264,6 +358,7 @@ export default {
         this.getMenu()
         this.name = localStorage.getItem('username')
         this.roleDescription = localStorage.getItem('userrole')
+        this.$store.commit('setRoleGroup', localStorage.getItem('rolegroup'))
         let res = await Axios.get('http://localhost:3000/folderfiles/lists', {
             params: {
                 storage_id: localStorage.getItem('bucket'),
@@ -274,18 +369,28 @@ export default {
         this.desserts = res.data.body.folder_file_list
     },
 
+    computed: {
+        ...mapState ([
+            'rolegroup'
+        ])
+    },
+
     watch: {
         search (val) {
-            val && val !== this.textSearch && this.querySelections(val)        
+            if(val === "" || val === null || val === undefined) {
+                this.itemSearches = []
+            }
+            val && val !== this.textSearch && this.querySelections(val) 
         },
         textSearch (val) {
             if (val.parent_id) {
                 this.$router.push('/user/folder/' + val.parent_id)
-                this.itemSearches = []
             } else if (val.folders.length > 0) {
                 this.$router.push('/user/folder/' + val.folders[0].id)
-                this.itemSearches = []
+            } else {
+                this.$router.push('/user/drive')
             }
+            this.itemSearches = []
         }
     },
 
@@ -293,9 +398,9 @@ export default {
         async getMenu() {
             try {
                 let res = await Axios.get('http://localhost:3000/menus/lists/role', {
-                params: {
-                    role: localStorage.getItem('userrole')
-                }
+                    params: {
+                        role: localStorage.getItem('userrole')
+                    }
                 })  
                 this.items = res.data.body.menu_list
             } catch (error) {
@@ -315,22 +420,22 @@ export default {
 
         async logout() {
             try {
-            await Axios.post('http://localhost:3000/logout', {}, {
-                headers: {
-                    Authorization: `Bearer ${localStorage.getItem('jwt_token')}`
-                }
-            })
-            let storage = ['jwt_token', 'userid', 'username', 'useremail', 'userrole', 'bucket']
-            storage.map((elCurrent) => {
-                return localStorage.removeItem(elCurrent)
-            })
-            this.$router.push('/')
+                await Axios.post('http://localhost:3000/logout', {}, {
+                    headers: {
+                        Authorization: `Bearer ${localStorage.getItem('jwt_token')}`
+                    }
+                })
+                let storage = ['jwt_token', 'userid', 'username', 'useremail', 'userrole', 'bucket', 'rolegroup']
+                storage.map((elCurrent) => {
+                    return localStorage.removeItem(elCurrent)
+                })
+                this.$router.push('/')
             } catch (error) {
-            this.$store.commit('setNoti', {
-                typeNoti: 0,
-                textNoti: 'Đăng xuất thất bại !',
-                showNoti: true
-            })
+                this.$store.commit('setNoti', {
+                    typeNoti: 0,
+                    textNoti: 'Đăng xuất thất bại !',
+                    showNoti: true
+                })
             }
         },
 

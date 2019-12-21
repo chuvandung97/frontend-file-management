@@ -93,25 +93,25 @@
                         <v-list-item-title>Xem chi tiết</v-list-item-title>
                     </v-list-item-content>
                 </v-list-item>
-                <v-list-item @click="dialog = true, overlay = true">
+                <v-list-item @click="dialog = true, overlay = true" :disabled="rolegroup == 'READ' ? true : false">
                     <v-list-item-action>
-                        <v-icon>mdi-pencil</v-icon>
+                        <v-icon :disabled="rolegroup == 'READ' ? true : false">mdi-pencil</v-icon>
                     </v-list-item-action>
                     <v-list-item-content>
                         <v-list-item-title>Đổi tên</v-list-item-title>
                     </v-list-item-content>
                 </v-list-item>
-                <v-list-item @click="dialog1 = true">
+                <v-list-item @click="dialog1 = true" :disabled="rolegroup == 'READ' ? true : false">
                     <v-list-item-action>
-                        <v-icon>mdi-folder-move</v-icon>
+                        <v-icon :disabled="rolegroup == 'READ' ? true : false">mdi-folder-move</v-icon>
                     </v-list-item-action>
                     <v-list-item-content>
                         <v-list-item-title>Di chuyển</v-list-item-title>
                     </v-list-item-content>
                 </v-list-item>
-                <v-list-item>
+                <v-list-item :disabled="rolegroup == 'READ' ? true : false">
                     <v-list-item-action>
-                        <v-icon>mdi-share</v-icon>
+                        <v-icon :disabled="rolegroup == 'READ' ? true : false">mdi-share</v-icon>
                     </v-list-item-action>
                     <v-list-item-content>
                         <v-list-item-title>Chia sẻ</v-list-item-title>
@@ -126,9 +126,9 @@
                     </v-list-item-content>
                 </v-list-item>
                 <v-divider></v-divider>
-                <v-list-item class="file-upload" @click="showUploadFile()" :disabled="detailItem.type ? false : true"> 
+                <v-list-item class="file-upload" @click="showUploadFile()" :disabled="detailItem.type && rolegroup != 'READ' ? false : true"> 
                     <v-list-item-action>
-                        <v-icon :disabled="detailItem.type ? false : true">mdi-upload</v-icon>
+                        <v-icon :disabled="detailItem.type && rolegroup != 'READ' ? false : true">mdi-upload</v-icon>
                     </v-list-item-action>
                     <v-list-item-content>
                         <v-list-item-title>Tải lên bản thay thế</v-list-item-title>
@@ -144,9 +144,9 @@
                     </v-list-item-content>
                 </v-list-item>
                 <v-divider></v-divider>
-                <v-list-item @click="removeToTrash()">
+                <v-list-item @click="removeToTrash()" :disabled="rolegroup == 'READ' ? true : false">
                     <v-list-item-action>
-                        <v-icon>mdi-delete</v-icon>
+                        <v-icon :disabled="rolegroup == 'READ' ? true : false">mdi-delete</v-icon>
                     </v-list-item-action>
                     <v-list-item-content>
                         <v-list-item-title>Xóa</v-list-item-title>
@@ -392,7 +392,7 @@ export default {
 
     computed: {
         ...mapState ([
-            'viewFile', 'reloadDrive'
+            'viewFile', 'reloadDrive', 'rolegroup'
         ]),
         folderLists: function() {
             return this.desserts.filter((el) => {

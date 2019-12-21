@@ -13,7 +13,8 @@ function defaultState() {
     selectedCount: null,
     dialogDeleteTrash: false,
     restoreTrash: false,
-    reloadDrive: false
+    reloadDrive: false,
+    rolegroup: null
   }
 }
 export default new Vuex.Store({
@@ -41,6 +42,9 @@ export default new Vuex.Store({
     },
     updateShowNoti(state, payload) {
       state.showNoti = payload
+    },
+    setRoleGroup(state, payload) {
+      state.rolegroup = payload
     }
   },
   actions: {
