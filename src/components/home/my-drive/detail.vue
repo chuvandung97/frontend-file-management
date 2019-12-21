@@ -22,7 +22,7 @@
                             <v-icon class="mr-2" v-else>mdi-folder</v-icon> 
                             {{ item.name.length >=40 ? item.name.substring(0,40) + '...' : item.name }}
                         </td>
-                        <td>{{ item.User ? item.User.name : '' }}</td>
+                        <td>{{ item.User ? (item.User.id == userId ? 'tôi' : item.User.name) : '' }}</td>
                         <td>{{ item.updatedAt | formatDate }}</td>
                         <td>{{ item.size | formatSize }}</td>
                     </tr>
@@ -85,7 +85,7 @@
             offset-y
             transition="scale-transition"
         >
-            <v-list width="200">
+            <v-list width="300">
                 <v-list-item @click="dialog2 = true">
                     <v-list-item-action>
                         <v-icon>mdi-eye</v-icon>
@@ -94,32 +94,49 @@
                         <v-list-item-title>Xem chi tiết</v-list-item-title>
                     </v-list-item-content>
                 </v-list-item>
-                <v-list-item @click="dialog = true, overlay = true">
+                <v-list-item @click="dialog = true, overlay = true" :disabled="rolegroup == 'READ' ? true : false">
                     <v-list-item-action>
-                        <v-icon>mdi-pencil</v-icon>
+                        <v-icon :disabled="rolegroup == 'READ' ? true : false">mdi-pencil</v-icon>
                     </v-list-item-action>
                     <v-list-item-content>
                         <v-list-item-title>Đổi tên</v-list-item-title>
                     </v-list-item-content>
                 </v-list-item>
-                <v-list-item @click="dialog1 = true">
+                <v-list-item @click="dialog1 = true" :disabled="rolegroup == 'READ' ? true : false">
                     <v-list-item-action>
-                        <v-icon>mdi-folder-move</v-icon>
+                        <v-icon :disabled="rolegroup == 'READ' ? true : false">mdi-folder-move</v-icon>
                     </v-list-item-action>
                     <v-list-item-content>
                         <v-list-item-title>Di chuyển</v-list-item-title>
                     </v-list-item-content>
                 </v-list-item>
-                <v-list-item>
+                <v-list-item :disabled="rolegroup == 'READ' ? true : false">
                     <v-list-item-action>
-                        <v-icon>mdi-share</v-icon>
+                        <v-icon :disabled="rolegroup == 'READ' ? true : false">mdi-share</v-icon>
                     </v-list-item-action>
                     <v-list-item-content>
                         <v-list-item-title>Chia sẻ</v-list-item-title>
                     </v-list-item-content>
                 </v-list-item>
-                <v-list-item @click.prevent="downloadFile()
-                ">
+                <v-list-item v-if="detailItem.filehistories && detailItem.filehistories.length != 0" @click="dialog3 = true">
+                    <v-list-item-action>
+                        <v-icon>mdi-history</v-icon>
+                    </v-list-item-action>
+                    <v-list-item-content>
+                        <v-list-item-title>Quản lý phiên bản</v-list-item-title>
+                    </v-list-item-content>
+                </v-list-item>
+                <v-divider></v-divider>
+                <v-list-item class="file-upload" @click="showUploadFile()" :disabled="detailItem.type && rolegroup != 'READ' ? false : true"> 
+                    <v-list-item-action>
+                        <v-icon :disabled="detailItem.type && rolegroup != 'READ' ? false : true">mdi-upload</v-icon>
+                    </v-list-item-action>
+                    <v-list-item-content>
+                        <v-list-item-title>Tải lên bản thay thế</v-list-item-title>
+                    </v-list-item-content>
+                    <input style="display: none" type="file" id="file" name="file" ref="file" accept=".doc,.docx,.xlsx,.xsl,.pptx,application/*,image/*, video/*, audio/*, font/*, text/*" v-on:change="replaceFileUpload()"/>
+                </v-list-item>
+                <v-list-item @click.prevent="downloadFile()">
                     <v-list-item-action>
                         <v-icon>mdi-download</v-icon>
                     </v-list-item-action>
@@ -127,9 +144,10 @@
                         <v-list-item-title>Tải xuống</v-list-item-title>
                     </v-list-item-content>
                 </v-list-item>
-                <v-list-item @click="removeToTrash()">
+                <v-divider></v-divider>
+                <v-list-item @click="removeToTrash()" :disabled="rolegroup == 'READ' ? true : false">
                     <v-list-item-action>
-                        <v-icon>mdi-delete</v-icon>
+                        <v-icon :disabled="rolegroup == 'READ' ? true : false">mdi-delete</v-icon>
                     </v-list-item-action>
                     <v-list-item-content>
                         <v-list-item-title>Xóa</v-list-item-title>
@@ -137,6 +155,38 @@
                 </v-list-item>
             </v-list>
         </v-menu>
+        <v-dialog v-model="dialog2" fullscreen hide-overlay transition="dialog-bottom-transition">
+            <v-card>
+                <v-toolbar dark color="primary">
+                    <v-btn icon dark @click="dialog2 = false">
+                        <v-icon>mdi-close</v-icon>
+                    </v-btn>
+                    <v-toolbar-title>Chi tiết</v-toolbar-title>
+                </v-toolbar>
+                <v-row>
+                    <v-col cols="7">
+                        <v-timeline dense clipped>
+                            <v-timeline-item
+                                hide-dot
+                            >
+                                <span>TODAY</span>
+                            </v-timeline-item>
+                            <v-timeline-item
+                                icon-color="grey lighten-2"
+                                small
+                            >
+                                <v-row justify="space-between">
+                                <v-col cols="7">This order was archived.</v-col>
+                                <v-col cols="5">15:26</v-col>
+                                </v-row>
+                            </v-timeline-item>
+                        </v-timeline>
+                    </v-col>
+                    <v-divider vertical inset></v-divider>
+                    <v-col class="text-center" cols="5"></v-col>
+                </v-row>
+            </v-card>
+        </v-dialog>  
         <v-dialog v-model="dialog" width="400" persistent>
             <v-card>
                 <v-card-title
@@ -224,6 +274,60 @@
                 </v-card-actions>
             </v-card>
         </v-dialog>
+        <v-dialog v-model="dialog3" width="600" scrollable>
+            <v-card>
+                <v-card-title
+                    class="headline primary white--text"
+                    primary-title
+                >
+                    Quản lý phiên bản
+                    <v-spacer></v-spacer>
+                    <v-btn depressed text icon>
+                        <v-icon color="white" @click="dialog3 = false">mdi-close</v-icon>
+                    </v-btn>
+                </v-card-title>
+
+                <v-card-text style="height: 600px;">
+                    <v-expansion-panels
+                        multiple
+                        focusable
+                        class="mt-3" 
+                    >
+                        <v-expansion-panel
+                            v-for="(item,i) in fileHistories"
+                            :key="i"
+                        >
+                            <v-expansion-panel-header class="pa-1" disable-icon-rotate>
+                                <v-icon class="mr-2" style="flex: 0" v-if="item.type == 'image/png'" color="primary">mdi-file-image</v-icon>
+                                <v-icon class="mr-2" style="flex: 0" v-else-if="item.type == 'application/docx'" color="blue">mdi-file-word-box</v-icon> 
+                                <v-icon class="mr-2" style="flex: 0" v-else-if="item.type == 'application/pdf'" color="red">mdi-file-pdf-box</v-icon>
+                                <v-icon class="mr-2" style="flex: 0" v-else-if="item.type == 'application/xlsx'" color="green">mdi-file-excel-box</v-icon>
+                                <v-icon class="mr-2" style="flex: 0" v-else-if="item.type == 'application/pptx'" color="orange">mdi-file-powerpoint-box</v-icon>
+                                <v-icon class="mr-2" style="flex: 0" v-else-if="item.type == 'video/mp4'" color="red">mdi-file-video</v-icon>
+                                {{ item.name }}<v-subheader>Phiên bản {{fileHistories.length - i}}</v-subheader>
+                                <template v-slot:actions>
+                                    <v-btn text icon depressed @click.stop="downloadFile(item.name)"><v-icon color="teal">mdi-download</v-icon></v-btn>
+                                </template>
+                            </v-expansion-panel-header>
+                            <v-expansion-panel-content>
+                                <v-subheader>Kích cỡ: {{item.size | formatSize}}</v-subheader>
+                                <v-subheader class="mt-n3">Được tải lên bởi: {{item.updated_by == userId ? 'tôi' : item.User.name}} vào lúc {{item.updatedAt | formatTime}} ngày {{item.updatedAt | formatDate}}</v-subheader>
+                                <v-divider></v-divider>
+                            </v-expansion-panel-content>
+                        </v-expansion-panel>
+                    </v-expansion-panels>
+                </v-card-text>
+                <v-card-actions class="mr-4">
+                    <v-spacer></v-spacer>
+                    <v-btn
+                        @click="dialog3 = false"
+                        class="text-none"
+                        depressed
+                        color="primary"
+                    >Đóng</v-btn>
+                </v-card-actions>
+            </v-card>
+        </v-dialog>
     </v-card>
 </template>
 
@@ -253,6 +357,7 @@ export default {
         dialog: false,
         dialog1: false,
         dialog2: false,
+        dialog3: false,
         show: false,
         x: 0,
         y: 0,
@@ -279,7 +384,7 @@ export default {
 
     computed: {
         ...mapState ([
-            'viewFile', 'reloadDrive'
+            'viewFile', 'reloadDrive', 'rolegroup'
         ]),
         folderLists: function() {
             return this.desserts.filter((el) => {
@@ -290,6 +395,12 @@ export default {
             return this.desserts.filter((el) => {
                 return el.type
             })
+        },
+        fileHistories: function() {
+            return this.detailItem.filehistories
+        },
+        userId: function() {
+            return localStorage.getItem('userid')
         }
     },
 
@@ -449,18 +560,18 @@ export default {
             }
         },
 
-        async downloadFile() {
+        async downloadFile(name = null) {
             try {
                 let res = await Axios.get('http://localhost:3000/files/download', {
                     params: {
                         bucket_name: localStorage.getItem('bucket'),
-                        name: this.detailItem.name
+                        name: name ? name : this.detailItem.name
                     }, 
                     responseType: 'blob'
                 })
                 const link = document.createElement('a')
                 link.href = window.URL.createObjectURL(new Blob([res.data]))
-                link.setAttribute('download', this.detailItem.name) 
+                link.setAttribute('download', name ? name : this.detailItem.name) 
                 document.body.appendChild(link);
                 link.click()
                 document.body.removeChild(link);
@@ -471,6 +582,46 @@ export default {
                     textNoti: 'Tải xuống thất bại !',
                     showNoti: true
                 })
+            }
+        },
+
+        showUploadFile() {
+            const btn_upload = document.getElementById('file')
+            btn_upload.click()
+        },
+
+        async replaceFileUpload() {
+            this.file = this.$refs.file.files[0];
+            let formData = new FormData();
+            formData.append('file', this.file); // coi như là name="file"
+            try {
+                let res = await Axios.post('http://localhost:3000/files/upload/replace/' + this.detailItem.id, formData, {
+                    headers: {
+                        'Content-Type': 'multipart/form-data'
+                    }, 
+                    params: {
+                        bucket_name: localStorage.getItem('bucket'),
+                        created_by: localStorage.getItem('userid'),
+                        updated_by: localStorage.getItem('userid')
+                    },
+                    onUploadProgress: function( progressEvent ) {
+                        console.log( progressEvent.loaded);
+                    }
+                })
+                this.$store.commit('setNoti', {
+                    typeNoti: 1,
+                    textNoti: res.data.message,
+                    showNoti: true
+                })
+            } catch (error) {
+                console.log(error)
+                this.$store.commit('setNoti', {
+                    typeNoti: 0,
+                    textNoti: 'Tải file thất bại !',
+                    showNoti: true
+                })
+            } finally {
+                this.$store.commit('setReloadIndexDrive', true)
             }
         },
 
