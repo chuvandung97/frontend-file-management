@@ -114,6 +114,11 @@ export default new Router({
           path: 'trash',
           name: 'user.trash',
           component: () => import('./components/home/my-drive/trash'),
+        },
+        {
+          path: 'category',
+          name: 'category',
+          component: () => import('./components/home/Category.vue'),
         }
       ]
     }

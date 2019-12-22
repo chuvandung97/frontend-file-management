@@ -45,7 +45,7 @@
                             <v-list-item class="file-upload" @click="showUploadFile()" :disabled="rolegroup == 'READ' ? true : false">
                                 <v-list-item-icon><v-icon :disabled="rolegroup == 'READ' ? true : false">mdi-upload</v-icon></v-list-item-icon>
                                 <v-list-item-title class="body-2 font-weight-medium ml-n3">Tải tệp lên</v-list-item-title>
-                                <input style="display: none" type="file" id="file" name="file" ref="file" accept=".doc,.docx,.xlsx,.xsl,.pptx,application/*,image/*, video/*, audio/*, font/*, text/*" v-on:change="handleFileUpload()"/>
+                                <input style="display: none" type="file" id="file" name="file" ref="file" :accept="typeList" v-on:change="handleFileUpload()"/>
                             </v-list-item>
                         </v-list>
                     </v-menu>
@@ -351,11 +351,13 @@ export default {
             textSearch: null,
             loading: false,
             itemss: ['Foo', 'Bar', 'Fizz', 'Buzz'],
+            typeList: []
         }
     },
 
     async mounted() {
         this.getMenu()
+        this.getDetailFileType()
         this.name = localStorage.getItem('username')
         this.roleDescription = localStorage.getItem('userrole')
         this.$store.commit('setRoleGroup', localStorage.getItem('rolegroup'))
@@ -403,6 +405,16 @@ export default {
                     }
                 })  
                 this.items = res.data.body.menu_list
+            } catch (error) {
+                console.log(error)
+            }
+        },
+
+        async getDetailFileType() {
+            try {
+                let res = await Axios.get('http://localhost:3000/files/lists/detailtype')
+                this.typeList = res.data.body.detail_type_list
+                this.typeList = this.typeList.map(el => el.filetype.extension)
             } catch (error) {
                 console.log(error)
             }

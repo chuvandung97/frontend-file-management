@@ -12,13 +12,8 @@
                 <tbody>
                     <tr v-for="item in items" :key="item.name" @dblclick="showDetailFolder(item)" @contextmenu="showSelectMenu($event, item)">
                         <td :title="item.name" style="width: 40%">
-                            <v-icon class="mr-2" v-if="item.type == 'image/png'" color="primary">mdi-file-image</v-icon>
-                            <v-icon class="mr-2" v-else-if="item.type == 'application/docx'" color="blue">mdi-file-word-box</v-icon> 
-                            <v-icon class="mr-2" v-else-if="item.type == 'application/pdf'" color="red">mdi-file-pdf-box</v-icon>
-                            <v-icon class="mr-2" v-else-if="item.type == 'application/xlsx'" color="green">mdi-file-excel-box</v-icon>
-                            <v-icon class="mr-2" v-else-if="item.type == 'application/pptx'" color="orange">mdi-file-powerpoint-box</v-icon>
-                            <v-icon class="mr-2" v-else-if="item.type == 'video/mp4'" color="red">mdi-file-video</v-icon>
-                            <v-icon class="mr-2" v-else>mdi-folder</v-icon> 
+                            <v-icon class="mr-2" v-if="!item.filetypedetail">mdi-folder</v-icon> 
+                            <v-icon class="mr-2" v-else :color="item.filetypedetail.color">{{item.filetypedetail.icon}}</v-icon>
                             {{ item.name.length >=40 ? item.name.substring(0,40) + '...' : item.name }}
                         </td>
                         <td>{{ item.User ? (item.User.id == userId ? 'tôi' : item.User.name) : '' }}</td>
@@ -27,15 +22,6 @@
                     </tr>
                 </tbody>
             </template>
-            <!-- <template v-slot:item.name="{ item }">
-                <v-icon class="mr-2">mdi-folder</v-icon> {{ item.name }}
-            </template>
-            <template v-slot:item.created_by="{ item }">
-                {{ item.User.name }}
-            </template>
-            <template v-slot:item.updatedAt="{ item }">
-                {{ item.updatedAt | formatDate }}
-            </template> -->
         </v-data-table>
         <template v-if="!viewFile">
             <v-card flat v-if="folderLists.length > 0">
@@ -56,19 +42,8 @@
                     <v-row>
                         <v-col v-for="file in fileLists" cols="6" sm="4" md="3" xl="1" :key="file.name" @contextmenu="showSelectMenu($event, file)">
                             <v-card outlined class="pa-3 test" :title="file.name">
-                                <v-icon color="primary" v-if="file.type == 'image/png'" size="100" class="d-flex justify-center py-8">mdi-file-image</v-icon>
-                                <v-icon color="blue" v-if="file.type == 'application/docx'" size="100" class="d-flex justify-center py-8">mdi-file-word-box</v-icon>
-                                <v-icon color="red" v-if="file.type == 'application/pdf'" size="100" class="d-flex justify-center py-8">mdi-file-pdf-box</v-icon>
-                                <v-icon color="green" v-if="file.type == 'application/xlsx'" size="100" class="d-flex justify-center py-8">mdi-file-excel-box</v-icon>
-                                <v-icon color="orange" v-if="file.type == 'application/pptx'" size="100" class="d-flex justify-center py-8">mdi-file-powerpoint-box</v-icon>
-                                <v-icon color="red" v-if="file.type == 'video/mp4'" size="100" class="d-flex justify-center py-8">mdi-file-video</v-icon>
-
-                                <v-icon class="mr-2" v-if="file.type == 'image/png'" color="primary">mdi-file-image</v-icon>
-                                <v-icon class="mr-2" v-else-if="file.type == 'application/docx'" color="blue">mdi-file-word-box</v-icon> 
-                                <v-icon class="mr-2" v-else-if="file.type == 'application/pdf'" color="red">mdi-file-pdf-box</v-icon>
-                                <v-icon class="mr-2" v-else-if="file.type == 'application/xlsx'" color="green">mdi-file-excel-box</v-icon>
-                                <v-icon class="mr-2" v-else-if="file.type == 'application/pptx'" color="orange">mdi-file-powerpoint-box</v-icon>
-                                <v-icon class="mr-2" v-else-if="file.type == 'video/mp4'" color="red">mdi-file-video</v-icon>
+                                <v-icon :color="file.filetypedetail.color" size="100" class="d-flex justify-center py-8">{{file.filetypedetail.icon}}</v-icon>
+                                <v-icon class="mr-2" :color="file.filetypedetail.color">{{file.filetypedetail.icon}}</v-icon>
                                 {{ file.name.length >=25 ? file.name.substring(0,25) + '...' : file.name }}
                             </v-card>
                         </v-col>
@@ -126,14 +101,14 @@
                     </v-list-item-content>
                 </v-list-item>
                 <v-divider></v-divider>
-                <v-list-item class="file-upload" @click="showUploadFile()" :disabled="detailItem.type && rolegroup != 'READ' ? false : true"> 
+                <v-list-item class="file-upload" @click="showUploadFile()" :disabled="detailItem.filetypedetail && rolegroup != 'READ' ? false : true"> 
                     <v-list-item-action>
-                        <v-icon :disabled="detailItem.type && rolegroup != 'READ' ? false : true">mdi-upload</v-icon>
+                        <v-icon :disabled="detailItem.filetypedetail && rolegroup != 'READ' ? false : true">mdi-upload</v-icon>
                     </v-list-item-action>
                     <v-list-item-content>
                         <v-list-item-title>Tải lên bản thay thế</v-list-item-title>
                     </v-list-item-content>
-                    <input style="display: none" type="file" id="file" name="file" ref="file" accept=".doc,.docx,.xlsx,.xsl,.pptx,application/*,image/*, video/*, audio/*, font/*, text/*" v-on:change="replaceFileUpload()"/>
+                    <input style="display: none" type="file" id="file" name="file" ref="file" :accept="typeList" v-on:change="replaceFileUpload()"/>
                 </v-list-item>
                 <v-list-item @click.prevent="downloadFile()">
                     <v-list-item-action>
@@ -298,12 +273,7 @@
                             :key="i"
                         >
                             <v-expansion-panel-header class="pa-1" disable-icon-rotate>
-                                <v-icon class="mr-2" style="flex: 0" v-if="item.type == 'image/png'" color="primary">mdi-file-image</v-icon>
-                                <v-icon class="mr-2" style="flex: 0" v-else-if="item.type == 'application/docx'" color="blue">mdi-file-word-box</v-icon> 
-                                <v-icon class="mr-2" style="flex: 0" v-else-if="item.type == 'application/pdf'" color="red">mdi-file-pdf-box</v-icon>
-                                <v-icon class="mr-2" style="flex: 0" v-else-if="item.type == 'application/xlsx'" color="green">mdi-file-excel-box</v-icon>
-                                <v-icon class="mr-2" style="flex: 0" v-else-if="item.type == 'application/pptx'" color="orange">mdi-file-powerpoint-box</v-icon>
-                                <v-icon class="mr-2" style="flex: 0" v-else-if="item.type == 'video/mp4'" color="red">mdi-file-video</v-icon>
+                                <v-icon class="mr-2" style="flex: 0" :color="item.filetypedetail.color">{{item.filetypedetail.icon}}</v-icon>
                                 {{ item.name }}<v-subheader>Phiên bản {{fileHistories.length - i}}</v-subheader>
                                 <template v-slot:actions>
                                     <v-btn text icon depressed @click.stop="downloadFile(item.name)"><v-icon color="teal">mdi-download</v-icon></v-btn>
@@ -380,11 +350,13 @@ export default {
             { text: 'Kích cỡ', value: 'size' },
         ],
         desserts: [],
-        detailItem: {}
+        detailItem: {},
+        typeList: []
     }),
 
     mounted() {
         this.getFolderFileList()
+        this.getDetailFileType()
         this.$store.commit('setSelectedTrash', {
             selectedCount: null
         })
@@ -396,12 +368,12 @@ export default {
         ]),
         folderLists: function() {
             return this.desserts.filter((el) => {
-                return !el.type
+                return !el.filetypedetail
             })
         },
         fileLists: function() {
             return this.desserts.filter((el) => {
-                return el.type
+                return el.filetypedetail
             })
         },
         fileHistories: function() {
@@ -421,7 +393,7 @@ export default {
 
     methods: {
         showDetailFolder(item) {
-            if(!item.type) {
+            if(!item.filetypedetail) {
                 this.$router.push('/user/folder/' + item.id)
                 this.getFolderFileList()
             }
@@ -453,6 +425,16 @@ export default {
             }
         },
 
+        async getDetailFileType() {
+            try {
+                let res = await Axios.get('http://localhost:3000/files/lists/detailtype')
+                this.typeList = res.data.body.detail_type_list
+                this.typeList = this.typeList.map(el => el.filetype.extension)
+            } catch (error) {
+                console.log(error)
+            }
+        },
+
         async updateName() {
             if(this.new_name == this.detailItem.name) {
                 this.$store.commit('setNoti', {
@@ -464,7 +446,7 @@ export default {
             } else { 
                 try {
                     var url = ''
-                    if(this.detailItem.type === undefined) {
+                    if(this.detailItem.filetypedetail === undefined) {
                         url = 'http://localhost:3000/folders/update/'
                     } else {
                         url = 'http://localhost:3000/files/update/'
@@ -496,7 +478,7 @@ export default {
         async removeToTrash() {
             try {
                 var url = ''
-                if(this.detailItem.type === undefined) {
+                if(this.detailItem.filetypedetail === undefined) {
                     url = 'http://localhost:3000/folders/remove/trash/'
                 } else {
                     url = 'http://localhost:3000/files/remove/trash/'
@@ -529,7 +511,7 @@ export default {
                 })
             } else {
                 try {
-                    if(this.detailItem.type === undefined) {
+                    if(this.detailItem.filetypedetail === undefined) {
                         let res = await Axios.post('http://localhost:3000/folders/move/' + this.detailItem.id, {
                             folderId: this.selection[0].id,
                             user_id: localStorage.getItem('userid')

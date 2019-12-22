@@ -12,13 +12,8 @@
             :show-select="rolegroup == 'READ' ? false : true"
         >
             <template v-slot:item.name="{ item }">
-                <v-icon class="mr-2" v-if="item.type == 'image/png'" color="primary">mdi-file-image</v-icon>
-                <v-icon class="mr-2" v-else-if="item.type == 'application/docx'" color="blue">mdi-file-word-box</v-icon> 
-                <v-icon class="mr-2" v-else-if="item.type == 'application/pdf'" color="red">mdi-file-pdf-box</v-icon>
-                <v-icon class="mr-2" v-else-if="item.type == 'application/xlsx'" color="green">mdi-file-excel-box</v-icon>
-                <v-icon class="mr-2" v-else-if="item.type == 'application/pptx'" color="orange">mdi-file-powerpoint-box</v-icon>
-                <v-icon class="mr-2" v-else-if="item.type == 'video/mp4'" color="red">mdi-file-video</v-icon>
-                <v-icon class="mr-2" v-else>mdi-folder</v-icon>
+                <v-icon class="mr-2" v-if="!item.filetypedetail">mdi-folder</v-icon> 
+                <v-icon class="mr-2" v-else :color="item.filetypedetail.color">{{item.filetypedetail.icon}}</v-icon>
                 {{ item.name }}
             </template> 
             <template v-slot:item.created_by="{ item }">
@@ -50,19 +45,8 @@
                     <v-row>
                         <v-col v-for="file in fileLists" cols="6" sm="4" md="3" xl="1" :key="file.name" @contextmenu="showSelectMenu($event, file)">
                             <v-card outlined class="pa-3 test" :title="file.name">
-                                <v-icon color="primary" v-if="file.type == 'image/png'" size="100" class="d-flex justify-center py-8">mdi-file-image</v-icon>
-                                <v-icon color="blue" v-if="file.type == 'application/docx'" size="100" class="d-flex justify-center py-8">mdi-file-word-box</v-icon>
-                                <v-icon color="red" v-if="file.type == 'application/pdf'" size="100" class="d-flex justify-center py-8">mdi-file-pdf-box</v-icon>
-                                <v-icon color="green" v-if="file.type == 'application/xlsx'" size="100" class="d-flex justify-center py-8">mdi-file-excel-box</v-icon>
-                                <v-icon color="orange" v-if="file.type == 'application/pptx'" size="100" class="d-flex justify-center py-8">mdi-file-powerpoint-box</v-icon>
-                                <v-icon color="red" v-if="file.type == 'video/mp4'" size="100" class="d-flex justify-center py-8">mdi-file-video</v-icon>
-
-                                <v-icon class="mr-2" v-if="file.type == 'image/png'" color="primary">mdi-file-image</v-icon>
-                                <v-icon class="mr-2" v-else-if="file.type == 'application/docx'" color="blue">mdi-file-word-box</v-icon> 
-                                <v-icon class="mr-2" v-else-if="file.type == 'application/pdf'" color="red">mdi-file-pdf-box</v-icon>
-                                <v-icon class="mr-2" v-else-if="file.type == 'application/xlsx'" color="green">mdi-file-excel-box</v-icon>
-                                <v-icon class="mr-2" v-else-if="file.type == 'application/pptx'" color="orange">mdi-file-powerpoint-box</v-icon>
-                                <v-icon class="mr-2" v-else-if="file.type == 'video/mp4'" color="red">mdi-file-video</v-icon>
+                                <v-icon :color="file.filetypedetail.color" size="100" class="d-flex justify-center py-8">{{file.filetypedetail.icon}}</v-icon>
+                                <v-icon class="mr-2" :color="file.filetypedetail.color">{{file.filetypedetail.icon}}</v-icon>
                                 {{ file.name.length >=25 ? file.name.substring(0,25) + '...' : file.name }}
                             </v-card>
                         </v-col>
@@ -198,10 +182,8 @@
             },
 
             async restore() {
-                let folderIds = this.selected.filter(el => !el.type).map(currentElArray => currentElArray.id)
-                let fileIds = this.selected.filter(el => el.type).map(currentElArray => currentElArray.id)
-                console.log(this.selected.filter(el => !el.type))
-                console.log(folderIds)
+                let folderIds = this.selected.filter(el => !el.filetypedetail).map(currentElArray => currentElArray.id)
+                let fileIds = this.selected.filter(el => el.filetypedetail).map(currentElArray => currentElArray.id)
                 try {
                     if(folderIds.length == 0) {
                         await Axios.post('http://localhost:3000/files/restore', {
@@ -244,9 +226,9 @@
             },
 
             async deletePermanently() {
-                let folderIds = this.selected.filter(el => !el.type).map(currentElArray => currentElArray.id)
-                let fileIds = this.selected.filter(el => el.type).map(currentElArray => currentElArray.id)
-                let fileNames = this.selected.filter(el => el.type).map(currentElArray => currentElArray.name)
+                let folderIds = this.selected.filter(el => !el.filetypedetail).map(currentElArray => currentElArray.id)
+                let fileIds = this.selected.filter(el => el.filetypedetail).map(currentElArray => currentElArray.id)
+                let fileNames = this.selected.filter(el => el.filetypedetail).map(currentElArray => currentElArray.name)
                 try {
                     if(folderIds.length == 0) {
                         await Axios.delete('http://localhost:3000/files/delete', {
