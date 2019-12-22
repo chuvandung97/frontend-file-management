@@ -144,8 +144,8 @@ export default {
     }
   }
 </script>
-<style>
-    .v-data-table {
+<style scoped>
+    .v-data-table[data-v-d614f524] {
         width: 90%
     }
 </style>
