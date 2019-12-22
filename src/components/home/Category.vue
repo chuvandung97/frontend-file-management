@@ -52,7 +52,7 @@
                             {{item.filetype.extension}}
                         </template>
                         <template v-slot:item.icon="{ item }">
-                            <v-icon :color="item.color">{{item.icon}}</v-icon>
+                            <v-icon class="ml-n5" :color="item.color">{{item.icon}}</v-icon>
                         </template>
                     </v-data-table>
                 </v-card-text>
