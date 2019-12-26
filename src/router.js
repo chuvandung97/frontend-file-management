@@ -16,40 +16,44 @@ export default new Router({
       component: LandingPage,
       beforeEnter: async (to, from, next) => {
         let token = localStorage.getItem('jwt_token')
-        if(!token) {
-          next('/login')
-        } else {
-          try {
-            let res = await Axios.get('http://localhost:3000/me', {
-             headers: {
-               Authorization: `Bearer ${localStorage.getItem('jwt_token')}`
-             } 
-            })
-            if(res.data.code == 200) {
-              store.commit('setUser', res.data.body)
-              if(res.data.body.role == "Admin" || res.data.body.role == "Sysadmin") {
-                next('/user/info')
+          if(!token && to.path !== '/login') { 
+            next('/login')
+          } else if(token) {
+            try {
+              let res = await Axios.get('http://localhost:3000/me', {
+               headers: {
+                 Authorization: `Bearer ${localStorage.getItem('jwt_token')}`
+               } 
+              })
+              if(res.data.code == 200) {
+                store.commit('setUser', res.data.body)
+                if(res.data.body.role == "Admin" || res.data.body.role == "Sysadmin") {
+                  next({name: 'user.info'})
+                } else {
+                  console.log(12)
+                  next({name: 'user.drive'})
+                }
               } else {
-                next('/user/drive')
+                next({name: 'login'})
               }
-            } else {
+            } catch (error) {
               next('/login')
             }
-          } catch (error) {
-            next('/login')
+          } else {
+            next()
           }
-        }
-      }
-    },
-    {
-      path: '/login',
-      name: 'login',
-      component: () => import('./views/Login.vue')
-    },
-    {
-      path: '/register',
-      name: 'register',
-      component: () => import('./views/Register.vue')
+      },
+       children: [
+        {
+          path: 'login',
+          name: 'login',
+          component: () => import('./components/landing-page/login.vue')
+        },
+        {
+          path: 'register',
+          component: () => import('./components/landing-page/register.vue')
+        },
+      ] 
     },
     {
       path: '/user',
@@ -65,6 +69,7 @@ export default new Router({
       children: [
         {
           path: 'info',
+          name: 'user.info',
           component: () => import('./components/home/User.vue'),
         },
         {
