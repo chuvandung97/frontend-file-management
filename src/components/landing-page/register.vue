@@ -7,7 +7,6 @@
         name="name" label="Tên" required
         v-model="name"
         autocomplete="off"
-        :counter="10"
         outlined
         dense
         @keypress.enter="formSubmit()"
@@ -104,3 +103,12 @@
      }
   }
 </script>
+
+<style scoped>
+  a {
+      text-decoration:none;
+  }
+  a:hover {
+    text-decoration:underline;
+  }
+</style>

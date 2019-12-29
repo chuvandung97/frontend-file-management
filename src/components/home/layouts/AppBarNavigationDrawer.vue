@@ -213,12 +213,7 @@
                     </template> -->
 
                     <template v-slot:item="{ item }">
-                        <v-icon class="mr-3" v-if="item.type == 'image/png'" color="primary">mdi-file-image</v-icon>
-                        <v-icon class="mr-3" v-else-if="item.type == 'application/docx'" color="blue">mdi-file-word-box</v-icon> 
-                        <v-icon class="mr-3" v-else-if="item.type == 'application/pdf'" color="red">mdi-file-pdf-box</v-icon>
-                        <v-icon class="mr-3" v-else-if="item.type == 'application/xlsx'" color="green">mdi-file-excel-box</v-icon>
-                        <v-icon class="mr-3" v-else-if="item.type == 'application/pptx'" color="orange">mdi-file-powerpoint-box</v-icon>
-                        <v-icon class="mr-3" v-else-if="item.type == 'video/mp4'" color="red">mdi-file-video</v-icon>
+                        <v-icon class="mr-3" v-if="item.filetypedetail" :color="item.filetypedetail.color">{{item.filetypedetail.icon}}</v-icon>
                         <v-icon class="mr-3" v-else>mdi-folder</v-icon> 
                         <v-list-item-content>
                             <v-list-item-title v-text="item.name"></v-list-item-title>

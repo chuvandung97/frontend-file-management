@@ -325,7 +325,7 @@ Vue.filter('formatDate', function(value) {
 
 Vue.filter('formatSize', function(value) {
     if(value) {
-        return numeral(value).format('0.0 ib')
+        return numeral(value).format('0.0 b')
     }
 })
 export default {

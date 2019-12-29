@@ -56,7 +56,7 @@
           } catch(e) {
             this.$store.commit('setNoti', {
               typeNoti: 0,
-              textNoti: e,
+              textNoti: 'Đăng nhập thất bại !',
               showNoti: true
             })
           } finally {
@@ -71,3 +71,12 @@
     }
   }
 </script>
+
+<style scoped>
+  a {
+      text-decoration:none;
+  }
+  a:hover {
+    text-decoration:underline;
+  }
+</style>

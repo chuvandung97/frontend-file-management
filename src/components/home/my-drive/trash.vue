@@ -103,7 +103,7 @@
 
     Vue.filter('formatSize', function(value) {
         if(value) {
-            return numeral(value).format('0.0 ib')
+            return numeral(value).format('0.0 b')
         }
     })
     export default {
@@ -125,6 +125,7 @@
                 { text: 'Kích cỡ', value: 'size' },
             ],
             desserts: [],
+            selectedId: -1
         }),
 
         mounted() {

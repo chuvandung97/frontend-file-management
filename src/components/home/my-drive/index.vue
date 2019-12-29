@@ -7,10 +7,10 @@
             :items-per-page="999"
             v-if="viewFile"
             :class="'view_list unselectable'"
-        >   
+        > 
             <template v-slot:body=" { items } ">
                 <tbody>
-                    <tr v-for="item in items" :key="item.name" @dblclick="showDetailFolder(item)" @contextmenu="showSelectMenu($event, item)">
+                    <tr v-for="item in items" :key="item.name" :class="item.id == selectId ? 'blue lighten-5 primary--text' : ''" @click="clickRow(item)" @dblclick="showDetailFolder(item)" @contextmenu="showSelectMenu($event, item)">
                         <td :title="item.name" style="width: 40%">
                             <v-icon class="mr-2" v-if="!item.filetypedetail">mdi-folder</v-icon> 
                             <v-icon class="mr-2" v-else :color="item.filetypedetail.color">{{item.filetypedetail.icon}}</v-icon>
@@ -323,7 +323,7 @@ Vue.filter('formatTime', function(value) {
 
 Vue.filter('formatSize', function(value) {
     if(value) {
-        return numeral(value).format('0.0 ib')
+        return numeral(value).format('0.0 b')
     }
 })
 
@@ -351,7 +351,8 @@ export default {
         ],
         desserts: [],
         detailItem: {},
-        typeList: []
+        typeList: [],
+        selectId: -1
     }),
 
     mounted() {
@@ -404,11 +405,17 @@ export default {
             this.show = false;
             this.x = e.clientX;
             this.y = e.clientY;
+            this.selectId = item.id
+            //this.$set(item, 'selected', true)
             this.detailItem = Object.assign({}, item)
             this.new_name = item.name
             this.$nextTick(() => {
                 this.show = true;
             });
+        },
+
+        clickRow(item) {
+            this.selectId = item.id
         },
 
         async getFolderFileList() {
