@@ -9,9 +9,13 @@
             v-if="viewFile"
             :class="'view_list unselectable'"
             item-key="name"
+            :loading="isLoading"
             :show-select="isShowSelect"
             @click:row="clickRow"
         >
+            <template v-slot:progress>
+                <Loading />
+            </template>
             <template v-slot:no-data>
                 Không có dữ liệu
             </template>
@@ -30,6 +34,7 @@
                 {{ item.size | formatSize }}
             </template>
         </v-data-table>
+        
         <template v-if="!viewFile">
             <v-card flat v-if="folderLists.length > 0">
                 <v-subheader>Thư mục</v-subheader>
@@ -98,6 +103,7 @@
     import Axios from 'axios'
     import { mapState } from 'vuex'
     import numeral from 'numeral'
+    import Loading from '../layouts/Loading'
 
     Vue.filter('formatDate', function(value) {
         if (value) {
@@ -111,6 +117,9 @@
         }
     })
     export default {
+        components: {
+            Loading
+        },
         data: () => ({
             showSelectTable: false,
             show: false,
@@ -130,7 +139,8 @@
             ],
             desserts: [],
             selectedId: -1,
-            isShowSelect: false
+            isShowSelect: false,
+            isLoading: false
         }),
 
         mounted() {
@@ -187,6 +197,7 @@
             },
             async getFolderFileList() {
                 try {
+                    this.isLoading = true
                      let res = await Axios.get('http://localhost:3000/folderfiles/lists', {
                         params: {
                             storage_id: localStorage.getItem('bucket'),
@@ -196,6 +207,8 @@
                     this.desserts = res.data.body.folder_file_list
                 } catch (error) {
                     console.log(error)
+                } finally {
+                    this.isLoading = false
                 }
             },
 

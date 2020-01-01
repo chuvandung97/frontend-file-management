@@ -102,8 +102,12 @@
                 :items="desserts"
                 :search="search"
                 item-key="name"
+                :loading="isLoading"
                 :show-select=true
             >
+            <template v-slot:progress>
+                <Loading /> 
+            </template>
             <template v-slot:item.role_group="{ item }">
                 <v-btn-toggle color="primary" dense mandatory borderless v-model="item.rolegroup.code" @change="updateRoleCode(item.rolegroup.code, item.id)">
                     <v-btn class="text-none caption" :value="'READWRITE'">Đọc ghi</v-btn>
@@ -122,7 +126,11 @@
 
 <script>
 import Axios from 'axios'
+import Loading from '../layouts/Loading'
 export default {
+    components: {
+        Loading
+    },
     data () {
         return {
             name: null,
@@ -147,7 +155,8 @@ export default {
             { text: 'Trạng thái', align: 'center', value: 'active' },
             ],
             desserts: [],
-            errorMessage: null
+            errorMessage: null,
+            isLoading: false
         }
     },
 
@@ -206,6 +215,7 @@ export default {
 
         async getMemberGroup() {
             try {
+                this.isLoading = true
                 let res = await Axios.get('http://localhost:3000/groups/list/id', {
                     params: {
                     groupId: this.$route.params.groupId
@@ -214,6 +224,8 @@ export default {
                 this.desserts = res.data.body.group.storage.Users
             } catch (error) {
                 console.log(error)
+            } finally {
+                this.isLoading = false
             }
         },
 
@@ -224,6 +236,7 @@ export default {
                     this.errorMessage = null
                 }, 3000)
             } else {
+                this.isLoading = true
                 let userIds = this.model.map((currentElArray) => {
                     return currentElArray.id
                 })
@@ -244,6 +257,7 @@ export default {
                         showNoti: true
                     })
                 } finally {
+                    this.isLoading = false
                     this.model = []
                     this.getMemberGroup()
                     this.getUserCodeIsGroup()
@@ -256,6 +270,7 @@ export default {
                 return currentElArray.id
             })
             try {
+                this.isLoading = true
                 let res = await Axios.post('http://localhost:3000/users/remove/fromgroup', {
                     userIds: userIds
                 })
@@ -271,6 +286,7 @@ export default {
                     showNoti: true
                 })
             } finally {
+                this.isLoading = false
                 this.getMemberGroup()
                 this.getUserCodeIsGroup()
                 this.selected = []

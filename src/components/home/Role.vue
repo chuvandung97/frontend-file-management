@@ -18,11 +18,15 @@
       :search="search"
       item-key="code"
       :show-select=true
+      :loading="isLoading"
       :footer-props="{
         itemsPerPageText: 'Hiển thị',
       }"
     >
-    <template v-slot:no-data>
+      <template v-slot:progress>
+          <Loading /> 
+      </template>
+      <template v-slot:no-data>
         Không có dữ liệu
       </template>
       <template v-slot:no-results>
@@ -123,7 +127,11 @@
 
 <script>
 import Axios from 'axios'
+import Loading from './layouts/Loading'
   export default {
+    components: {
+        Loading
+    },
     data () {
       return {
         dialog: false,
@@ -160,6 +168,7 @@ import Axios from 'axios'
           { text: 'Chỉnh sửa', value: 'edit', sortable: false, align: 'center' },
         ],
         desserts: [],
+        isLoading: false
       }
     },
 
@@ -181,6 +190,7 @@ import Axios from 'axios'
 
     methods: {
       async getRole() {
+        this.isLoading = true
         this.useremail = localStorage.getItem('useremail')
         try {
           let res = await Axios.get('http://localhost:3000/roles/lists', {
@@ -191,6 +201,8 @@ import Axios from 'axios'
           this.desserts = res.data.body.role_list
         } catch (error) {
           console.log(error)
+        } finally {
+          this.isLoading = false
         }
       },
 

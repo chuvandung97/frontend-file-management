@@ -5,20 +5,16 @@
             :items="desserts"
             hide-default-footer
             :items-per-page="999"
+            :loading="isLoading"
             v-if="viewFile"
             :class="'view_list unselectable'"
         > 
+            <template v-slot:progress>
+                <Loading /> 
+            </template>
             <template v-slot:body=" { items } ">
                 <tbody v-click-outside="clickOutSide">
-                    <tr v-if="items.length == 0" class="text-center" style="height: 15pc">
-                        <td colspan="4">
-                            <v-progress-circular
-                                indeterminate
-                                color="primary"
-                            ></v-progress-circular>
-                        </td>
-                    </tr>
-                    <tr v-else v-for="item in items" :key="item.name" :class="item.id == selectId && item.filetypedetail === selectType ? 'blue lighten-5 primary--text' : ''" @click="clickRow(item)" @dblclick="showDetailFolder(item)" @contextmenu="showSelectMenu($event, item)">
+                    <tr v-for="item in items" :key="item.name" :class="item.id == selectId && item.filetypedetail === selectType ? 'blue lighten-5 primary--text' : ''" @click="clickRow(item)" @dblclick="showDetailFolder(item)" @contextmenu="showSelectMenu($event, item)">
                         <td :title="item.name" style="width: 40%">
                             <v-icon class="mr-2" v-if="!item.filetypedetail">mdi-folder</v-icon> 
                             <v-icon class="mr-2" v-else :color="item.filetypedetail.color">{{item.filetypedetail.icon}}</v-icon>
@@ -329,6 +325,7 @@ import Vue from 'vue'
 import { mapState } from 'vuex'
 import numeral from 'numeral'
 import vClickOutside from 'v-click-outside'
+import Loading from '../layouts/Loading'
 
 Vue.use(vClickOutside)
 Vue.filter('formatDate', function(value) {
@@ -350,6 +347,9 @@ Vue.filter('formatSize', function(value) {
 })
 
 export default {
+    components: {
+        Loading
+    },
     data: () => ({
         selection: [],
         overlay: false,
@@ -375,7 +375,8 @@ export default {
         detailItem: {},
         typeList: [],
         selectId: -1,
-        selectType: null
+        selectType: null,
+        isLoading: false
     }),
 
     mounted() {
@@ -465,6 +466,7 @@ export default {
 
         async getFolderFileList() {
             try {
+                this.isLoading = true
                 let res = await Axios.get('http://localhost:3000/folderfiles/lists', {
                     params: {
                         storage_id: localStorage.getItem('bucket'),
@@ -474,6 +476,8 @@ export default {
                 this.desserts = res.data.body.folder_file_list
             } catch (error) {
                 console.log(error)
+            } finally {
+                this.isLoading = false
             }
         },
 

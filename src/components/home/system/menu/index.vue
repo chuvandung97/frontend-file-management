@@ -17,9 +17,13 @@
       :items="desserts"
       :search="search"
       item-key="name"
+      :loading="isLoading"
       :show-select=true
     >
-    <template v-slot:no-data>
+      <template v-slot:progress>
+          <Loading /> 
+      </template>
+      <template v-slot:no-data>
         Không có dữ liệu
       </template>
       <template v-slot:no-results>
@@ -146,7 +150,11 @@
 
 <script>
 import Axios from 'axios'
+import Loading from '../../layouts/Loading'
   export default {
+    components: {
+      Loading
+    },
     data () {
         return {
             defaultItem: {
@@ -194,6 +202,7 @@ import Axios from 'axios'
             orderRules: [
               v => !!v || 'Mời bạn nhập thứ tự',
             ],
+            isLoading: false
         }
     },
 
@@ -204,10 +213,13 @@ import Axios from 'axios'
     methods: {
         async getMenu() {
             try {
+                this.isLoading = true
                 let res = await Axios.get('http://localhost:3000/menus/lists')  
                 this.desserts = res.data.body.menu_list
             } catch (error) {
-                console.log(error)
+                console.log(error) 
+            } finally {
+              this.isLoading = false
             }
         },
 

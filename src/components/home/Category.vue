@@ -46,8 +46,12 @@
                     <v-data-table
                         :headers="headers"
                         :items="desserts"
+                        :loading="isLoading"
                         :items-per-page="5"
                     >
+                        <template v-slot:progress>
+                            <Loading /> 
+                        </template>
                         <template v-slot:no-data>
                             Không có dữ liệu
                         </template>
@@ -69,7 +73,11 @@
 </template>
 <script>
 import Axios from 'axios'
+import Loading from './layouts/Loading';
 export default {
+    components: {
+        Loading
+    },
     data () {
         return {
             icon: null,
@@ -87,7 +95,8 @@ export default {
             ],
             desserts: [],
             type_list: [],
-            select: []
+            select: [],
+            isLoading: false
         }
     },
 
@@ -117,10 +126,13 @@ export default {
 
         async getDetailFileType() {
             try {
+                this.isLoading = true
                 let res = await Axios.get('http://localhost:3000/files/lists/detailtype')
                 this.desserts = res.data.body.detail_type_list
             } catch (error) {
                 console.log(error)
+            } finally {
+                this.isLoading = false
             }
         },
 

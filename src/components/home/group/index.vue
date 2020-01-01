@@ -16,94 +16,97 @@
             :headers="headers"
             :items="desserts"
             :search="search"
+            :loading="isLoading"
             item-key="name"
             :show-select=true
         >
-        <template v-slot:no-data>
-            Không có dữ liệu
-        </template>
-        <template v-slot:no-results>
-            Không tìm thấy kết quả
-        </template>
-        <template v-slot:item.member_count="{ item }">
-            <span class="ml-n4">{{item.storage != null ? item.storage.Users.length : 0}}</span>
-        </template>
-        <template v-slot:item.user_created="{ item }">
-            {{ item.User ? (item.User.id == userId ? 'tôi' : item.User.name) : '' }}
-        </template>
-        <template v-slot:item.created_at="{ item }">
-            {{ item.updatedAt | formatDate }}
-        </template>
-        <template v-slot:top>
-            <v-toolbar flat color="white">
-            <!-- <v-btn color="primary" dark class="mb-2" :to="{ name: 'group.add' }">Thêm mới<v-icon>add</v-icon></v-btn> -->
-            <v-dialog v-model="dialog" max-width="500px">
-                <template v-slot:activator="{ on }">
-                <v-btn color="primary" dark class="mb-2" v-on="on">Thêm mới</v-btn>
-                </template>
-                <v-card>
-                <v-card-title class="headline primary white--text" primary-title>
-                    <span class="headline">Thêm mới nhóm</span>
-                </v-card-title>
-
-                <v-card-text>
-                    <v-container>
-                    <v-form ref="form" lazy-validation v-model="valid">
-                        <v-row>
-                        <v-text-field 
-                            v-model="name" 
-                            label="Tên" 
-                            required 
-                            :counter="30" 
-                            :rules="nameRules"
-                            ></v-text-field>
-                        </v-row>
-                    </v-form>
-                    </v-container>
-                </v-card-text>
-
-                <v-card-actions class="mt-n6 mr-4">
-                    <v-spacer></v-spacer>
-                    <v-btn 
-                        color="primary" 
-                        text 
-                        @click="close"
-                        class="text-none"
-                        depressed
-                        outlined
-                    >Hủy</v-btn>
-                    <v-btn color="primary" depressed class="text-none" @click="save">Lưu</v-btn>
-                </v-card-actions>
-                </v-card>
-            </v-dialog>
-            <v-spacer></v-spacer>
-            <v-btn 
-                depressed 
-                text 
-                icon
-                v-if="selected.length > 0"
-                @click="deleteGroup()"
-            >
-                <v-badge
-                    color="primary"
-                    overlap
-                    class="align-self-center"
-                >
-                    <template v-slot:badge>
-                        <span>{{ selected.length }}</span>
+            <template v-slot:progress>
+                <Loading /> 
+            </template>
+            <template v-slot:no-data>
+                Không có dữ liệu
+            </template>
+            <template v-slot:no-results>
+                Không tìm thấy kết quả
+            </template>
+            <template v-slot:item.member_count="{ item }">
+                <span class="ml-n4">{{item.storage != null ? item.storage.Users.length : 0}}</span>
+            </template>
+            <template v-slot:item.user_created="{ item }">
+                {{ item.User ? (item.User.id == userId ? 'tôi' : item.User.name) : '' }}
+            </template>
+            <template v-slot:item.created_at="{ item }">
+                {{ item.updatedAt | formatDate }}
+            </template>
+            <template v-slot:top>
+                <v-toolbar flat color="white">
+                <v-dialog v-model="dialog" max-width="500px">
+                    <template v-slot:activator="{ on }">
+                    <v-btn color="primary" dark class="mb-2" v-on="on">Thêm mới</v-btn>
                     </template>
-                    <v-icon large>
-                    delete
-                    </v-icon>
-                </v-badge>
-            </v-btn>
-            </v-toolbar>
-        </template>
-        <template v-slot:item.edit="{ item }">
-            <v-btn text icon :to="{ name: 'group.update', params: {groupId: item.id}, query: {name: item.name, description: item.description}}">
-            <v-icon small>edit</v-icon>
-            </v-btn>
-        </template>
+                    <v-card>
+                    <v-card-title class="headline primary white--text" primary-title>
+                        <span class="headline">Thêm mới nhóm</span>
+                    </v-card-title>
+
+                    <v-card-text>
+                        <v-container>
+                        <v-form ref="form" lazy-validation v-model="valid">
+                            <v-row>
+                            <v-text-field 
+                                v-model="name" 
+                                label="Tên" 
+                                required 
+                                :counter="30" 
+                                :rules="nameRules"
+                                ></v-text-field>
+                            </v-row>
+                        </v-form>
+                        </v-container>
+                    </v-card-text>
+
+                    <v-card-actions class="mt-n6 mr-4">
+                        <v-spacer></v-spacer>
+                        <v-btn 
+                            color="primary" 
+                            text 
+                            @click="close"
+                            class="text-none"
+                            depressed
+                            outlined
+                        >Hủy</v-btn>
+                        <v-btn color="primary" depressed class="text-none" @click="save">Lưu</v-btn>
+                    </v-card-actions>
+                    </v-card>
+                </v-dialog>
+                <v-spacer></v-spacer>
+                <v-btn 
+                    depressed 
+                    text 
+                    icon
+                    v-if="selected.length > 0"
+                    @click="deleteGroup()"
+                >
+                    <v-badge
+                        color="primary"
+                        overlap
+                        class="align-self-center"
+                    >
+                        <template v-slot:badge>
+                            <span>{{ selected.length }}</span>
+                        </template>
+                        <v-icon large>
+                        delete
+                        </v-icon>
+                    </v-badge>
+                </v-btn>
+                </v-toolbar>
+            </template>
+            <template v-slot:item.edit="{ item }">
+                <v-btn text icon :to="{ name: 'group.update', params: {groupId: item.id}, query: {name: item.name, description: item.description}}">
+                    <v-icon small>edit</v-icon>
+                </v-btn>
+            </template>
         </v-data-table>
     </v-card>   
 </template>
@@ -112,6 +115,7 @@
 import Axios from 'axios'
 import moment from 'moment'
 import Vue from 'vue'
+import Loading from '../layouts/Loading'
 
 Vue.filter('formatDate', function(value) {
     if (value) {
@@ -119,6 +123,9 @@ Vue.filter('formatDate', function(value) {
     }
 })
 export default {
+    components: {
+        Loading
+    },
     data () {
         return {
             name: null,
@@ -139,9 +146,10 @@ export default {
             ],
             desserts: [],
             nameRules: [
-            v => !!v || 'Mời bạn nhập tên',
-            v => (v && v.length <= 30) || 'Tên phải nhỏ hơn 30 kí tự',
+                v => !!v || 'Mời bạn nhập tên',
+                v => (v && v.length <= 30) || 'Tên phải nhỏ hơn 30 kí tự',
             ],
+            isLoading: false
         }
     },
 
@@ -151,16 +159,19 @@ export default {
 
     methods: {
         async getGroup() {
+            this.isLoading = true
             this.useremail = localStorage.getItem('useremail')
             try {
-            let res = await Axios.get('http://localhost:3000/groups/lists', {
-                headers: {
-                    Authorization: `Bearer ${localStorage.getItem('jwt_token')}`
-                }
-            })  
-            this.desserts = res.data.body.group_list
+                let res = await Axios.get('http://localhost:3000/groups/lists', {
+                    headers: {
+                        Authorization: `Bearer ${localStorage.getItem('jwt_token')}`
+                    }
+                })  
+                this.desserts = res.data.body.group_list
             } catch (error) {
-            console.log(error)
+                console.log(error)
+            } finally {
+                this.isLoading = false
             }
         },
 

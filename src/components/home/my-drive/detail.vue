@@ -6,9 +6,12 @@
             hide-default-footer
             :items-per-page="999"
             v-if="viewFile"
+            :loading="isLoading"
             :class="'view_list unselectable'"
-            
         >
+            <template v-slot:progress>
+                <Loading />
+            </template>
             <template v-slot:body=" { items } ">
                 <tbody>
                     <tr v-for="item in items" :key="item.name" @dblclick="showDetailFolder(item)" @contextmenu="showSelectMenu($event, item)">
@@ -316,6 +319,7 @@ import Vue from 'vue'
 import Axios from 'axios'
 import { mapState } from 'vuex'
 import numeral from 'numeral'
+import Loading from '../layouts/Loading'
 
 Vue.filter('formatDate', function(value) {
     if (value) {
@@ -329,6 +333,9 @@ Vue.filter('formatSize', function(value) {
     }
 })
 export default {
+    components: {
+        Loading
+    },
     data: () => ({
         selection: [],
         overlay: false,
@@ -352,7 +359,8 @@ export default {
         ],
         desserts: [],
         detailItem: {},
-        typeList: []
+        typeList: [],
+        isLoading: false
     }),
 
     mounted() {
@@ -415,6 +423,7 @@ export default {
 
         async getFolderFileList() {
             try {
+                this.isLoading = true
                 let res = await Axios.all([
                     Axios.get('http://localhost:3000/folders/lists/subfolder', {
                         params: {
@@ -433,6 +442,8 @@ export default {
                 this.desserts = folder_list.concat(res[1].data.body.file_list)
             } catch (error) {
                 console.log(error)
+            } finally {
+                this.isLoading = false
             }
         },
 
