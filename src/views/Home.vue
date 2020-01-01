@@ -4,11 +4,6 @@
         <v-content>
             <OptionBar />
             <v-divider></v-divider>
-            <!-- <v-progress-linear
-                :active="true"
-                :indeterminate="true"
-                color="blue"
-            ></v-progress-linear> -->
             <router-view :key="$route.fullPath"></router-view>
         </v-content>
     </div>

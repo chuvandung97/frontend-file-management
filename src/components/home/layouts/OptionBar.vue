@@ -1,6 +1,6 @@
 <template>
     <v-card flat v-if="userrole == 'User' || userrole == 'Group'">
-        <v-row v-if="$route.fullPath != '/user/profile'">
+        <v-row v-if="$route.fullPath != '/user/profile'" class="mr-0">
             <v-col cols="5" md="6" class="pa-0">
                 <v-breadcrumbs :items="items" large>
                     <template v-slot:divider>
@@ -8,14 +8,27 @@
                     </template>
                 </v-breadcrumbs>
             </v-col>
-            <v-col cols="5" md="5">
+            <v-col cols="7" md="6" class="d-flex align-center justify-end">
                 <v-tooltip bottom v-if="selectedCount > 0">
                     <template v-slot:activator="{ on }">
                         <v-btn 
                             depressed 
                             text 
                             icon
-                            class="float-right mr-n4"
+                            v-on="on"
+                            @click="restoreTrash()"                            
+                        >
+                            <v-icon>mdi-backup-restore</v-icon>
+                        </v-btn>
+                    </template>
+                    <span>Khôi phục</span>
+                </v-tooltip>
+                <v-tooltip bottom v-if="selectedCount > 0">
+                    <template v-slot:activator="{ on }">
+                        <v-btn 
+                            depressed 
+                            text 
+                            icon
                             v-on="on"
                             @click="openDialogDeleteTrash()"
                             
@@ -34,23 +47,68 @@
                     </template>
                     <span>Xóa</span>
                 </v-tooltip>
-                <v-tooltip bottom v-if="selectedCount > 0">
+                
+                <v-tooltip bottom v-if="showDetail">
                     <template v-slot:activator="{ on }">
                         <v-btn 
                             depressed 
                             text 
                             icon
-                            class="float-right"
                             v-on="on"
-                            @click="restoreTrash()"                            
+                            @click="activeViewDetail()"
+                            
                         >
-                            <v-icon>mdi-backup-restore</v-icon>
+                            <v-icon>mdi-eye</v-icon>
                         </v-btn>
                     </template>
-                    <span>Khôi phục</span>
+                    <span>Xem chi tiết</span>
                 </v-tooltip>
-            </v-col>
-            <v-col cols="2" md="1">
+                <v-tooltip bottom v-if="showDetail">
+                    <template v-slot:activator="{ on }">
+                        <v-btn 
+                            depressed 
+                            text 
+                            icon
+                            v-on="on"
+                            @click="''"
+                            
+                        >
+                            <v-icon>mdi-share</v-icon>
+                        </v-btn>
+                    </template>
+                    <span>Chia sẻ</span>
+                </v-tooltip>
+                <v-tooltip bottom v-if="showDetail">
+                    <template v-slot:activator="{ on }">
+                        <v-btn 
+                            depressed 
+                            text 
+                            icon
+                            v-on="on"
+                            @click="''"
+                            
+                        >
+                            <v-icon>mdi-download</v-icon>
+                        </v-btn>
+                    </template>
+                    <span>Tải xuống</span>
+                </v-tooltip>
+                <v-tooltip bottom v-if="showDetail">
+                    <template v-slot:activator="{ on }">
+                        <v-btn 
+                            depressed 
+                            text 
+                            icon
+                            v-on="on"
+                            @click="''"
+                            
+                        >
+                            <v-icon>delete</v-icon>
+                        </v-btn>
+                    </template>
+                    <span>Xóa</span>
+                </v-tooltip>
+                <v-divider vertical class="mx-2" v-if="showDetail || selectedCount > 0"></v-divider>
                 <v-btn 
                     depressed 
                     text 
@@ -91,7 +149,7 @@ export default {
 
     computed: {
         ...mapState ([
-            'selectedCount',
+            'selectedCount', 'showDetail'
         ])
     },
 
@@ -101,6 +159,17 @@ export default {
         },
         restoreTrash() {
             this.$store.commit('setRestoreTrash', true)
+        },
+        activeViewDetail() {
+            this.$store.commit('setViewDetail', true)
+        },
+        activeOptionFile(active) {
+            this.$store.commit('setOptionFile', {
+                activeViewDetail: active,
+                activeShare: false,
+                activeDownload: false,
+                activeDelete: false
+            })
         }
     }
 }

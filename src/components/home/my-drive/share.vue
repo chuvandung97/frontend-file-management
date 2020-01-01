@@ -176,7 +176,8 @@ Vue.filter('formatSize', function(value) {
     mounted() {
         this.$store.commit('setSelectedTrash', {
             selectedCount: null
-        })
+        }),
+        this.$store.commit('setShowDetail', false)
     },
 
     computed: {

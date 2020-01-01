@@ -22,6 +22,12 @@
         itemsPerPageText: 'Hiển thị',
       }"
     >
+      <template v-slot:no-data>
+        Không có dữ liệu
+      </template>
+      <template v-slot:no-results>
+        Không tìm thấy kết quả
+      </template>
       <template v-slot:item.active="{ item }">
         <v-chip :color="getColor(item.active)" dark>{{ item.active == true ? 'Hoạt động' : 'Không hoạt động' }}</v-chip>
       </template>

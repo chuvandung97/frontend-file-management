@@ -84,6 +84,7 @@
                             deletable-chips
                             item-text="code"
                             return-object
+                            :error-messages="errorMessage"
                         >
                             <template v-if="noData" v-slot:no-data>
                                 <v-list-item>
@@ -164,6 +165,7 @@ import Axios from 'axios'
             orderRules: [
                 v => !!v || 'Mời bạn nhập thứ tự',
             ],
+            errorMessage: null
         }
     },
 
@@ -171,6 +173,14 @@ import Axios from 'axios'
         this.getMenu()
         this.getRole()
         this.getMenuInfo()
+    },
+
+    watch: {
+        model: function() {
+            if(this.model) {
+                this.errorMessage = null
+            }
+        }
     },
 
     methods: {
@@ -244,20 +254,27 @@ import Axios from 'axios'
         },
 
         async addRoleToMenu() {
-            try {
-                await Axios.post('http://localhost:3000/menus/add/role', {
-                    menu_id: this.$route.params.menuId,
-                    role_id: this.model.id,
-                }) 
-                this.desserts.push(this.model)
-            } catch(e) {
-                this.$store.commit('setNoti', {
-                    typeNoti: 0,
-                    textNoti: 'Vai trò đã được chọn !',
-                    showNoti: true
-                })
-            } finally {
-                this.model = null
+            if(!this.model) {
+                this.errorMessage = 'Vai trò chưa được chọn'
+                setTimeout(() => {
+                    this.errorMessage = null
+                }, 3000)
+            } else {
+                try {
+                    await Axios.post('http://localhost:3000/menus/add/role', {
+                        menu_id: this.$route.params.menuId,
+                        role_id: this.model.id,
+                    }) 
+                    this.desserts.push(this.model)
+                } catch(e) {
+                    this.$store.commit('setNoti', {
+                        typeNoti: 0,
+                        textNoti: 'Vai trò đã được chọn !',
+                        showNoti: true
+                    })
+                } finally {
+                    this.model = null
+                }
             }
         },
 

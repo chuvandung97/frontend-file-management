@@ -360,7 +360,8 @@ export default {
         this.getDetailFileType()
         this.$store.commit('setSelectedTrash', {
             selectedCount: null
-        })
+        }),
+        this.$store.commit('setShowDetail', false)
     },
 
     computed: {

@@ -9,8 +9,12 @@
             v-if="viewFile"
             :class="'view_list unselectable'"
             item-key="name"
-            :show-select="rolegroup == 'READ' ? false : true"
+            :show-select="isShowSelect"
+            @click:row="clickRow"
         >
+            <template v-slot:no-data>
+                Không có dữ liệu
+            </template>
             <template v-slot:item.name="{ item }">
                 <v-icon class="mr-2" v-if="!item.filetypedetail">mdi-folder</v-icon> 
                 <v-icon class="mr-2" v-else :color="item.filetypedetail.color">{{item.filetypedetail.icon}}</v-icon>
@@ -44,7 +48,7 @@
                 <v-card-text class="mt-n5 unselectable">
                     <v-row>
                         <v-col v-for="file in fileLists" cols="6" sm="4" md="3" xl="1" :key="file.name" @contextmenu="showSelectMenu($event, file)">
-                            <v-card outlined class="pa-3 test" :title="file.name">
+                            <v-card outlined class="pa-3" :title="file.name">
                                 <v-icon :color="file.filetypedetail.color" size="100" class="d-flex justify-center py-8">{{file.filetypedetail.icon}}</v-icon>
                                 <v-icon class="mr-2" :color="file.filetypedetail.color">{{file.filetypedetail.icon}}</v-icon>
                                 {{ file.name.length >=25 ? file.name.substring(0,25) + '...' : file.name }}
@@ -125,11 +129,13 @@
                 { text: 'Kích cỡ', value: 'size' },
             ],
             desserts: [],
-            selectedId: -1
+            selectedId: -1,
+            isShowSelect: false
         }),
 
         mounted() {
             this.getFolderFileList()
+            this.$store.commit('setShowDetail', false)
         },
 
         computed: {
@@ -158,16 +164,27 @@
 
         watch: {
             selected: function() {
+                if(this.selected.length > 0) {
+                    this.isShowSelect = true
+                } else {
+                    this.isShowSelect = false
+                }
                 this.$store.commit('setSelectedTrash', {
                     selectedCount: this.selected.length
                 })
+                
             },
             restoreTrash: function() {
                 this.restore()
-            }
+            },
         },
 
         methods: {
+            clickRow(value) {
+                if(!this.selected.includes(value)) {
+                    this.selected.push(value)
+                } 
+            },
             async getFolderFileList() {
                 try {
                      let res = await Axios.get('http://localhost:3000/folderfiles/lists', {

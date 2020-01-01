@@ -14,7 +14,14 @@ function defaultState() {
     dialogDeleteTrash: false,
     restoreTrash: false,
     reloadDrive: false,
-    rolegroup: null
+    rolegroup: null,
+    showDetail: false,
+    optionBar: {
+      activeViewDetail: false,
+      activeShare: false,
+      activeDownload: false,
+      activeDelete: false
+    }
   }
 }
 export default new Vuex.Store({
@@ -45,7 +52,13 @@ export default new Vuex.Store({
     },
     setRoleGroup(state, payload) {
       state.rolegroup = payload
-    }
+    },
+    setShowDetail(state, payload) {
+      state.showDetail = payload
+    },
+    setViewDetail(state, payload) {
+      state.optionBar.activeViewDetail = payload
+    },
   },
   actions: {
 

@@ -436,7 +436,7 @@ export default {
                 storage.map((elCurrent) => {
                     return localStorage.removeItem(elCurrent)
                 })
-                this.$router.push('/')
+                this.$router.go('/')
             } catch (error) {
                 this.$store.commit('setNoti', {
                     typeNoti: 0,

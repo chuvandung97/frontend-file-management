@@ -19,8 +19,20 @@
             item-key="name"
             :show-select=true
         >
+        <template v-slot:no-data>
+            Không có dữ liệu
+        </template>
+        <template v-slot:no-results>
+            Không tìm thấy kết quả
+        </template>
         <template v-slot:item.member_count="{ item }">
-            {{item.storage != null ? item.storage.Users.length : 0}}
+            <span class="ml-n4">{{item.storage != null ? item.storage.Users.length : 0}}</span>
+        </template>
+        <template v-slot:item.user_created="{ item }">
+            {{ item.User ? (item.User.id == userId ? 'tôi' : item.User.name) : '' }}
+        </template>
+        <template v-slot:item.created_at="{ item }">
+            {{ item.updatedAt | formatDate }}
         </template>
         <template v-slot:top>
             <v-toolbar flat color="white">
@@ -78,7 +90,7 @@
                     class="align-self-center"
                 >
                     <template v-slot:badge>
-                    <span>{{ selected.length }}</span>
+                        <span>{{ selected.length }}</span>
                     </template>
                     <v-icon large>
                     delete
@@ -98,6 +110,14 @@
 
 <script>
 import Axios from 'axios'
+import moment from 'moment'
+import Vue from 'vue'
+
+Vue.filter('formatDate', function(value) {
+    if (value) {
+        return moment(String(value)).format('DD/MM/YYYY')
+    }
+})
 export default {
     data () {
         return {

@@ -48,6 +48,9 @@
                         :items="desserts"
                         :items-per-page="5"
                     >
+                        <template v-slot:no-data>
+                            Không có dữ liệu
+                        </template>
                         <template v-slot:item.type="{ item }">
                             {{item.filetype.extension}}
                         </template>

@@ -9,8 +9,16 @@
             :class="'view_list unselectable'"
         > 
             <template v-slot:body=" { items } ">
-                <tbody>
-                    <tr v-for="item in items" :key="item.name" :class="item.id == selectId ? 'blue lighten-5 primary--text' : ''" @click="clickRow(item)" @dblclick="showDetailFolder(item)" @contextmenu="showSelectMenu($event, item)">
+                <tbody v-click-outside="clickOutSide">
+                    <tr v-if="items.length == 0" class="text-center" style="height: 15pc">
+                        <td colspan="4">
+                            <v-progress-circular
+                                indeterminate
+                                color="primary"
+                            ></v-progress-circular>
+                        </td>
+                    </tr>
+                    <tr v-else v-for="item in items" :key="item.name" :class="item.id == selectId && item.filetypedetail === selectType ? 'blue lighten-5 primary--text' : ''" @click="clickRow(item)" @dblclick="showDetailFolder(item)" @contextmenu="showSelectMenu($event, item)">
                         <td :title="item.name" style="width: 40%">
                             <v-icon class="mr-2" v-if="!item.filetypedetail">mdi-folder</v-icon> 
                             <v-icon class="mr-2" v-else :color="item.filetypedetail.color">{{item.filetypedetail.icon}}</v-icon>
@@ -29,7 +37,14 @@
                 <v-card-text class="mt-n5 unselectable">
                     <v-row>
                         <v-col v-for="folder in folderLists" cols="6" sm="4" md="3" xl="1" :key="folder.name">
-                            <v-card outlined class="pa-3"  @dblclick="showDetailFolder(folder)" @contextmenu="showSelectMenu($event, folder)">
+                            <v-card outlined class="pa-3" 
+                                :ripple="false" 
+                                :class="folder.id == selectId && folder.filetypedetail == selectType ? 'blue lighten-5 primary--text' : ''"   
+                                :style="folder.id == selectId ? 'border-color: rgba(0, 0, 0, 0.12) !important' : ''"
+                                @click="clickRow(folder)" 
+                                @dblclick="showDetailFolder(folder)" 
+                                @contextmenu="showSelectMenu($event, folder)"
+                            >
                                 <v-icon class="mr-2">mdi-folder</v-icon> {{ folder.name }}    
                             </v-card>
                         </v-col>
@@ -41,7 +56,13 @@
                 <v-card-text class="mt-n5 unselectable">
                     <v-row>
                         <v-col v-for="file in fileLists" cols="6" sm="4" md="3" xl="1" :key="file.name" @contextmenu="showSelectMenu($event, file)">
-                            <v-card outlined class="pa-3 test" :title="file.name">
+                            <v-card outlined class="pa-3"
+                                :ripple="false"
+                                :class="file.id == selectId && file.filetypedetail == selectType ? 'blue lighten-5 primary--text' : ''"   
+                                :style="file.id == selectId ? 'border-color: rgba(0, 0, 0, 0.12) !important' : ''"
+                                @click="clickRow(file)" 
+                                :title="file.name"
+                            >
                                 <v-icon :color="file.filetypedetail.color" size="100" class="d-flex justify-center py-8">{{file.filetypedetail.icon}}</v-icon>
                                 <v-icon class="mr-2" :color="file.filetypedetail.color">{{file.filetypedetail.icon}}</v-icon>
                                 {{ file.name.length >=25 ? file.name.substring(0,25) + '...' : file.name }}
@@ -307,13 +328,14 @@ import moment from 'moment'
 import Vue from 'vue'
 import { mapState } from 'vuex'
 import numeral from 'numeral'
+import vClickOutside from 'v-click-outside'
 
+Vue.use(vClickOutside)
 Vue.filter('formatDate', function(value) {
     if (value) {
         return moment(String(value)).format('DD/MM/YYYY')
     }
 })
-
 
 Vue.filter('formatTime', function(value) {
     if (value) {
@@ -352,7 +374,8 @@ export default {
         desserts: [],
         detailItem: {},
         typeList: [],
-        selectId: -1
+        selectId: -1,
+        selectType: null
     }),
 
     mounted() {
@@ -365,7 +388,7 @@ export default {
 
     computed: {
         ...mapState ([
-            'viewFile', 'reloadDrive', 'rolegroup'
+            'viewFile', 'reloadDrive', 'rolegroup', 'optionBar'
         ]),
         folderLists: function() {
             return this.desserts.filter((el) => {
@@ -389,10 +412,30 @@ export default {
         reloadDrive: function() {
             this.getFolderFileList()
             this.$store.commit('setReloadIndexDrive', false)
+        },
+        selectId: function() {
+            if(this.selectId > 0) {
+                this.$store.commit('setShowDetail', true)
+            } else {
+                this.$store.commit('setShowDetail', false)
+            }
+        },
+        optionBar: {
+            deep: true,
+            handler: function(val) {
+                if(val.activeViewDetail) {
+                    this.dialog2 = true
+                }
+            }
         }
     },
 
     methods: {
+        clickOutSide() {
+            this.selectId = -1
+            this.filetypedetail = null
+            this.detailItem = {}
+        },
         showDetailFolder(item) {
             if(!item.filetypedetail) {
                 this.$router.push('/user/folder/' + item.id)
@@ -415,7 +458,9 @@ export default {
         },
 
         clickRow(item) {
+            this.detailItem = Object.assign({}, item)
             this.selectId = item.id
+            this.selectType = item.filetypedetail
         },
 
         async getFolderFileList() {

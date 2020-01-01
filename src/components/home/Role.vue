@@ -22,6 +22,12 @@
         itemsPerPageText: 'Hiển thị',
       }"
     >
+    <template v-slot:no-data>
+        Không có dữ liệu
+      </template>
+      <template v-slot:no-results>
+        Không tìm thấy kết quả
+      </template>
       <template v-slot:top>
         <v-toolbar flat color="white">
           <v-dialog v-model="dialog" max-width="500px">
@@ -110,12 +116,6 @@
       >
         edit
       </v-icon>
-      <!-- <v-icon
-        small
-        @click="deleteItem(item)"
-      >
-        delete
-      </v-icon> -->
     </template>
     </v-data-table>
   </v-card>
