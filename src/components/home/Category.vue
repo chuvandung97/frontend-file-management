@@ -48,6 +48,9 @@
                         :items="desserts"
                         :loading="isLoading"
                         :items-per-page="5"
+                        :footer-props="{
+                            itemsPerPageText: 'Hiển thị',
+                        }"
                     >
                         <template v-slot:progress>
                             <Loading /> 

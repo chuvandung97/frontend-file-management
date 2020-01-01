@@ -1,7 +1,7 @@
 <template>
   <v-card flat>
     <v-card-title>
-      Danh sách quyền hệ thống
+      Danh sách vai trò hệ thống
       <v-spacer></v-spacer>
       <v-text-field
         v-model="search"

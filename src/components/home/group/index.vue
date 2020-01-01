@@ -19,6 +19,9 @@
             :loading="isLoading"
             item-key="name"
             :show-select=true
+            :footer-props="{
+                itemsPerPageText: 'Hiển thị',
+            }"
         >
             <template v-slot:progress>
                 <Loading /> 
