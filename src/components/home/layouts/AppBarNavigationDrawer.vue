@@ -1,7 +1,7 @@
 <template>
     <div>
         <v-navigation-drawer
-            v-model="drawer"
+            v-model="expandDrawer"
             :clipped="$vuetify.breakpoint.lgAndUp"
             app
         >
@@ -177,7 +177,7 @@
             dark
         >
         
-            <v-app-bar-nav-icon @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
+            <v-app-bar-nav-icon @click.stop="expandDrawer = !expandDrawer"></v-app-bar-nav-icon>
             <v-col cols="3" md="3" class="hidden-sm-and-down">
                 <v-toolbar-title
                     class="ml-0 pl-3"
@@ -334,7 +334,7 @@ import { mapState } from 'vuex'
 export default {
     data () {
         return {
-            drawer: null,
+            expandDrawer: true,
             items: [],
             roleDescription: null, 
             name: null,
@@ -380,14 +380,22 @@ export default {
             val && val !== this.textSearch && this.querySelections(val) 
         },
         textSearch (val) {
-            if (val.parent_id) {
-                this.$router.push('/user/folder/' + val.parent_id)
-            } else if (val.folders.length > 0) {
-                this.$router.push('/user/folder/' + val.folders[0].id)
-            } else {
-                this.$router.push('/user/drive')
+            if(val) {
+                if (val.filetypedetail) {
+                    if(val.folders.length > 0) {
+                        this.$router.push('/user/folder/' + val.folders[0].id)
+                    } else {
+                        this.$router.push('/user/drive')
+                    }
+                    this.$store.commit('setSearchIndexDrive', {
+                        selectId: val.id,
+                        selectType: val.filetypedetail
+                    })
+                } else {
+                    this.$router.push('/user/folder/' + val.id)
+                }
+                this.search = null
             }
-            this.itemSearches = []
         }
     },
 

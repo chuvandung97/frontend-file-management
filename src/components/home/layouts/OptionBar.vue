@@ -126,10 +126,10 @@ export default {
     data: () => ({
         items: [
             {
-                text: 'Tất cả file',
+                text: 'Kho của tôi',
                 disabled: false,
                 to: '/user/drive'
-            }
+            },
         ],
         userrole: null,
         viewFile: true,
@@ -145,6 +145,25 @@ export default {
                 viewFile: this.viewFile
             })
         },
+        $route(from) {
+            let path = from.fullPath
+            switch (path) {
+                case '/user/drive':
+                    this.items[0].text = 'Kho của tôi'
+                    this.items[0].to = path
+                    break;
+                case '/user/share':
+                    this.items[0].text = 'Được chia sẻ với tôi'
+                    this.items[0].to = path
+                    break;
+                case '/user/trash':
+                    this.items[0].text = 'Thùng rác'
+                    this.items[0].to = path
+                    break;
+                default:
+                    break;
+            }
+        }
     },
 
     computed: {

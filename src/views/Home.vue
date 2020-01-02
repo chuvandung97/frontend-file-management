@@ -18,11 +18,9 @@ export default {
     },
 
     data: () => ({
-        fullPath: null,
+        
     }),
 
-    mounted() {
-        this.fullPath = this.$route.fullPath
-    },
+    
 };
 </script>

@@ -14,7 +14,7 @@
             </template>
             <template v-slot:body=" { items } ">
                 <tbody v-click-outside="clickOutSide">
-                    <tr v-for="item in items" :key="item.name" :class="item.id == selectId && item.filetypedetail === selectType ? 'blue lighten-5 primary--text' : ''" @click="clickRow(item)" @dblclick="showDetailFolder(item)" @contextmenu="showSelectMenu($event, item)">
+                    <tr v-for="item in items" :key="item.name" :class="item.id === selectId && item.filetypedetail === selectType ? 'blue lighten-5 primary--text' : ''" @click="clickRow(item)" @dblclick="showDetailFolder(item)" @contextmenu="showSelectMenu($event, item)">
                         <td :title="item.name" style="width: 40%">
                             <v-icon class="mr-2" v-if="!item.filetypedetail">mdi-folder</v-icon> 
                             <v-icon class="mr-2" v-else :color="item.filetypedetail.color">{{item.filetypedetail.icon}}</v-icon>
@@ -22,7 +22,7 @@
                         </td>
                         <td>{{ item.User ? (item.User.id == userId ? 'tôi' : item.User.name) : '' }}</td>
                         <td>{{ item.updatedAt | formatDate }}</td>
-                        <td>{{ item.size | formatSize  }}</td>
+                        <td>{{ item.size | formatSize }}</td>
                     </tr>
                 </tbody>
             </template>
@@ -389,7 +389,7 @@ export default {
 
     computed: {
         ...mapState ([
-            'viewFile', 'reloadDrive', 'rolegroup', 'optionBar'
+            'viewFile', 'reloadDrive', 'rolegroup', 'optionBar', 'searchIndexDrive'
         ]),
         folderLists: function() {
             return this.desserts.filter((el) => {
@@ -428,13 +428,21 @@ export default {
                     this.dialog2 = true
                 }
             }
+        },
+        searchIndexDrive: {
+            deep: true,
+            handler: function(val) {
+                console.log(val)
+                this.selectId = val.selectId
+                this.selectType = val.selectType
+            }
         }
     },
 
     methods: {
         clickOutSide() {
             this.selectId = -1
-            this.filetypedetail = null
+            this.selectType = null
             this.detailItem = {}
         },
         showDetailFolder(item) {
