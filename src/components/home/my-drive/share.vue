@@ -9,6 +9,9 @@
             v-if="viewFile"
             :class="'view_list unselectable'"
         >
+            <template v-slot:no-data>
+                Không có dữ liệu
+            </template>
             <template v-slot:item.name="{ item }">
                 <v-icon class="mr-2">folder_shared</v-icon> {{ item.name }}
             </template> 
