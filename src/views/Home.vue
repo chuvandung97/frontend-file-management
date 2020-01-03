@@ -1,6 +1,7 @@
 <template>
     <div>
-        <AppBarNavigationDrawer />
+        <AppBar />
+        <NavigationDrawer />
         <v-content>
             <OptionBar />
             <v-divider></v-divider>
@@ -10,11 +11,12 @@
 </template>
 
 <script>
-import AppBarNavigationDrawer from '../components/home/layouts/AppBarNavigationDrawer';
+import AppBar from '../components/home/layouts/AppBar'
+import NavigationDrawer from '../components/home/layouts/NavigationDrawer';
 import OptionBar from '../components/home/layouts/OptionBar'
 export default {
     components: {
-        AppBarNavigationDrawer, OptionBar
+        AppBar, NavigationDrawer, OptionBar
     },
 
     data: () => ({

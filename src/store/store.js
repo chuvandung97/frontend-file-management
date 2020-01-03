@@ -6,6 +6,7 @@ Vue.use(Vuex)
 
 function defaultState() {
   return {
+    expandDrawer: true,
     typeNoti: null,
     textNoti: null, 
     showNoti: false,
@@ -32,6 +33,9 @@ function defaultState() {
 export default new Vuex.Store({
   state: defaultState(),
   mutations: {
+    setExpandDrawer(state, payload) {
+      state.expandDrawer = payload
+    },
     setNoti(state, payload) {
       state.typeNoti = payload.typeNoti
       state.textNoti = payload.textNoti
