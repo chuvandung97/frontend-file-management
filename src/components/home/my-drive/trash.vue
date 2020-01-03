@@ -146,6 +146,7 @@
         mounted() {
             this.getFolderFileList()
             this.$store.commit('setShowDetail', false)
+            this.$store.commit('setBreadcrumbs', null)
         },
 
         computed: {

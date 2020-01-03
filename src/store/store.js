@@ -25,7 +25,8 @@ function defaultState() {
     searchIndexDrive: {
       selectId: null,
       selectType: null
-    }
+    },
+    breadcrumbs: null
   }
 }
 export default new Vuex.Store({
@@ -66,6 +67,9 @@ export default new Vuex.Store({
     setSearchIndexDrive(state, payload) {
       state.searchIndexDrive.selectId = payload.selectId
       state.searchIndexDrive.selectType = payload.selectType
+    },
+    setBreadcrumbs(state, payload) {
+      state.breadcrumbs = payload
     }
   },
   actions: {

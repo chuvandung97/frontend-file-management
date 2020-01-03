@@ -385,6 +385,7 @@ export default {
         this.$store.commit('setSelectedTrash', {
             selectedCount: null
         })
+        this.$store.commit('setBreadcrumbs', null)
     },
 
     computed: {
@@ -448,7 +449,7 @@ export default {
         showDetailFolder(item) {
             if(!item.filetypedetail) {
                 this.$router.push('/user/folder/' + item.id)
-                this.getFolderFileList()
+                //this.getFolderFileList()
             }
         },
 

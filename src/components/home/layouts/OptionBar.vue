@@ -1,14 +1,19 @@
 <template>
     <v-card flat v-if="userrole == 'User' || userrole == 'Group'">
         <v-row v-if="$route.fullPath != '/user/profile'" class="mr-0">
-            <v-col cols="5" md="6" class="pa-0">
-                <v-breadcrumbs :items="items" large>
+            <v-col cols="5" md="9" sm="8" class="pa-0">
+                <v-breadcrumbs :items="items" large v-if="!breadcrumbs">
+                    <template v-slot:divider>
+                        <v-icon>mdi-chevron-right</v-icon>
+                    </template>
+                </v-breadcrumbs>
+                <v-breadcrumbs :items="breadcrumbs" v-else large>
                     <template v-slot:divider>
                         <v-icon>mdi-chevron-right</v-icon>
                     </template>
                 </v-breadcrumbs>
             </v-col>
-            <v-col cols="7" md="6" class="d-flex align-center justify-end">
+            <v-col cols="7" md="3" sm="4" class="d-flex align-center justify-end">
                 <v-tooltip bottom v-if="selectedCount > 0">
                     <template v-slot:activator="{ on }">
                         <v-btn 
@@ -169,7 +174,16 @@ export default {
     computed: {
         ...mapState ([
             'selectedCount', 'showDetail'
-        ])
+        ]),
+
+        breadcrumbs: {
+            get() {
+                let breadcrumbs = this.$store.state.breadcrumbs
+                if(breadcrumbs !==null) {
+                    return [...this.items, ...breadcrumbs]
+                } else return null
+            }
+        }
     },
 
     methods: {

@@ -178,6 +178,7 @@ Vue.filter('formatSize', function(value) {
             selectedCount: null
         }),
         this.$store.commit('setShowDetail', false)
+        this.$store.commit('setBreadcrumbs', null)
     },
 
     computed: {

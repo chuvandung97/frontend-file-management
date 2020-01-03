@@ -368,12 +368,14 @@ export default {
         typeList: [],
         selectId: -1,
         selectType: null,
-        isLoading: false
+        isLoading: false,
+        folder_info: {}
     }),
 
     mounted() {
         this.getFolderFileList()
         this.getDetailFileType()
+        this.getFolderInfo()
         this.$store.commit('setSelectedTrash', {
             selectedCount: null
         }),
@@ -432,7 +434,7 @@ export default {
         showDetailFolder(item) {
             if(!item.filetypedetail) {
                 this.$router.push('/user/folder/' + item.id)
-                this.getFolderFileList()
+                //this.getFolderFileList()
             }
         },
 
@@ -453,6 +455,35 @@ export default {
             this.detailItem = Object.assign({}, item)
             this.selectId = item.id
             this.selectType = item.filetypedetail
+        },
+
+        async getFolderInfo() {
+            try {
+                let res = await Axios.get('http://localhost:3000/folders/info/' + this.$route.params.folderId)
+                this.folder_info = res.data.body.folder_info
+            } catch (error) {
+                console.log(error)
+            } finally {
+                var breadcrumbs = [{
+                    text: this.folder_info.name,
+                    disable: false,
+                    to: '/user/folder/' + this.folder_info.id
+                }]
+                var temp = this.folder_info.parent
+                for(let i = 0 ; i < 10 ; i++) {
+                    if(temp) {
+                        breadcrumbs.push({
+                            text: temp.name,
+                            disable: false,
+                            to: '/user/folder/' + temp.id
+                        })
+                        temp = temp.parent
+                    } else {
+                        break;
+                    }
+                }
+                this.$store.commit('setBreadcrumbs', breadcrumbs.reverse())
+            }
         },
 
         async getFolderFileList() {
