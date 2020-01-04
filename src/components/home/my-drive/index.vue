@@ -346,7 +346,26 @@
                                 </div>
                             </div>
                         </v-tab-item>
-                        <v-tab-item class="pa-2">cd</v-tab-item>
+                        <v-tabs-items v-if="logLists.length == 0">
+                            <Loading />
+                        </v-tabs-items>
+                        <v-tab-item class="pa-2" v-else>
+                            <v-timeline dense clipped class="pa-0">
+                                <v-timeline-item
+                                    v-for="logList in logLists"
+                                    :key="logList.log"
+                                    color="primary"
+                                    icon-color="grey lighten-2"
+                                    small
+                                    class="pa-0"
+                                >
+                                    <v-row justify="space-between">
+                                        <v-col cols="7">{{logList.log}}</v-col>
+                                        <v-col class="text-right" cols="5">{{logList.createdAt | formatDate}}</v-col>
+                                    </v-row>
+                                </v-timeline-item>
+                            </v-timeline>
+                        </v-tab-item>
                     </v-tabs-items>
                 </v-card-text>
             </v-card>
@@ -387,7 +406,7 @@ export default {
         Loading
     },
     data: () => ({
-        tab: null,
+        tab: 0,
         selection: [],
         overlay: false,
         new_name: null,
@@ -413,7 +432,8 @@ export default {
         selectId: -1,
         selectType: null,
         isLoading: false,
-        showDetailView: false
+        showDetailView: false,
+        logLists: []
     }),
 
     mounted() {
@@ -476,7 +496,20 @@ export default {
             }
         },
         detailItem: function() {
-
+            if(this.detailItem.filetypedetail) {
+                this.getFileLog(this.detailItem.id)
+            } else {
+                this.getFolderLog(this.detailItem.id)
+            }
+        },
+        tab: function(val) {
+            if(val == 1) {
+                if(this.detailItem.filetypedetail) {
+                    this.getFileLog(this.detailItem.id)
+                } else {
+                    this.getFolderLog(this.detailItem.id)
+                }
+            }
         }
     },
 
@@ -716,6 +749,30 @@ export default {
             }
         },
 
+        async getFileLog(id) {
+            try {
+                this.loading = true
+                let res = await Axios.get('http://localhost:3000/files/lists/log/' + id)
+                this.logLists = res.data.body.log_list
+            } catch (error) {
+                console.log(error)
+            } finally {
+                this.loading = false
+            }
+        },
+
+        async getFolderLog(id) {
+            try {
+                this.loading = true
+                let res = await Axios.get('http://localhost:3000/folders/lists/log/' + id)
+                this.logLists = res.data.body.log_list
+            } catch (error) {
+                console.log(error)
+            } finally {
+                this.loading = false
+            }
+        },
+
         formSubmit() {
             this.updateName()
         }
@@ -738,7 +795,8 @@ export default {
     }
     .tabs-items {
         max-height: 300px;
-        overflow: auto
+        overflow-x: hidden;
+        overflow-y: auto
     }  
     .detailview-card {
         position: fixed;
@@ -775,5 +833,14 @@ export default {
             top: 20pc;
             bottom: 20pc;
         }
+    }
+
+    .v-timeline--dense:not(.v-timeline--reverse):before {
+        left: calc(15px - 1px);
+        right: initial;
+    }
+
+    .v-timeline-item__divider[data-v-35a1d8bc] {
+        min-width: 35px;
     }
 </style>
