@@ -15,7 +15,7 @@
             </v-card-title>
             <v-card-text class="text-center">
                 <h5 class="category text-gray font-weight-bold">{{ roleDescription }}</h5>
-                <h4 class="card-title font-weight-light">{{ name }}</h4>
+                <h4 class="card-title font-weight-light"><router-link :to="'/user/profile'">{{ name }}</router-link></h4>
             </v-card-text>
             <v-card-actions class="d-flex justify-center" v-if="roleDescription != 'Admin' && roleDescription != 'Sysadmin'">
                 <v-menu
@@ -326,3 +326,10 @@ export default {
     }
 }
 </script>
+
+<style scoped>
+    a {
+        text-decoration:none;
+        color: inherit;
+    }
+</style>

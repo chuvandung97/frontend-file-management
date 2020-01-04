@@ -42,13 +42,16 @@
                 <template v-slot:append>
                     <v-menu 
                         min-width="525"
+                        max-height="525"
                         open-delay="500"
                         nudge-right="12"
+                        nudge-bottom="5"
                         bottom
                         left
                         content-class="dropdown-menu"
                         offset-y
                         transition="slide-y-transition"
+                        :close-on-content-click='false'
                     >
                         <template v-slot:activator="{ on }">
                             <v-btn text icon depressed small v-on="on">
@@ -56,30 +59,71 @@
                             </v-btn>   
                         </template>
                         <v-card>
-                            <v-card-text>
-                                <v-list dense>
-                                <v-list-item>
-                                    <v-list-item-action>
-                                        Loại
-                                    </v-list-item-action>
-                                    <v-list-item-content>
-                                        <v-select :items="itemss"></v-select>
-                                    </v-list-item-content>
-                                </v-list-item>
-                                <v-list-item>
-                                    <v-list-item-action>
-                                        Loại
-                                    </v-list-item-action>
-                                    <v-list-item-content>
-                                        <v-select></v-select>
-                                    </v-list-item-content>
-                                </v-list-item>
-                                </v-list>
-                            </v-card-text>
+                            <v-card-text class="pa-0">
+                                <v-form>
+                                    <v-row class="mb-n3 px-5">
+                                        <v-col md="4" class="py-0 d-flex align-center">
+                                            Loại:
+                                        </v-col>
+                                        <v-col md="5" class="pa-0">
+                                            <v-select :items="typeSearchItems" return-object>
+                                                <template v-slot:item="{ item }">
+                                                    <v-row v-for="ite in item" :key="ite.name">
+                                                        <v-col md="1"><v-icon>{{ite.icon}}</v-icon></v-col>
+                                                        <v-col>{{ite.name}}</v-col>
+                                                    </v-row>
+                                                </template>
+                                            </v-select>
+                                        </v-col>
+                                    </v-row>
+                                    <v-row class="mb-n3 px-5">
+                                        <v-col md="4" class="py-0 d-flex align-center">
+                                            Chủ sở hữu:
+                                        </v-col>
+                                        <v-col md="5" class="pa-0">
+                                            <v-select :items="ownerSearchItems"></v-select>
+                                        </v-col>
+                                    </v-row>
+                                    <v-row class="mb-n3 px-5">
+                                        <v-col md="4" class="py-0 d-flex align-center">
+                                            Địa điểm:
+                                        </v-col>
+                                        <v-col md="5" class="pa-0">
+                                            <v-checkbox label="Thùng rác"></v-checkbox>
+                                        </v-col>
+                                    </v-row>
+                                    <v-divider></v-divider>
+                                    <v-row class="mb-n3 px-5">
+                                        <v-col md="4" class="py-0 d-flex align-center">
+                                            Tên:
+                                        </v-col>
+                                        <v-col md="5" class="pa-0">
+                                            <v-text-field
+                                                placeholder="Nhập cụm từ cần tìm kiếm"
+                                            ></v-text-field>
+                                        </v-col>
+                                    </v-row>
+                                    <v-row class="mb-n3 px-5">
+                                        <v-col md="4" class="py-0 d-flex align-center">
+                                            Kích cỡ:
+                                        </v-col>
+                                        <v-col md="5" class="pa-0">
+                                            <v-select></v-select>
+                                        </v-col>
+                                    </v-row>
+                                    <v-row class="mb-n3 px-5">
+                                        <v-col md="4" class="py-0 d-flex align-center">
+                                            Cập nhật lần cuối:
+                                        </v-col>
+                                        <v-col md="5" class="pa-0">
+                                            <v-select></v-select>
+                                        </v-col>
+                                    </v-row>
+                                </v-form>
+                            </v-card-text>                            
                             <v-card-actions>
                                 <v-btn
                                     @click="''"
-                                    class="text-none"
                                     depressed
                                     text
                                     color="primary"
@@ -89,7 +133,6 @@
                                 <v-btn
                                     color="primary"
                                     @click="''"
-                                    class="text-none"
                                     depressed
                                 >Tìm kiếm</v-btn>
                             </v-card-actions>
@@ -148,7 +191,6 @@
 
 <script>
 import Axios from 'axios'
-import { mapState } from 'vuex'
 export default {
     data () {
         return {
@@ -159,7 +201,19 @@ export default {
             desserts: [],
             textSearch: null,
             loading: false,
-            itemss: ['Foo', 'Bar', 'Fizz', 'Buzz'],
+            typeSearchItems: [
+                {
+                    name: 'Hình ảnh',
+                    icon: 'mdi-file-image',
+                    color: 'primary'
+                },
+                {
+                    name: 'Tài liệu',
+                    icon: 'mdi-file-word-box',
+                    color: 'primary'
+                }
+            ],
+            ownerSearchItems: ['Bất kì ai', 'Tôi', 'Không phải tôi'],
         }
     },
 

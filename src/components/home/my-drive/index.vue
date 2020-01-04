@@ -80,7 +80,7 @@
             transition="scale-transition"
         >
             <v-list width="300">
-                <v-list-item @click="dialog2 = true">
+                <v-list-item @click="showDetailView = true">
                     <v-list-item-action>
                         <v-icon>mdi-eye</v-icon>
                     </v-list-item-action>
@@ -149,38 +149,6 @@
                 </v-list-item>
             </v-list>
         </v-menu>
-        <v-dialog v-model="dialog2" fullscreen hide-overlay transition="dialog-bottom-transition">
-            <v-card>
-                <v-toolbar dark color="primary">
-                    <v-btn icon dark @click="dialog2 = false">
-                        <v-icon>mdi-close</v-icon>
-                    </v-btn>
-                    <v-toolbar-title>Chi tiết</v-toolbar-title>
-                </v-toolbar>
-                <v-row>
-                    <v-col cols="7">
-                        <v-timeline dense clipped>
-                            <v-timeline-item
-                                hide-dot
-                            >
-                                <span>TODAY</span>
-                            </v-timeline-item>
-                            <v-timeline-item
-                                icon-color="grey lighten-2"
-                                small
-                            >
-                                <v-row justify="space-between">
-                                <v-col cols="7">This order was archived.</v-col>
-                                <v-col cols="5">15:26</v-col>
-                                </v-row>
-                            </v-timeline-item>
-                        </v-timeline>
-                    </v-col>
-                    <v-divider vertical inset></v-divider>
-                    <v-col class="text-center" cols="5"></v-col>
-                </v-row>
-            </v-card>
-        </v-dialog>    
         <v-dialog v-model="dialog" width="400" persistent>
             <v-card>
                 <v-card-title
@@ -318,6 +286,71 @@
                 </v-card-actions>
             </v-card>
         </v-dialog>
+        <v-slide-x-reverse-transition>
+            <v-card v-show="showDetailView" class="detailview-card" elevation="5">
+                <v-card-title
+                    class="primary white--text py-2 body-1"
+                >
+                    Chi tiết
+                    <v-spacer></v-spacer>
+                    <v-btn depressed text icon>
+                        <v-icon color="white" @click="showDetailView = false">mdi-close</v-icon>
+                    </v-btn>
+                </v-card-title>
+                <v-card-text class="pa-0 color-detail">
+                    <v-tabs
+                        v-model="tab"
+                        background-color="transparent"
+                        color="primary"
+                        grow
+                        height="40"
+                        centered
+                    >
+                        <v-tab class="text-none">Thông tin</v-tab>
+                        <v-tab class="text-none">Hoạt động</v-tab>
+                    </v-tabs>
+                    <v-tabs-items v-model="tab" class="tabs-items">
+                        <v-tab-item class="pa-2" v-if="Object.values(detailItem).length == 0">
+                            <div class="text-center">
+                                <v-icon size="110">folder_open</v-icon>
+                            </div>
+                            <div class="pl-3 text-center headline">
+                                Kho của tôi
+                            </div>
+                        </v-tab-item>
+                        <v-tab-item class="pa-2" v-else>
+                            <div class="text-center">
+                                <v-icon size="110" :color="detailItem.filetypedetail ? detailItem.filetypedetail.color : ''">{{detailItem.filetypedetail ? detailItem.filetypedetail.icon : 'mdi-folder'}}</v-icon>
+                            </div>
+                            <div class="pl-2">
+                                <div class="row-detail">
+                                    <div class="child-row-detail">Tên:</div>
+                                    <div>{{detailItem.name}}</div>
+                                </div>
+                                <div class="row-detail">
+                                    <div class="child-row-detail">Chủ sở hữu:</div>
+                                    <div>{{detailItem.User.name}}</div>
+                                </div>
+                                <div class="row-detail">
+                                    <div class="child-row-detail">Kích cỡ:</div>
+                                    <div v-if="detailItem.size">{{detailItem.size | formatSize}}</div>
+                                    <div v-else>--</div>
+                                </div>
+                                <div class="row-detail">
+                                    <div class="child-row-detail">Ngày tải lên:</div>
+                                    <div>{{detailItem.createdAt | formatDate}}</div>
+                                </div>
+                                <div class="row-detail">
+                                    <div class="child-row-detail">Cập nhật lần cuối:</div>
+                                    <div>{{detailItem.updatedAt | formatDate}}</div>
+                                </div>
+                            </div>
+                        </v-tab-item>
+                        <v-tab-item class="pa-2">cd</v-tab-item>
+                    </v-tabs-items>
+                </v-card-text>
+            </v-card>
+        </v-slide-x-reverse-transition>
     </v-card>
 </template>
 
@@ -354,12 +387,12 @@ export default {
         Loading
     },
     data: () => ({
+        tab: null,
         selection: [],
         overlay: false,
         new_name: null,
         dialog: false,
         dialog1: false,
-        dialog2: false,
         dialog3: false,
         show: false,
         x: 0,
@@ -379,7 +412,8 @@ export default {
         typeList: [],
         selectId: -1,
         selectType: null,
-        isLoading: false
+        isLoading: false,
+        showDetailView: false
     }),
 
     mounted() {
@@ -429,7 +463,7 @@ export default {
             deep: true,
             handler: function(val) {
                 if(val.activeViewDetail) {
-                    this.dialog2 = true
+                    this.showDetailView = true
                 }
             }
         },
@@ -440,6 +474,9 @@ export default {
                 this.selectId = val.selectId
                 this.selectType = val.selectType
             }
+        },
+        detailItem: function() {
+
         }
     },
 
@@ -447,7 +484,7 @@ export default {
         clickOutSide() {
             this.selectId = -1
             this.selectType = null
-            this.detailItem = {}
+            //this.detailItem = {}
         },
         showDetailFolder(item) {
             if(!item.filetypedetail) {
@@ -679,10 +716,64 @@ export default {
             }
         },
 
-
         formSubmit() {
             this.updateName()
         }
     }
   }
 </script>
+
+<style scoped>
+    .color-detail[data-v-35a1d8bc] {
+        color: black   
+    }
+
+    .row-detail {
+        display: flex;
+        padding-bottom: 12px
+    }
+
+    .child-row-detail {
+        flex: 0 0 90px
+    }
+    .tabs-items {
+        max-height: 300px;
+        overflow: auto
+    }  
+    .detailview-card {
+        position: fixed;
+        z-index: 1;
+        width: 19%;
+        right: 0;
+        top: 8pc;
+        bottom: 8pc;        
+    }
+    @media only screen and (max-width: 450px) {
+        .detailview-card {
+            width: 50%;
+            top: 15pc;
+            bottom: 15pc;
+        }
+    }
+    @media only screen and (min-width: 768px) and (max-width: 1023px) {
+        .detailview-card {
+            width: 30%;
+            top: 20pc;
+            bottom: 20pc;
+        }
+    }
+    @media only screen and (min-width: 1024px) and (max-width: 1025px) {
+        .detailview-card {
+            width: 30%;
+            top: 28pc;
+            bottom: 28pc;
+        }
+    }
+    @media only screen and (min-width: 2400px) {
+        .detailview-card {
+            width: 15%;
+            top: 20pc;
+            bottom: 20pc;
+        }
+    }
+</style>
