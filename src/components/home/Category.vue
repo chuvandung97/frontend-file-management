@@ -21,6 +21,7 @@
                                 :items="type_list"
                                 item-text="extension"
                                 label="Loại"
+                                :error-messages="errorMessage"
                             ></v-combobox>
                         </v-col>
                         <v-col cols="12" md="2" sm="5">
@@ -99,7 +100,8 @@ export default {
             desserts: [],
             type_list: [],
             select: [],
-            isLoading: false
+            isLoading: false,
+            errorMessage: null
         }
     },
 
@@ -114,6 +116,14 @@ export default {
         },
         color (val) {
             this.color = val
+        },
+        select (val) {
+            if(typeof(val) != "object") {
+                this.errorMessage = 'Định dạng không hợp lệ'
+                setTimeout(() => {
+                    this.errorMessage = null
+                }, 2000)
+            }
         }
     },
 
@@ -141,11 +151,24 @@ export default {
 
         async addFileType() {
             try {
-                await Axios.post('http://localhost:3000/files/add/detailtype', {
-                    type_id: this.select.id,
-                    icon: this.icon,
-                    color: this.color
-                })
+                let checkExistsExtension = this.desserts.some(el => el.type_id == this.select.id)
+                if(checkExistsExtension) {
+                    this.errorMessage = 'Định dạng đã tồn tại'
+                } else if(typeof(this.select) != "object" || this.select.length == 0) {
+                    this.errorMessage = 'Mời bạn chọn định dạng'
+                } else {
+                    await Axios.post('http://localhost:3000/files/add/detailtype', {
+                        type_id: this.select.id,
+                        icon: this.icon,
+                        color: this.color
+                    })
+                    this.$store.commit('setNoti', {
+                        typeNoti: 1,
+                        textNoti: 'Thêm mới thành công !',
+                        showNoti: true
+                    })
+                    this.getDetailFileType()
+                }
             } catch (error) {
                 this.$store.commit('setNoti', {
                     typeNoti: 0,
@@ -153,10 +176,12 @@ export default {
                     showNoti: true
                 })
             } finally {
-                this.getDetailFileType()
                 this.select = []
                 this.icon = null,
                 this.color = null
+                setTimeout(() => {
+                    this.errorMessage = null
+                }, 2000)
             }
         }
     }

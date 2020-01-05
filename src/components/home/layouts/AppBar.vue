@@ -13,7 +13,7 @@
                 <span>Hệ thống quản lý file</span>
             </v-toolbar-title>
         </v-col>
-        <v-col cols="9" md="5">
+        <v-col cols="9" md="5" xl="3">
             <v-autocomplete
                 v-model="textSearch"
                 flat
@@ -59,7 +59,7 @@
                             </v-btn>   
                         </template>
                         <v-card>
-                            <v-card-text class="pa-0">
+                            <v-card-text class="pa-0 search-card">
                                 <v-form>
                                     <v-row class="mb-n3 px-5">
                                         <v-col md="4" class="py-0 d-flex align-center">
@@ -68,10 +68,8 @@
                                         <v-col md="5" class="pa-0">
                                             <v-select :items="typeSearchItems" return-object>
                                                 <template v-slot:item="{ item }">
-                                                    <v-row v-for="ite in item" :key="ite.name">
-                                                        <v-col md="1"><v-icon>{{ite.icon}}</v-icon></v-col>
-                                                        <v-col>{{ite.name}}</v-col>
-                                                    </v-row>
+                                                    <v-icon class="mr-2" :color="item.color">{{item.icon}}</v-icon>
+                                                    {{item.name}}
                                                 </template>
                                             </v-select>
                                         </v-col>
@@ -88,7 +86,10 @@
                                         <v-col md="4" class="py-0 d-flex align-center">
                                             Địa điểm:
                                         </v-col>
-                                        <v-col md="5" class="pa-0">
+                                        <v-col md="3" class="pa-0">
+                                            <v-checkbox label="Kho của tôi"></v-checkbox>
+                                        </v-col>
+                                        <v-col md="3" class="pa-0">
                                             <v-checkbox label="Thùng rác"></v-checkbox>
                                         </v-col>
                                     </v-row>
@@ -100,6 +101,7 @@
                                         <v-col md="5" class="pa-0">
                                             <v-text-field
                                                 placeholder="Nhập cụm từ cần tìm kiếm"
+                                                style="font-size: 14px"
                                             ></v-text-field>
                                         </v-col>
                                     </v-row>
@@ -128,12 +130,14 @@
                                     text
                                     color="primary"
                                     outlined
+                                    class="caption font-weight-bold"
                                 >Đặt lại</v-btn>
                                 <v-spacer></v-spacer>
                                 <v-btn
                                     color="primary"
                                     @click="''"
                                     depressed
+                                    class="caption font-weight-bold"
                                 >Tìm kiếm</v-btn>
                             </v-card-actions>
                         </v-card>
@@ -295,3 +299,10 @@ export default {
     }
 }
 </script>
+
+<style scoped>
+    .search-card[data-v-17d61de8] {
+        color: black;
+        font-size: 14px
+    }
+</style>
