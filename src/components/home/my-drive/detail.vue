@@ -80,7 +80,7 @@
             transition="scale-transition"
         >
             <v-list width="300">
-                <v-list-item @click="dialog2 = true">
+                <v-list-item @click="showDetailView = true">
                     <v-list-item-action>
                         <v-icon>mdi-eye</v-icon>
                     </v-list-item-action>
@@ -149,38 +149,6 @@
                 </v-list-item>
             </v-list>
         </v-menu>
-        <v-dialog v-model="dialog2" fullscreen hide-overlay transition="dialog-bottom-transition">
-            <v-card>
-                <v-toolbar dark color="primary">
-                    <v-btn icon dark @click="dialog2 = false">
-                        <v-icon>mdi-close</v-icon>
-                    </v-btn>
-                    <v-toolbar-title>Chi tiết</v-toolbar-title>
-                </v-toolbar>
-                <v-row>
-                    <v-col cols="7">
-                        <v-timeline dense clipped>
-                            <v-timeline-item
-                                hide-dot
-                            >
-                                <span>TODAY</span>
-                            </v-timeline-item>
-                            <v-timeline-item
-                                icon-color="grey lighten-2"
-                                small
-                            >
-                                <v-row justify="space-between">
-                                <v-col cols="7">This order was archived.</v-col>
-                                <v-col cols="5">15:26</v-col>
-                                </v-row>
-                            </v-timeline-item>
-                        </v-timeline>
-                    </v-col>
-                    <v-divider vertical inset></v-divider>
-                    <v-col class="text-center" cols="5"></v-col>
-                </v-row>
-            </v-card>
-        </v-dialog>  
         <v-dialog v-model="dialog" width="400" persistent>
             <v-card>
                 <v-card-title
@@ -317,6 +285,12 @@
                 </v-card-actions>
             </v-card>
         </v-dialog>
+        <ViewDetail
+            :showDetailView="showDetailView"
+            @closeDetailView="showDetailView = $event"
+            :detailItem="detailItem"
+            :userId="userId"
+        ></ViewDetail>
     </v-card>
 </template>
 
@@ -328,6 +302,7 @@ import { mapState } from 'vuex'
 import numeral from 'numeral'
 import Loading from '../layouts/Loading'
 import vClickOutside from 'v-click-outside'
+import ViewDetail from '../layouts/ViewDetail'
 
 Vue.use(vClickOutside)
 Vue.filter('formatDate', function(value) {
@@ -343,7 +318,7 @@ Vue.filter('formatSize', function(value) {
 })
 export default {
     components: {
-        Loading
+        Loading, ViewDetail
     },
     data: () => ({
         selection: [],
@@ -351,7 +326,6 @@ export default {
         new_name: null,
         dialog: false,
         dialog1: false,
-        dialog2: false,
         dialog3: false,
         show: false,
         x: 0,
@@ -372,7 +346,8 @@ export default {
         selectId: -1,
         selectType: null,
         isLoading: false,
-        folder_info: {}
+        folder_info: {},
+        showDetailView: false,
     }),
 
     mounted() {
@@ -432,7 +407,7 @@ export default {
         clickOutSide() {
             this.selectId = -1
             this.selectType = null
-            this.detailItem = {}
+            //this.detailItem = {}
         },
         showDetailFolder(item) {
             if(!item.filetypedetail) {
