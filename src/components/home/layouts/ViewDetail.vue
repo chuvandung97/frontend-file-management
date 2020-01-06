@@ -158,6 +158,7 @@ export default {
         },
         closeDetailView() {
             this.$emit('closeDetailView', false)
+            this.$store.commit('setViewDetail', false)
         },
     }
 }

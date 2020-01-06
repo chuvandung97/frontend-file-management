@@ -61,7 +61,6 @@
                             icon
                             v-on="on"
                             @click="activeViewDetail()"
-                            
                         >
                             <v-icon>mdi-eye</v-icon>
                         </v-btn>
@@ -75,13 +74,12 @@
                             text 
                             icon
                             v-on="on"
-                            @click="''"
-                            
+                            @click="activeRename()"
                         >
-                            <v-icon>mdi-share</v-icon>
+                            <v-icon>mdi-pencil</v-icon>
                         </v-btn>
                     </template>
-                    <span>Chia sẻ</span>
+                    <span>Đổi tên</span>
                 </v-tooltip>
                 <v-tooltip bottom v-if="showDetail">
                     <template v-slot:activator="{ on }">
@@ -90,8 +88,7 @@
                             text 
                             icon
                             v-on="on"
-                            @click="''"
-                            
+                            @click="activeDownload()"
                         >
                             <v-icon>mdi-download</v-icon>
                         </v-btn>
@@ -105,8 +102,7 @@
                             text 
                             icon
                             v-on="on"
-                            @click="''"
-                            
+                            @click="activeDelete()"
                         >
                             <v-icon>delete</v-icon>
                         </v-btn>
@@ -204,14 +200,15 @@ export default {
         activeViewDetail() {
             this.$store.commit('setViewDetail', true)
         },
-        activeOptionFile(active) {
-            this.$store.commit('setOptionFile', {
-                activeViewDetail: active,
-                activeShare: false,
-                activeDownload: false,
-                activeDelete: false
-            })
-        }
+        activeRename() {
+            this.$store.commit('setRename', true)
+        },
+        activeDownload() {
+            this.$store.commit('setDownload', true)
+        },
+        activeDelete() {
+            this.$store.commit('setDelete', true)
+        },
     }
 }
 </script>

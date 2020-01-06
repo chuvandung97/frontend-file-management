@@ -173,7 +173,7 @@
                 <v-card-actions class="mt-n6 mr-4">
                     <v-spacer></v-spacer>
                     <v-btn
-                        @click="dialog = false, overlay = false"
+                        @click="dialog = false, overlay = false, $store.commit('setRename', false)"
                         class="text-none"
                         depressed
                         text
@@ -190,7 +190,7 @@
                 </v-card-actions>
             </v-card>
         </v-dialog>
-        <v-dialog v-model="dialog1" max-width="400" scrollable persistent>
+        <v-dialog v-model="dialog1" width="400" scrollable persistent>
             <v-card>
                 <v-card-title
                     class="headline primary white--text"
@@ -202,7 +202,7 @@
                 <v-card-text class="red--text mt-3" v-if="folderLists.length == 0" style="height: 150px;">
                     Không có thư mục nào để di chuyển !
                 </v-card-text>
-                <v-card-text class="unselectable" v-else>
+                <v-card-text class="unselectable" v-else style="height: 200px">
                     <v-treeview
                         :active.sync="selection"
                         :items="folderLists"
@@ -406,6 +406,13 @@ export default {
             handler: function(val) {
                 if(val.activeViewDetail) {
                     this.showDetailView = true
+                } else if(val.activeRename) {
+                    this.dialog = true
+                    this.new_name = this.detailItem.name
+                } else if(val.activeDownload) {
+                    this.downloadFile()
+                } else if(val.activeDelete){
+                    this.removeToTrash()
                 }
             }
         },
@@ -515,6 +522,7 @@ export default {
                     this.dialog = false
                     this.overlay = false
                     this.getFolderFileList()
+                    this.$store.commit('setRename', false)
                 }
             }
         },
@@ -543,6 +551,7 @@ export default {
                 })
             } finally {
                 this.getFolderFileList()
+                this.$store.commit('setDelete', false)
             }
         },
         
@@ -612,6 +621,8 @@ export default {
                     textNoti: 'Tải xuống thất bại !',
                     showNoti: true
                 })
+            } finally {
+                this.$store.commit('setDownload', false)
             }
         },
 

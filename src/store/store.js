@@ -19,7 +19,7 @@ function defaultState() {
     showDetail: false,
     optionBar: {
       activeViewDetail: false,
-      activeShare: false,
+      activeRename: false,
       activeDownload: false,
       activeDelete: false
     },
@@ -68,6 +68,15 @@ export default new Vuex.Store({
     },
     setViewDetail(state, payload) {
       state.optionBar.activeViewDetail = payload
+    },
+    setRename(state, payload) {
+      state.optionBar.activeRename = payload
+    },
+    setDownload(state, payload) {
+      state.optionBar.activeDownload = payload
+    },
+    setDelete(state, payload) {
+      state.optionBar.activeDelete = payload
     },
     setSearchIndexDrive(state, payload) {
       state.searchIndexDrive.selectId = payload.selectId

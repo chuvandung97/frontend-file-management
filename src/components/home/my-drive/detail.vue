@@ -173,7 +173,7 @@
                 <v-card-actions class="mt-n6 mr-4">
                     <v-spacer></v-spacer>
                     <v-btn
-                        @click="dialog = false, overlay = false"
+                        @click="dialog = false, overlay = false, $store.commit('setRename', false)"
                         class="text-none"
                         depressed
                         text
@@ -201,7 +201,7 @@
                 </v-btn>{{folderLists[0] ? folderLists[0].parent.name : ''}}
                 </v-card-title>
 
-                <v-card-text class="unselectable">
+                <v-card-text class="unselectable" style="height: 200px">
                     <v-treeview
                         :active.sync="selection"
                         :items="folderLists"
@@ -362,7 +362,7 @@ export default {
 
     computed: {
         ...mapState ([
-            'viewFile', 'reloadDrive', 'rolegroup', 'searchIndexDrive'
+            'viewFile', 'reloadDrive', 'rolegroup', 'searchIndexDrive', 'optionBar'
         ]),
         folderLists: function() {
             return this.desserts.filter((el) => {
@@ -392,6 +392,21 @@ export default {
                 this.$store.commit('setShowDetail', true)
             } else {
                 this.$store.commit('setShowDetail', false)
+            }
+        },
+        optionBar: {
+            deep: true,
+            handler: function(val) {
+                if(val.activeViewDetail) {
+                    this.showDetailView = true
+                } else if(val.activeRename) {
+                    this.dialog = true
+                    this.new_name = this.detailItem.name
+                } else if(val.activeDownload) {
+                    this.downloadFile()
+                } else if(val.activeDelete){
+                    this.removeToTrash()
+                }
             }
         },
         searchIndexDrive: {
@@ -536,6 +551,7 @@ export default {
                     this.dialog = false
                     this.overlay = false
                     this.getFolderFileList()
+                    this.$store.commit('setRename', false)
                 }
             }
         },
@@ -562,6 +578,7 @@ export default {
                 })
             } finally {
                 this.getFolderFileList()
+                this.$store.commit('setDelete', false)
             }
         },
 
@@ -629,6 +646,8 @@ export default {
                     textNoti: 'Tải xuống thất bại !',
                     showNoti: true
                 })
+            } finally {
+                this.$store.commit('setDownload', false)
             }
         },
 
