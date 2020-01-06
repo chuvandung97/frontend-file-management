@@ -66,10 +66,16 @@
                                             Loại:
                                         </v-col>
                                         <v-col cols="5" class="pa-0">
-                                            <v-select :items="typeSearchItems" return-object>
+                                            <v-select v-model="typeSearch" :items="typeSearchItems" return-object>
                                                 <template v-slot:item="{ item }">
                                                     <v-icon class="mr-2" :color="item.color">{{item.icon}}</v-icon>
-                                                    {{item.text}}
+                                                    <span v-if="item.icon == 'mdi-file-word-box'">Tài liệu</span>
+                                                    <span v-if="item.icon == 'mdi-file-excel-box'">Trang tính</span>
+                                                    <span v-if="item.icon == 'mdi-file-powerpoint-box'">Trình chiếu</span>
+                                                    <span v-if="item.icon == 'mdi-file-pdf-box'">PDF</span>
+                                                    <span v-if="item.icon == 'mdi-file-image'">Hình ảnh</span>
+                                                    <span v-if="item.icon == 'mdi-file-video'">Video</span>
+                                                    <span v-if="item.icon == 'mdi-file-music'">Âm thanh</span>
                                                 </template>
                                             </v-select>
                                         </v-col>
@@ -295,18 +301,7 @@ export default {
             desserts: [],
             textSearch: null,
             loading: false,
-            typeSearchItems: [
-                {
-                    text: 'Hình ảnh',
-                    icon: 'mdi-file-image',
-                    color: 'primary'
-                },
-                {
-                    text: 'Tài liệu',
-                    icon: 'mdi-file-word-box',
-                    color: 'primary'
-                }
-            ],
+            typeSearchItems: [],
             ownerSearchItems: [
                 {
                     text: 'Bất kì ai',
@@ -377,6 +372,7 @@ export default {
                     time: null
                 }
             ],
+            typeSearch: null,
             nameSearch: null,
             sizeSearch: null,
             timeSearch: null,
@@ -398,6 +394,7 @@ export default {
     },
 
     async mounted() {
+        this.getDetailFileType()
         this.resetSearch()
         this.roleDescription = localStorage.getItem('userrole')
         let res = await Axios.get('http://localhost:3000/folderfiles/lists', {
@@ -453,6 +450,30 @@ export default {
     },
 
     methods: {
+        async getDetailFileType() {
+            try {
+                let res = await Axios.get('http://localhost:3000/files/lists/detailtype')
+                this.typeSearchItems = res.data.body.detail_type_list
+                let tempObj = {}
+                this.typeSearchItems.forEach(el => {
+                    var icon = el.icon
+                    var color = el.color
+                    if(!tempObj[icon]) {
+                        tempObj[icon] = []
+                        tempObj[icon].push(color)
+                    }
+                    tempObj[icon].push(el.id)
+                })    
+                this.typeSearchItems = []
+                for(var i in tempObj) {
+                    let color = tempObj[i].shift()
+                    this.typeSearchItems.push({icon: i, color: color, id: tempObj[i]})
+                }
+            } catch (error) {
+                console.log(error)
+            }
+        },
+
         clickExpandDrawer() {
             this.expandDrawer = !this.expandDrawer
             this.$store.commit('setExpandDrawer', this.expandDrawer)
