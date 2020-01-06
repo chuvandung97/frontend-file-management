@@ -41,8 +41,8 @@
                 </template>
                 <template v-slot:append>
                     <v-menu 
+                        v-model="showMenuSearch"
                         min-width="525"
-                        max-height="525"
                         open-delay="500"
                         nudge-right="12"
                         nudge-bottom="5"
@@ -54,78 +54,152 @@
                         :close-on-content-click='false'
                     >
                         <template v-slot:activator="{ on }">
-                            <v-btn text icon depressed small v-on="on">
+                            <v-btn text icon depressed small v-on="on" @click="showMenuSearch = true">
                                 <v-icon>mdi-menu-down</v-icon> 
                             </v-btn>   
                         </template>
                         <v-card>
                             <v-card-text class="pa-0 search-card">
-                                <v-form>
+                                <v-form ref="form" lazy-validation>
                                     <v-row class="mb-n3 px-5">
-                                        <v-col md="4" class="py-0 d-flex align-center">
+                                        <v-col cols="4" class="py-0 d-flex align-center">
                                             Loại:
                                         </v-col>
-                                        <v-col md="5" class="pa-0">
+                                        <v-col cols="5" class="pa-0">
                                             <v-select :items="typeSearchItems" return-object>
                                                 <template v-slot:item="{ item }">
                                                     <v-icon class="mr-2" :color="item.color">{{item.icon}}</v-icon>
-                                                    {{item.name}}
+                                                    {{item.text}}
                                                 </template>
                                             </v-select>
                                         </v-col>
                                     </v-row>
                                     <v-row class="mb-n3 px-5">
-                                        <v-col md="4" class="py-0 d-flex align-center">
+                                        <v-col cols="4" class="py-0 d-flex align-center">
                                             Chủ sở hữu:
                                         </v-col>
-                                        <v-col md="5" class="pa-0">
+                                        <v-col cols="5" class="pa-0">
                                             <v-select :items="ownerSearchItems"></v-select>
                                         </v-col>
                                     </v-row>
                                     <v-row class="mb-n3 px-5">
-                                        <v-col md="4" class="py-0 d-flex align-center">
+                                        <v-col cols="4" class="py-0 d-flex align-center">
                                             Địa điểm:
                                         </v-col>
-                                        <v-col md="3" class="pa-0">
-                                            <v-checkbox label="Kho của tôi"></v-checkbox>
-                                        </v-col>
-                                        <v-col md="3" class="pa-0">
-                                            <v-checkbox label="Thùng rác"></v-checkbox>
+                                        <v-col cols="3" class="pa-0">
+                                            <v-checkbox v-model="isTrash" label="Thùng rác"></v-checkbox>
                                         </v-col>
                                     </v-row>
                                     <v-divider></v-divider>
                                     <v-row class="mb-n3 px-5">
-                                        <v-col md="4" class="py-0 d-flex align-center">
+                                        <v-col cols="4" class="py-0 d-flex align-center">
                                             Tên:
                                         </v-col>
-                                        <v-col md="5" class="pa-0">
+                                        <v-col cols="5" class="pa-0">
                                             <v-text-field
+                                                v-model="nameSearch"
                                                 placeholder="Nhập cụm từ cần tìm kiếm"
-                                                style="font-size: 14px"
+                                                class="body-2"
                                             ></v-text-field>
                                         </v-col>
                                     </v-row>
                                     <v-row class="mb-n3 px-5">
-                                        <v-col md="4" class="py-0 d-flex align-center">
+                                        <v-col cols="4" class="py-0 d-flex align-center">
                                             Kích cỡ:
                                         </v-col>
-                                        <v-col md="5" class="pa-0">
-                                            <v-select></v-select>
+                                        <v-col cols="5" class="pa-0">
+                                            <v-select v-model="sizeSearch" :items="sizeSearchItems" return-object>
+                                                <template v-slot:item="{ item }">
+                                                    <span class="body-2">{{item.text}}</span>
+                                                </template>
+                                            </v-select>
+                                        </v-col>
+                                    </v-row>
+                                    <v-row class="mb-n3 px-5" v-if="sizeSearch == sizeSearchItems[5]">
+                                        <v-col cols="4" class="py-0"></v-col>
+                                        <v-col cols="2" class="pa-0">
+                                            <v-text-field 
+                                                v-model="fromSize" 
+                                                suffix="MB" 
+                                                placeholder="Từ" 
+                                                class="body-2"
+                                                :rules="[v => !!v || 'Mời bạn nhập kích cỡ']"
+                                            ></v-text-field>
+                                        </v-col>
+                                        <v-col cols="1" class="py-0 d-flex justify-center align-center"><v-icon dense class="body-2">mdi-minus</v-icon></v-col>
+                                        <v-col cols="2" class="pa-0">
+                                            <v-text-field 
+                                                v-model="toSize" 
+                                                suffix="MB" 
+                                                placeholder="Đến" 
+                                                class="body-2"
+                                                :rules="[v => !!v || 'Mời bạn nhập kích cỡ']"
+                                            ></v-text-field>
                                         </v-col>
                                     </v-row>
                                     <v-row class="mb-n3 px-5">
-                                        <v-col md="4" class="py-0 d-flex align-center">
+                                        <v-col cols="4" class="py-0 d-flex align-center">
                                             Cập nhật lần cuối:
                                         </v-col>
-                                        <v-col md="5" class="pa-0">
-                                            <v-select></v-select>
+                                        <v-col cols="5" class="pa-0">
+                                            <v-select v-model="timeSearch" :items="timeSearchItems" return-object>
+                                                <template v-slot:item="{ item }">
+                                                    <span class="body-2">{{item.text}}</span>
+                                                </template>
+                                            </v-select>
+                                        </v-col>
+                                    </v-row>
+                                    <v-row class="mb-n3 px-5" v-if="timeSearch == timeSearchItems[5]">
+                                        <v-col cols="4" class="py-0"></v-col>
+                                        <v-col cols="3" class="pa-0">
+                                            <v-menu
+                                                v-model="selectFromDate"
+                                                :close-on-content-click="false"
+                                                :nudge-right="40"
+                                                transition="scale-transition"
+                                                offset-y
+                                                min-width="290px"
+                                            >
+                                                <template v-slot:activator="{ on }">
+                                                <v-text-field
+                                                    v-model="fromDate"
+                                                    label="Từ ngày"
+                                                    prepend-icon="event"
+                                                    readonly
+                                                    v-on="on"
+                                                ></v-text-field>
+                                                </template>
+                                                <v-date-picker v-model="fromDate" @input="selectFromDate = false"></v-date-picker>
+                                            </v-menu>
+                                        </v-col>
+                                        <v-col cols="1" class="py-0 d-flex justify-center align-center"><v-icon dense class="body-2">mdi-minus</v-icon></v-col>
+                                        <v-col cols="3" class="pa-0">
+                                            <v-menu
+                                                v-model="selectToDate"
+                                                :close-on-content-click="false"
+                                                :nudge-right="40"
+                                                transition="scale-transition"
+                                                offset-y
+                                                min-width="290px"
+                                            >
+                                                <template v-slot:activator="{ on }">
+                                                <v-text-field
+                                                    v-model="toDate"
+                                                    label="Đến ngày"
+                                                    prepend-icon="event"
+                                                    readonly
+                                                    v-on="on"
+                                                ></v-text-field>
+                                                </template>
+                                                <v-date-picker v-model="toDate" @input="selectToDate = false"></v-date-picker>
+                                            </v-menu>
                                         </v-col>
                                     </v-row>
                                 </v-form>
                             </v-card-text>                            
                             <v-card-actions>
                                 <v-btn
-                                    @click="''"
+                                    @click="resetSearch()"
                                     depressed
                                     text
                                     color="primary"
@@ -135,7 +209,7 @@
                                 <v-spacer></v-spacer>
                                 <v-btn
                                     color="primary"
-                                    @click="''"
+                                    @click="searchFolderFile()"
                                     depressed
                                     class="caption font-weight-bold"
                                 >Tìm kiếm</v-btn>
@@ -198,6 +272,7 @@ import Axios from 'axios'
 export default {
     data () {
         return {
+            te: false,
             expandDrawer: true,
             roleDescription: null, 
             search: null,
@@ -207,21 +282,85 @@ export default {
             loading: false,
             typeSearchItems: [
                 {
-                    name: 'Hình ảnh',
+                    text: 'Hình ảnh',
                     icon: 'mdi-file-image',
                     color: 'primary'
                 },
                 {
-                    name: 'Tài liệu',
+                    text: 'Tài liệu',
                     icon: 'mdi-file-word-box',
                     color: 'primary'
                 }
             ],
             ownerSearchItems: ['Bất kì ai', 'Tôi', 'Không phải tôi'],
+            sizeSearchItems: [
+                {
+                    text: 'Bất kì',
+                    size: null
+                },
+                {
+                    text: 'Nhỏ hơn 1MB',
+                    size: 'less:1048576'
+                },
+                {
+                    text: 'Từ 1MB đến 50MB',
+                    size: 'more_:1048576:less_:52428800'
+                },
+                {
+                    text: 'Từ 50MB đến 100MB',
+                    size: 'more_:52428800:less_:104857600'
+                },
+                {
+                    text: 'Lớn hơn 100MB',
+                    size: 'more:104857600'
+                },
+                {
+                    text: 'Tùy chọn',
+                    size: null,
+                }
+            ],
+            timeSearchItems: [
+                {
+                    text: 'Bất kì',
+                    time: null
+                },
+                {
+                    text: 'Hôm nay',
+                    time: 'after:' + new Date().toISOString().substr(0, 10)
+                },
+                {
+                    text: 'Hôm qua',
+                    time: 'before:' + new Date().toISOString().substr(0, 10) + ':after:' + new Date(new Date().setDate(new Date().getDate()-1)).toISOString().substr(0, 10)
+                },
+                {
+                    text: '1 tuần trước',
+                    time: 'after:' + new Date(new Date().setDate(new Date().getDate()-7)).toISOString().substr(0, 10)
+                },
+                {
+                    text: '1 tháng trước',
+                    time: 'after:' + new Date(new Date().setDate(new Date().getDate()-30)).toISOString().substr(0, 10)
+                },
+                {
+                    text: 'Tùy chọn',
+                    time: null
+                }
+            ],
+            nameSearch: null,
+            sizeSearch: null,
+            fromSize: 0,
+            toSize: 0,
+            timeSearch: null,
+            selectFromDate: false,
+            selectToDate: false,
+            fromDate: new Date(new Date().setDate(new Date().getDate()-30)).toISOString().substr(0, 10),
+            toDate: new Date().toISOString().substr(0, 10),
+            showMenuSearch: false,
+            isTrash: false
         }
     },
 
     async mounted() {
+        this.resetSearch()
         this.roleDescription = localStorage.getItem('userrole')
         let res = await Axios.get('http://localhost:3000/folderfiles/lists', {
             params: {
@@ -257,6 +396,18 @@ export default {
                 }
                 this.search = null
             }
+        },
+        fromSize (val) {
+            this.sizeSearch.size = 'more_:' + val*1048576 + ':less_:' + this.toSize*1048576
+        },
+        toSize (val) {
+            this.sizeSearch.size = 'more_:' + this.fromSize*1048576 + ':less_:' + val*1048576
+        },
+        fromDate(val) {
+            this.timeSearch.time = 'before:' + this.toDate + ':after:' + val
+        },
+        toDate(val) {
+            this.timeSearch.time = 'before:' + val + ':after:' + this.fromDate
         }
     },
 
@@ -274,6 +425,36 @@ export default {
                 })
                 this.loading = false
             }, 500)
+        },
+
+        searchFolderFile() {
+            if(this.$refs.form.validate()) {
+                this.showMenuSearch = false
+                let query = {}
+                if(this.nameSearch) {
+                    query.name = this.nameSearch
+                }
+                if(this.sizeSearch.size) {
+                    query.size = this.sizeSearch.size
+                }
+                if(this.timeSearch.time) {
+                    query.time = this.timeSearch.time
+                }
+                if(this.isTrash) {
+                    query.active= false
+                }
+                this.$router.push({
+                    path: '/user/search',
+                    query
+                })
+            }
+        },
+
+        resetSearch() {
+            this.isTrash = false
+            this.nameSearch = null
+            this.sizeSearch = this.sizeSearchItems[0]
+            this.timeSearch = this.timeSearchItems[0]
         },
 
         async logout() {
@@ -303,6 +484,9 @@ export default {
 <style scoped>
     .search-card[data-v-17d61de8] {
         color: black;
-        font-size: 14px
+        font-size: 14px;
+        overflow-y: auto;
+        overflow-x: hidden;
+        max-height: 350px
     }
 </style>

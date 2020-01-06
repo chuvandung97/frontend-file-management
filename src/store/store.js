@@ -27,7 +27,8 @@ function defaultState() {
       selectId: null,
       selectType: null
     },
-    breadcrumbs: null
+    breadcrumbs: null,
+    textOptionBarForSearch: false
   }
 }
 export default new Vuex.Store({
@@ -74,6 +75,9 @@ export default new Vuex.Store({
     },
     setBreadcrumbs(state, payload) {
       state.breadcrumbs = payload
+    },
+    setTextOptionBarForSearch(state, payload) {
+      state.textOptionBarForSearch = payload
     }
   },
   actions: {

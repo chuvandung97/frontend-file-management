@@ -124,6 +124,11 @@ export default new Router({
           path: 'category',
           name: 'category',
           component: () => import('./components/home/Category.vue'),
+        },
+        {
+          path: 'search',
+          name: 'search',
+          component: () => import('./components/home/my-drive/search'),
         }
       ]
     }

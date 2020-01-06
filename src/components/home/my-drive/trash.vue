@@ -147,6 +147,7 @@
             this.getFolderFileList()
             this.$store.commit('setShowDetail', false)
             this.$store.commit('setBreadcrumbs', null)
+            this.$store.commit('setTextOptionBarForSearch', false)
         },
 
         computed: {

@@ -168,12 +168,19 @@ export default {
                 default:
                     break;
             }
+        }, 
+        textOptionBarForSearch (val) {
+            if(val) {
+                this.items[0].text = 'Kết quả tìm kiếm'
+            } else {
+                this.items[0].text = 'Kho của tôi'
+            }
         }
     },
 
     computed: {
         ...mapState ([
-            'selectedCount', 'showDetail'
+            'selectedCount', 'showDetail', 'textOptionBarForSearch'
         ]),
 
         breadcrumbs: {

@@ -17,7 +17,7 @@
                     <tr v-if="items.length == 0" class="text-center v-data-table__empty-wrapper">
                         <td colspan="4">Không có dữ liệu</td>
                     </tr>
-                    <tr v-else v-for="item in items" :key="item.name" :class="item.id === selectId && item.filetypedetail === selectType ? 'blue lighten-5 primary--text' : ''" @click="clickRow(item)" @dblclick="showDetailFolder(item)" @contextmenu="showSelectMenu($event, item)">
+                    <tr v-else v-for="item in items" :key="item.id" :class="item.id === selectId && item.filetypedetail === selectType ? 'blue lighten-5 primary--text' : ''" @click="clickRow(item)" @dblclick="showDetailFolder(item)" @contextmenu="showSelectMenu($event, item)">
                         <td :title="item.name" style="width: 40%">
                             <v-icon class="mr-2" v-if="!item.filetypedetail">mdi-folder</v-icon> 
                             <v-icon class="mr-2" v-else :color="item.filetypedetail.color">{{item.filetypedetail.icon}}</v-icon>
@@ -358,13 +358,13 @@ export default {
     }),
 
     mounted() {
+        this.$store.commit('setTextOptionBarForSearch', true)
         this.getFolderFileList()
         this.getDetailFileType()
         this.$store.commit('setSelectedTrash', {
             selectedCount: null
         })
         this.$store.commit('setBreadcrumbs', null)
-        this.$store.commit('setTextOptionBarForSearch', false)
     },
 
     computed: {
@@ -458,7 +458,11 @@ export default {
                 let res = await Axios.get('http://localhost:3000/folderfiles/lists', {
                     params: {
                         storage_id: localStorage.getItem('bucket'),
-                        active: 1,
+                        active: this.$route.query ? this.$route.query.active : true,
+                        search: true,
+                        name: this.$route.query ? this.$route.query.name : '',
+                        size: this.$route.query ? this.$route.query.size : '',
+                        time: this.$route.query ? this.$route.query.time : ''
                     }
                 })
                 this.desserts = res.data.body.folder_file_list
