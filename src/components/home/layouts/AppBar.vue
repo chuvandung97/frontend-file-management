@@ -79,7 +79,22 @@
                                             Chủ sở hữu:
                                         </v-col>
                                         <v-col cols="5" class="pa-0">
-                                            <v-select :items="ownerSearchItems"></v-select>
+                                            <v-select v-model="ownerSearch" :items="ownerSearchItems" return-object>
+                                                <template v-slot:item="{ item }">
+                                                    <span class="body-2">{{item.text}}</span>
+                                                </template>
+                                            </v-select>
+                                        </v-col>
+                                    </v-row>
+                                    <v-row class="mb-n3 px-5" v-if="ownerSearch == ownerSearchItems[3]">
+                                        <v-col cols="4" class="py-0"></v-col>
+                                        <v-col cols="7" class="pa-0">
+                                            <v-text-field
+                                                v-model="emailSearch"
+                                                placeholder="Nhập email người dùng cần tìm kiếm"
+                                                class="body-2"
+                                                :rules="emailRules"
+                                            ></v-text-field>
                                         </v-col>
                                     </v-row>
                                     <v-row class="mb-n3 px-5">
@@ -292,7 +307,24 @@ export default {
                     color: 'primary'
                 }
             ],
-            ownerSearchItems: ['Bất kì ai', 'Tôi', 'Không phải tôi'],
+            ownerSearchItems: [
+                {
+                    text: 'Bất kì ai',
+                    owner: null
+                }, 
+                {
+                    text: 'Tôi',
+                    owner: 'me'
+                }, 
+                {
+                    text: 'Không phải tôi',
+                    owner: 'notme'
+                },
+                {
+                    text: 'Tùy chọn',
+                    owner: null
+                }
+            ],
             sizeSearchItems: [
                 {
                     text: 'Bất kì',
@@ -347,15 +379,21 @@ export default {
             ],
             nameSearch: null,
             sizeSearch: null,
+            timeSearch: null,
+            ownerSearch: null,
+            emailSearch: null,
             fromSize: 0,
             toSize: 0,
-            timeSearch: null,
             selectFromDate: false,
             selectToDate: false,
             fromDate: new Date(new Date().setDate(new Date().getDate()-30)).toISOString().substr(0, 10),
             toDate: new Date().toISOString().substr(0, 10),
             showMenuSearch: false,
-            isTrash: false
+            isTrash: false,
+            emailRules: [
+                v => !!v || 'Mời bạn nhập email',
+                v => /.+@.+\..+/.test(v) || 'E-mail không hợp lệ',
+            ],
         }
     },
 
@@ -408,6 +446,9 @@ export default {
         },
         toDate(val) {
             this.timeSearch.time = 'before:' + val + ':after:' + this.fromDate
+        },
+        emailSearch(val) {
+            this.ownerSearch.owner = val
         }
     },
 
@@ -443,6 +484,9 @@ export default {
                 if(this.isTrash) {
                     query.active= false
                 }
+                if(this.ownerSearch.owner) {
+                    query.owner = this.ownerSearch.owner
+                }
                 this.$router.push({
                     path: '/user/search',
                     query
@@ -451,6 +495,7 @@ export default {
         },
 
         resetSearch() {
+            this.ownerSearch = this.ownerSearchItems[0]
             this.isTrash = false
             this.nameSearch = null
             this.sizeSearch = this.sizeSearchItems[0]

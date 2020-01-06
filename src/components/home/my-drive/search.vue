@@ -355,9 +355,11 @@ export default {
         selectType: null,
         isLoading: false,
         showDetailView: false,
+        userId: null
     }),
 
     mounted() {
+        this.userId = localStorage.getItem('userid')
         this.$store.commit('setTextOptionBarForSearch', true)
         this.getFolderFileList()
         this.getDetailFileType()
@@ -384,9 +386,6 @@ export default {
         fileHistories: function() {
             return this.detailItem.filehistories
         },
-        userId: function() {
-            return localStorage.getItem('userid')
-        }
     },
 
     watch: {
@@ -457,12 +456,14 @@ export default {
                 this.isLoading = true
                 let res = await Axios.get('http://localhost:3000/folderfiles/lists', {
                     params: {
+                        userid: this.userId,
                         storage_id: localStorage.getItem('bucket'),
                         active: this.$route.query ? this.$route.query.active : true,
                         search: true,
                         name: this.$route.query ? this.$route.query.name : '',
                         size: this.$route.query ? this.$route.query.size : '',
-                        time: this.$route.query ? this.$route.query.time : ''
+                        time: this.$route.query ? this.$route.query.time : '',
+                        owner: this.$route.query ? this.$route.query.owner : '',
                     }
                 })
                 this.desserts = res.data.body.folder_file_list
@@ -501,7 +502,7 @@ export default {
                     }
                     let res = await Axios.post(url + this.detailItem.id, {
                         name: this.new_name,
-                        user_id: localStorage.getItem('userid')
+                        user_id: this.userId
                     })
                     this.$store.commit('setNoti', {
                         typeNoti: 1,
@@ -532,7 +533,7 @@ export default {
                     url = 'http://localhost:3000/files/remove/trash/'
                 }
                 await Axios.post(url + this.detailItem.id, {
-                    user_id: localStorage.getItem('userid')
+                    user_id: this.userId
                 })
                 this.$store.commit('setNoti', {
                     typeNoti: 1,
@@ -562,7 +563,7 @@ export default {
                     if(this.detailItem.filetypedetail === undefined) {
                         let res = await Axios.post('http://localhost:3000/folders/move/' + this.detailItem.id, {
                             folderId: this.selection[0].id,
-                            user_id: localStorage.getItem('userid')
+                            user_id: this.userId
                         })
                         this.$store.commit('setNoti', {
                             typeNoti: 1,
@@ -573,7 +574,7 @@ export default {
                         let res = await Axios.post('http://localhost:3000/files/move/' + this.detailItem.id, {
                             oldFolderId: this.$route.params ? this.$route.params.folderId : null,
                             newFolderId: this.selection[0].id,
-                            user_id: localStorage.getItem('userid')
+                            user_id: this.userId
                         })
                         this.$store.commit('setNoti', {
                             typeNoti: 1,
@@ -635,8 +636,8 @@ export default {
                     }, 
                     params: {
                         bucket_name: localStorage.getItem('bucket'),
-                        created_by: localStorage.getItem('userid'),
-                        updated_by: localStorage.getItem('userid')
+                        created_by: this.userId,
+                        updated_by: this.userId
                     },
                     onUploadProgress: function( progressEvent ) {
                         console.log( progressEvent.loaded);

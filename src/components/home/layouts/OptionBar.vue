@@ -174,6 +174,7 @@ export default {
                 this.items[0].text = 'Kết quả tìm kiếm'
             } else {
                 this.items[0].text = 'Kho của tôi'
+                this.items[0].to = '/user/drive'
             }
         }
     },
