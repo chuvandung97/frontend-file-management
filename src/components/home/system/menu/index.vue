@@ -32,6 +32,9 @@
       <template v-slot:no-results>
         Không tìm thấy kết quả
       </template>
+      <template v-slot:item.parent="{ item }">
+        <span class="ml-n5">{{item.parentMenu ? item.parentMenu.name : '--'}}</span>
+      </template>
         <template v-slot:item.icon="{ item }">
             <v-icon class="ml-n5">{{item.icon}}</v-icon>
         </template>

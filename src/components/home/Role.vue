@@ -112,6 +112,9 @@
           </v-btn>
         </v-toolbar>
       </template>
+      <template v-slot:item.description="{ item }">
+        {{item.description ? item.description : '--'}}
+      </template>
       <template v-slot:item.edit="{ item }">
       <v-icon
         small
@@ -163,8 +166,9 @@ import Loading from './layouts/Loading'
             align: 'left',
             sortable: false,
             value: 'name',
+            width: '35%'
           },
-          { text: 'Mô tả', value: 'description' },
+          { text: 'Mô tả', value: 'description', sortable: false, align: 'center' },
           { text: 'Chỉnh sửa', value: 'edit', sortable: false, align: 'center' },
         ],
         desserts: [],
