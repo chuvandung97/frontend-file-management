@@ -96,7 +96,7 @@
 
 <script>
 import Axios from 'axios'
-import Loading from './Loading'
+import Loading from '../Loading'
 export default {
     props: {
         'showDetailView': {default: false, type: Boolean},
@@ -165,7 +165,7 @@ export default {
 </script>
 
 <style scoped>
-    .color-detail[data-v-2b7b520c] {
+    .color-detail[data-v-4aa1feb1] {
         color: black   
     }
 

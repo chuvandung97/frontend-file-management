@@ -303,7 +303,7 @@ import { mapState } from 'vuex'
 import numeral from 'numeral'
 import vClickOutside from 'v-click-outside'
 import Loading from '../layouts/Loading'
-import ViewDetail from '../layouts/ViewDetail'
+import ViewDetail from '../layouts/drive/ViewDetail'
 
 Vue.use(vClickOutside)
 Vue.filter('formatDate', function(value) {

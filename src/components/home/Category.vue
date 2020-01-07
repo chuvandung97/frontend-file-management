@@ -4,7 +4,7 @@
         <v-tabs vertical >
             <v-tab class="justify-start">
                 <v-icon left>mdi-file</v-icon>
-                Loại file
+                Loại tệp tin
             </v-tab>
             <v-tab class="justify-start">
                 <v-icon left>mdi-folder</v-icon>
@@ -43,7 +43,7 @@
                             <v-btn color="primary" depressed class="text-none mt-3" @click="addFileType()">Thêm mới</v-btn>
                         </v-col>
                     </v-row>
-                    <span class="caption red--text font-italic font-weight-medium">( * Loại file được thêm mới sẽ cho phép người dùng tải loại file đó lên hệ thống )</span>
+                    <span class="caption red--text font-italic font-weight-medium">( * Loại tệp tin được thêm mới sẽ cho phép người dùng tải loại tệp tin đó lên hệ thống )</span>
                     <v-data-table
                         :headers="headers"
                         :items="desserts"
@@ -64,6 +64,11 @@
                         </template>
                         <template v-slot:item.icon="{ item }">
                             <v-icon class="ml-n5" :color="item.color">{{item.icon}}</v-icon>
+                        </template>
+                        <template v-slot:item.delete="{ item }">
+                            <v-btn depressed icon text class="mr-4" @click="deleteItem(item)">
+                                <v-icon small>delete</v-icon>
+                            </v-btn>
                         </template>
                     </v-data-table>
                 </v-card-text>
@@ -95,7 +100,7 @@ export default {
                 width: '12%'
             },
             { text: 'Biểu tượng', align: 'center', value: 'icon', width: '12%' },
-            { text: 'Chỉnh sửa', align: 'center', value: 'edit', width: '12%' },
+            { text: 'Xóa', align: 'center', value: 'delete', width: '12%' },
             ],
             desserts: [],
             type_list: [],
@@ -157,7 +162,7 @@ export default {
                 } else if(typeof(this.select) != "object" || this.select.length == 0) {
                     this.errorMessage = 'Mời bạn chọn định dạng'
                 } else {
-                    await Axios.post('http://localhost:3000/files/add/detailtype', {
+                    await Axios.post('http://localhost:3000/filetypedetails/add', {
                         type_id: this.select.id,
                         icon: this.icon,
                         color: this.color
@@ -182,6 +187,25 @@ export default {
                 setTimeout(() => {
                     this.errorMessage = null
                 }, 2000)
+            }
+        }, 
+
+        async deleteItem(item) {
+            try {
+                let res = await Axios.delete('http://localhost:3000/filetypedetails/delete/' + item.id)
+                this.$store.commit('setNoti', {
+                    typeNoti: 1,
+                    textNoti: res.data.message,
+                    showNoti: true
+                })
+            } catch (error) {
+                this.$store.commit('setNoti', {
+                    typeNoti: 0,
+                    textNoti: 'Xóa thất bại !',
+                    showNoti: true
+                })
+            } finally {
+                this.getDetailFileType()
             }
         }
     }
