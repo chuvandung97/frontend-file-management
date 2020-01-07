@@ -157,6 +157,7 @@ export default {
             }
         },
         closeDetailView() {
+            this.tab = 0
             this.$emit('closeDetailView', false)
             this.$store.commit('setViewDetail', false)
         },
