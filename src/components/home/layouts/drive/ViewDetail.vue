@@ -70,10 +70,10 @@
                                 color="primary"
                                 icon-color="grey lighten-2"
                                 small
-                                class="pa-0"
+                                class="pa-0 ml-n9"
                             >
                                 <v-row justify="space-between">
-                                    <v-col cols="7">
+                                    <v-col cols="7" class="pa-1 ml-n4">
                                         {{logList.User.id == userId ? 'Bạn' : logList.User.name}} đã 
                                         <span v-if="logList.action == 'created' && logList.folder_id">tạo</span>
                                         <span v-if="logList.action == 'created' && logList.file_id">tải lên</span>
@@ -83,7 +83,7 @@
                                         <span v-if="logList.action == 'restored'">khôi phục</span>
                                         1 mục {{logList.log}}                                            
                                     </v-col>
-                                    <v-col class="text-right" cols="5">{{logList.createdAt | formatDate}}</v-col>
+                                    <v-col class="text-right pa-1 mr-1" cols="5">{{logList.createdAt | formatDate}}</v-col>
                                 </v-row>
                             </v-timeline-item>
                         </v-timeline>
@@ -220,11 +220,11 @@ export default {
     }
 
     .v-timeline--dense:not(.v-timeline--reverse):before {
-        left: calc(15px - 1px);
+        left: calc(12px - 1px);
         right: initial;
     }
 
-    .v-timeline-item__divider[data-v-35a1d8bc] {
+    .v-timeline-item__divider[data-v-4aa1feb1] {
         min-width: 35px;
     }
 </style>
