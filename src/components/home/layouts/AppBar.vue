@@ -240,51 +240,42 @@
                 </template>
             </v-autocomplete>
         </v-col>
-        <v-col cols="2" md="2" class="hidden-sm-and-down">
-            <v-spacer></v-spacer>
-        </v-col>
-        <v-col cols="2" md="2">
-            <div class="float-right">
-            <v-btn icon>
-                <v-icon>notifications</v-icon>
-            </v-btn>
-            <v-menu
-                min-width="150"
-                bottom
-                left
-                content-class="dropdown-menu"
-                offset-y
-                transition="slide-y-transition"
-            >
-                <template v-slot:activator="{ on }">
-                    <v-btn
-                        icon
-                        large
-                        v-on="on"
-                        class="hidden-sm-and-down"
-                    >
-                        <v-avatar>
-                        <v-icon dark>mdi-account-circle</v-icon>
-                        </v-avatar>
-                    </v-btn>
-                </template>
-                <v-card>
-                    <v-list dense>
-                        <v-list-item to="/user/profile">
-                            <v-list-item-title><v-icon class="mr-4">person_outline</v-icon> Hồ sơ</v-list-item-title>
-                        </v-list-item>
-                        <v-list-item>
-                            <v-list-item-title><v-icon class="mr-4">mdi-settings</v-icon> Cài đặt</v-list-item-title>
-                        </v-list-item>
-                        <v-divider></v-divider>
-                        <v-list-item @click="logout()">
-                            <v-list-item-title ><v-icon class="mr-4">mdi-logout</v-icon> Đăng xuất</v-list-item-title>
-                        </v-list-item>
-                    </v-list>
-                </v-card>
-            </v-menu>
-            </div>
-        </v-col>
+        <v-menu
+            min-width="150"
+            bottom
+            left
+            content-class="dropdown-menu"
+            offset-y
+            transition="slide-y-transition"
+        >
+            <template v-slot:activator="{ on }">
+                <v-btn
+                    icon
+                    large
+                    v-on="on"
+                    fixed
+                    right
+                >
+                    <v-avatar>
+                    <v-icon dark>mdi-account-circle</v-icon>
+                    </v-avatar>
+                </v-btn>
+            </template>
+            <v-card>
+                <v-list dense>
+                    <v-list-item to="/user/profile">
+                        <v-list-item-title><v-icon class="mr-4">person_outline</v-icon> Hồ sơ</v-list-item-title>
+                    </v-list-item>
+                    <v-list-item>
+                        <v-list-item-title><v-icon class="mr-4">mdi-settings</v-icon> Cài đặt</v-list-item-title>
+                    </v-list-item>
+                    <v-divider></v-divider>
+                    <v-list-item @click="logout()">
+                        <v-list-item-title ><v-icon class="mr-4">mdi-logout</v-icon> Đăng xuất</v-list-item-title>
+                    </v-list-item>
+                </v-list>
+            </v-card>
+        </v-menu>
     </v-app-bar>
 </template>
 
