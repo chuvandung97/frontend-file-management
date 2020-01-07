@@ -24,20 +24,20 @@
                                 :error-messages="errorMessage"
                             ></v-combobox>
                         </v-col>
-                        <v-col cols="12" md="2" sm="5">
+                        <v-col cols="12" md="3" sm="6">
                             <v-text-field
                                 v-model="icon"
                                 label="Biểu tượng"
                             ></v-text-field>
                         </v-col>
-                        <v-col cols="12" md="1" sm="1" class="d-flex justify-center">
-                            <v-icon :color="color">{{ icon }}</v-icon>
-                        </v-col>
-                        <v-col cols="12" md="3" sm="6">
+                        <v-col cols="12" md="2" sm="5">
                             <v-text-field
                                 v-model="color"
                                 label="Màu sắc"
                             ></v-text-field>
+                        </v-col>
+                        <v-col cols="12" md="1" sm="1" class="d-flex justify-center">
+                            <v-icon :color="color">{{ icon }}</v-icon>
                         </v-col>
                         <v-col cols="12" md="3">
                             <v-btn color="primary" depressed class="text-none mt-3" @click="addFileType()">Thêm mới</v-btn>
