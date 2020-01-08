@@ -262,7 +262,7 @@
                         >
                             <v-expansion-panel-header class="pa-1" disable-icon-rotate>
                                 <v-icon class="mr-2" style="flex: 0" :color="item.filetypedetail.color">{{item.filetypedetail.icon}}</v-icon>
-                                {{ item.name }}<v-subheader>Phiên bản {{fileHistories.length - i}}</v-subheader>
+                                {{ item.name.slice(14) }}<v-subheader>Phiên bản {{fileHistories.length - i}}</v-subheader>
                                 <template v-slot:actions>
                                     <v-btn text icon depressed @click.stop="downloadFile(item.name)"><v-icon color="teal">mdi-download</v-icon></v-btn>
                                 </template>
@@ -604,13 +604,13 @@ export default {
                 let res = await Axios.get('http://localhost:3000/files/download', {
                     params: {
                         bucket_name: localStorage.getItem('bucket'),
-                        name: name ? name : this.detailItem.name
+                        name: name ? name : this.detailItem.origin_name
                     }, 
                     responseType: 'blob'
                 })
                 const link = document.createElement('a')
                 link.href = window.URL.createObjectURL(new Blob([res.data]))
-                link.setAttribute('download', name ? name : this.detailItem.name) 
+                link.setAttribute('download', name ? name.slice(14) : this.detailItem.name) 
                 document.body.appendChild(link);
                 link.click()
                 document.body.removeChild(link);

@@ -17,7 +17,7 @@
                     <tr v-if="items.length == 0" class="text-center v-data-table__empty-wrapper">
                         <td colspan="4">Không có dữ liệu</td>
                     </tr>
-                    <tr v-else v-for="item in items" :key="item.id" :class="item.id === selectId && item.filetypedetail === selectType ? 'blue lighten-5 primary--text' : ''" @click="clickRow(item)" @dblclick="showDetailFolder(item)" @contextmenu="showSelectMenu($event, item)">
+                    <tr v-else v-for="item in items" :key="item.name" :class="item.id === selectId && item.filetypedetail === selectType ? 'blue lighten-5 primary--text' : ''" @click="clickRow(item)" @dblclick="showDetailFolder(item)" @contextmenu="showSelectMenu($event, item)">
                         <td :title="item.name" style="width: 40%">
                             <v-icon class="mr-2" v-if="!item.filetypedetail">mdi-folder</v-icon> 
                             <v-icon class="mr-2" v-else :color="item.filetypedetail.color">{{item.filetypedetail.icon}}</v-icon>
@@ -600,7 +600,7 @@ export default {
                 let res = await Axios.get('http://localhost:3000/files/download', {
                     params: {
                         bucket_name: localStorage.getItem('bucket'),
-                        name: name ? name : this.detailItem.name
+                        name: name ? name : this.detailItem.origin_name
                     }, 
                     responseType: 'blob'
                 })

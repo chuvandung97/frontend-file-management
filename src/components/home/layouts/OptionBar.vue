@@ -184,6 +184,10 @@ export default {
             get() {
                 let breadcrumbs = this.$store.state.breadcrumbs
                 if(breadcrumbs !==null) {
+                    breadcrumbs.map(el => {
+                        el.text = el.text.slice(14)
+                        return el
+                    })
                     return [...this.items, ...breadcrumbs]
                 } else return null
             }

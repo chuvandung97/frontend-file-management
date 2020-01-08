@@ -66,7 +66,7 @@
                         <v-timeline dense clipped class="pa-0">
                             <v-timeline-item
                                 v-for="logList in logLists"
-                                :key="logList.log"
+                                :key="logList.id"
                                 color="primary"
                                 icon-color="grey lighten-2"
                                 small

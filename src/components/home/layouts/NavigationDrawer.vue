@@ -44,7 +44,7 @@
                         <v-list-item class="file-upload" @click="showUploadFile()" :disabled="rolegroup == 'READ' ? true : false">
                             <v-list-item-icon><v-icon :disabled="rolegroup == 'READ' ? true : false">mdi-upload</v-icon></v-list-item-icon>
                             <v-list-item-title class="body-2 font-weight-medium ml-n3">Tải tệp lên</v-list-item-title>
-                            <input style="display: none" type="file" id="file" name="file" ref="file" :accept="typeList" v-on:change="handleFileUpload()"/>
+                            <input style="display: none" type="file" id="files" name="files" ref="files" multiple :accept="typeList" v-on:change="handleFileUpload()"/>
                         </v-list-item>
                     </v-list>
                 </v-menu>
@@ -262,12 +262,17 @@ export default {
                     showNoti: true
                 })
             }
+            /* this.files = this.$refs.files.files;
+            let formData = new FormData();
+            Array.prototype.forEach.call(this.files, (index, el) => {
+                formData.append('files[' + index + ']', el) // coi như là name="file"
+            }) */
         },
 
         async handleFileUpload(){
-            this.file = this.$refs.file.files[0];
+            this.files = this.$refs.files.files[0];
             let formData = new FormData();
-            formData.append('file', this.file); // coi như là name="file"
+            formData.append('file', this.files); // coi như là name="file"
             try {
                 let res = await Axios.post('http://localhost:3000/files/upload', formData, {
                     headers: {
@@ -302,7 +307,7 @@ export default {
         },
 
         showUploadFile() {
-            const btn_upload = document.getElementById('file')
+            const btn_upload = document.getElementById('files')
             btn_upload.click()
         },
 
