@@ -463,7 +463,7 @@ export default {
                     to: '/user/folder/' + this.folder_info.id
                 }]
                 var temp = this.folder_info.parent
-                for(let i = 0 ; i < 10 ; i++) {
+                for(let i = 0 ; i < 100 ; i++) {
                     if(temp) {
                         breadcrumbs.push({
                             text: temp.name,
@@ -565,7 +565,9 @@ export default {
                 } else {
                     url = 'http://localhost:3000/files/remove/trash/'
                 }
-                await Axios.post(url + this.detailItem.id)
+                await Axios.post(url + this.detailItem.id, {
+                    user_id: localStorage.getItem('userid')
+                })
                 this.$store.commit('setNoti', {
                     typeNoti: 1,
                     textNoti: 'Chuyển đến thùng rác thành công',
@@ -594,7 +596,8 @@ export default {
                 try {
                     if(this.detailItem.filetypedetail === undefined) {
                         let res = await Axios.post('http://localhost:3000/folders/move/' + this.detailItem.id, {
-                            folderId: this.selection[0].id
+                            folderId: this.selection[0].id,
+                            user_id: localStorage.getItem('userid')
                         })
                         this.$store.commit('setNoti', {
                             typeNoti: 1,
@@ -604,7 +607,8 @@ export default {
                     } else {
                         let res = await Axios.post('http://localhost:3000/files/move/' + this.detailItem.id, {
                             oldFolderId: this.$route.params ? this.$route.params.folderId : null,
-                            newFolderId: this.selection[0].id
+                            newFolderId: this.selection[0].id,
+                            user_id: localStorage.getItem('userid')
                         })
                         this.$store.commit('setNoti', {
                             typeNoti: 1,
