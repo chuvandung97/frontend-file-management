@@ -365,6 +365,7 @@ export default {
         })
         this.$store.commit('setBreadcrumbs', null)
         this.$store.commit('setTextOptionBarForSearch', false)
+        this.$store.commit('setFolderName', null)
     },
 
     computed: {

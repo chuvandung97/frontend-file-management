@@ -27,6 +27,7 @@ function defaultState() {
       selectId: null,
       selectType: null
     },
+    folderName: null,
     breadcrumbs: null,
     textOptionBarForSearch: false
   }
@@ -81,6 +82,9 @@ export default new Vuex.Store({
     setSearchIndexDrive(state, payload) {
       state.searchIndexDrive.selectId = payload.selectId
       state.searchIndexDrive.selectType = payload.selectType
+    },
+    setFolderName(state, payload) {
+      state.folderName = payload
     },
     setBreadcrumbs(state, payload) {
       state.breadcrumbs = payload

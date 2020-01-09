@@ -348,6 +348,7 @@ export default {
         isLoading: false,
         folder_info: {},
         showDetailView: false,
+        folderPath: null
     }),
 
     mounted() {
@@ -475,8 +476,10 @@ export default {
                         break;
                     }
                 }
+                this.folderPath = breadcrumbs.reverse().map(el => el.text).join('/')
+                this.$store.commit('setFolderName', this.folderPath)
                 this.$store.commit('setTextOptionBarForSearch', false)
-                this.$store.commit('setBreadcrumbs', breadcrumbs.reverse())
+                this.$store.commit('setBreadcrumbs', breadcrumbs)
             }
         },
 
@@ -634,7 +637,8 @@ export default {
                 let res = await Axios.get('http://localhost:3000/files/download', {
                     params: {
                         bucket_name: localStorage.getItem('bucket'),
-                        name: name ? name : this.detailItem.origin_name
+                        name: name ? name : this.detailItem.origin_name,
+                        folder_path: this.folderPath ? this.folderPath : ''
                     }, 
                     responseType: 'blob'
                 })

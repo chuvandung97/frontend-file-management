@@ -183,6 +183,7 @@ Vue.filter('formatSize', function(value) {
         this.$store.commit('setShowDetail', false)
         this.$store.commit('setBreadcrumbs', null)
         this.$store.commit('setTextOptionBarForSearch', false)
+        this.$store.commit('setFolderName', null)
     },
 
     computed: {

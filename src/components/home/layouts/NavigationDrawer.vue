@@ -183,7 +183,7 @@ export default {
             dialog: false,
             name_folder: 'Thư mục mới',
             typeList: [],
-            folderBreadcrumbs: null
+            folderPath: null
         }
     },
 
@@ -197,14 +197,9 @@ export default {
 
     computed: {
         ...mapState ([
-            'rolegroup', 'breadcrumbs'
+            'rolegroup', 'folderName'
         ]),
-        breadcrumbs() {
-            let breadcrumbs = this.$store.state.breadcrumbs
-            if(breadcrumbs != null) {
-                return breadcrumbs.map(el => el.text).join('/')
-            } else return null
-        },
+
         expandDrawer: {
             get() {
                 return this.$store.state.expandDrawer
@@ -214,8 +209,8 @@ export default {
     },
 
     watch: {
-        breadcrumbs: function(val) {
-            this.folderBreadcrumbs = val
+        folderName: function(val) {
+            this.folderPath = val
         }
     },
 
@@ -283,7 +278,7 @@ export default {
                         created_by: localStorage.getItem('userid'),
                         folder_id: this.$route.params ? this.$route.params.folderId : null,
                         updated_by: localStorage.getItem('userid'),
-                        folder_arr: this.folderBreadcrumbs
+                        folder_arr: this.folderPath
                     },
                     onUploadProgress: function( progressEvent ) {
                         console.log( progressEvent.loaded);
