@@ -30,7 +30,6 @@ export default new Router({
                 if(res.data.body.role == "Admin" || res.data.body.role == "Sysadmin") {
                   next({name: 'user.info'})
                 } else {
-                  console.log(12)
                   next({name: 'user.drive'})
                 }
               } else {
@@ -114,6 +113,11 @@ export default new Router({
           path: 'share',
           name: 'user.share',
           component: () => import('./components/home/my-drive/share'),
+        },
+        {
+          path: 'star',
+          name: 'user.star',
+          component: () => import('./components/home/my-drive/star'),
         },
         {
           path: 'trash',

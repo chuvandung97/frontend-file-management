@@ -204,6 +204,7 @@
                         params: {
                             storage_id: localStorage.getItem('bucket'),
                             active: 0,
+                            search: true
                         }
                     })
                     this.desserts = res.data.body.folder_file_list

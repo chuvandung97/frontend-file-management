@@ -5,12 +5,12 @@
             :items="desserts"
             hide-default-footer
             :items-per-page="999"
-            v-if="viewFile"
             :loading="isLoading"
+            v-if="viewFile"
             :class="'view_list unselectable'"
-        >
+        > 
             <template v-slot:progress>
-                <Loading />
+                <Loading /> 
             </template>
             <template v-slot:body=" { items } ">
                 <tbody v-click-outside="clickOutSide">
@@ -190,18 +190,19 @@
                 </v-card-actions>
             </v-card>
         </v-dialog>
-        <v-dialog v-model="dialog1" width="400" max-height="200" persistent>
+        <v-dialog v-model="dialog1" width="400" scrollable persistent>
             <v-card>
                 <v-card-title
-                    class="primary white--text"
+                    class="headline primary white--text"
                     primary-title
                 >
-                <v-btn text icon dark depressed>
-                    <v-icon>mdi-keyboard-backspace</v-icon> 
-                </v-btn>{{folderLists[0] ? folderLists[0].parent.name : ''}}
+                    Di chuyển thư mục
                 </v-card-title>
 
-                <v-card-text class="unselectable" style="height: 200px">
+                <v-card-text class="red--text mt-3" v-if="folderLists.length == 0" style="height: 150px;">
+                    Không có thư mục nào để di chuyển !
+                </v-card-text>
+                <v-card-text class="unselectable" v-else style="height: 200px">
                     <v-treeview
                         :active.sync="selection"
                         :items="folderLists"
@@ -261,7 +262,7 @@
                         >
                             <v-expansion-panel-header class="pa-1" disable-icon-rotate>
                                 <v-icon class="mr-2" style="flex: 0" :color="item.filetypedetail.color">{{item.filetypedetail.icon}}</v-icon>
-                                {{ item.name }}<v-subheader>Phiên bản {{fileHistories.length - i}}</v-subheader>
+                                {{ item.name.slice(14) }}<v-subheader>Phiên bản {{fileHistories.length - i}}</v-subheader>
                                 <template v-slot:actions>
                                     <v-btn text icon depressed @click.stop="downloadFile(item.name)"><v-icon color="teal">mdi-download</v-icon></v-btn>
                                 </template>
@@ -295,13 +296,13 @@
 </template>
 
 <script>
+import Axios from 'axios';
 import moment from 'moment'
 import Vue from 'vue'
-import Axios from 'axios'
 import { mapState } from 'vuex'
 import numeral from 'numeral'
-import Loading from '../layouts/Loading'
 import vClickOutside from 'v-click-outside'
+import Loading from '../layouts/Loading'
 import ViewDetail from '../layouts/drive/ViewDetail'
 
 Vue.use(vClickOutside)
@@ -311,11 +312,18 @@ Vue.filter('formatDate', function(value) {
     }
 })
 
+Vue.filter('formatTime', function(value) {
+    if (value) {
+        return moment(String(value)).format('HH:mm')
+    }
+})
+
 Vue.filter('formatSize', function(value) {
     if(value) {
         return numeral(value).format('0.0 b')
     }
 })
+
 export default {
     components: {
         Loading, ViewDetail
@@ -346,23 +354,22 @@ export default {
         selectId: -1,
         selectType: null,
         isLoading: false,
-        folder_info: {},
         showDetailView: false,
     }),
 
     mounted() {
         this.getFolderFileList()
         this.getDetailFileType()
-        this.getFolderInfo()
         this.$store.commit('setSelectedTrash', {
             selectedCount: null
-        }),
-        this.$store.commit('setShowDetail', false)
+        })
+        this.$store.commit('setBreadcrumbs', null)
+        this.$store.commit('setTextOptionBarForSearch', false)
     },
 
     computed: {
         ...mapState ([
-            'viewFile', 'reloadDrive', 'rolegroup', 'searchIndexDrive', 'optionBar'
+            'viewFile', 'reloadDrive', 'rolegroup', 'optionBar', 'searchIndexDrive'
         ]),
         folderLists: function() {
             return this.desserts.filter((el) => {
@@ -412,10 +419,11 @@ export default {
         searchIndexDrive: {
             deep: true,
             handler: function(val) {
+                console.log(val)
                 this.selectId = val.selectId
-                this.selectType = val.filetypedetail
+                this.selectType = val.selectType
             }
-        }
+        },
     },
 
     methods: {
@@ -437,6 +445,7 @@ export default {
             this.x = e.clientX;
             this.y = e.clientY;
             this.selectId = item.id
+            //this.$set(item, 'selected', true)
             this.detailItem = Object.assign({}, item)
             this.new_name = item.name
             this.$nextTick(() => {
@@ -450,55 +459,18 @@ export default {
             this.selectType = item.filetypedetail
         },
 
-        async getFolderInfo() {
-            try {
-                let res = await Axios.get('http://localhost:3000/folders/info/' + this.$route.params.folderId)
-                this.folder_info = res.data.body.folder_info
-            } catch (error) {
-                console.log(error)
-            } finally {
-                var breadcrumbs = [{
-                    text: this.folder_info.name,
-                    disable: false,
-                    to: '/user/folder/' + this.folder_info.id
-                }]
-                var temp = this.folder_info.parent
-                for(let i = 0 ; i < 10 ; i++) {
-                    if(temp) {
-                        breadcrumbs.push({
-                            text: temp.name,
-                            disable: false,
-                            to: '/user/folder/' + temp.id
-                        })
-                        temp = temp.parent
-                    } else {
-                        break;
-                    }
-                }
-                this.$store.commit('setTextOptionBarForSearch', false)
-                this.$store.commit('setBreadcrumbs', breadcrumbs.reverse())
-            }
-        },
-
         async getFolderFileList() {
             try {
                 this.isLoading = true
-                let res = await Axios.all([
-                    Axios.get('http://localhost:3000/folders/lists/subfolder', {
-                        params: {
-                            folder_id: this.$route.params.folderId, 
-                            active: 1
-                        }
-                    }),
-                    Axios.get('http://localhost:3000/files/lists/parentfolder', {
-                        params: {
-                            folder_id: this.$route.params.folderId, 
-                            active: 1
-                        }
-                    })
-                ])
-                let folder_list = res[0].data.body.folder_list
-                this.desserts = folder_list.concat(res[1].data.body.file_list)
+                let res = await Axios.get('http://localhost:3000/folderfiles/lists', {
+                    params: {
+                        storage_id: localStorage.getItem('bucket'),
+                        active: 1,
+                        search: true,
+                        is_star: 1
+                    }
+                })
+                this.desserts = res.data.body.folder_file_list
             } catch (error) {
                 console.log(error)
             } finally {
@@ -565,7 +537,9 @@ export default {
                 } else {
                     url = 'http://localhost:3000/files/remove/trash/'
                 }
-                await Axios.post(url + this.detailItem.id)
+                await Axios.post(url + this.detailItem.id, {
+                    user_id: localStorage.getItem('userid')
+                })
                 this.$store.commit('setNoti', {
                     typeNoti: 1,
                     textNoti: 'Chuyển đến thùng rác thành công',
@@ -582,7 +556,7 @@ export default {
                 this.$store.commit('setDelete', false)
             }
         },
-
+        
         async moveFolderOrFile() {
             if(this.detailItem.id == this.selection[0].id) {
                 this.$store.commit('setNoti', {
@@ -594,7 +568,8 @@ export default {
                 try {
                     if(this.detailItem.filetypedetail === undefined) {
                         let res = await Axios.post('http://localhost:3000/folders/move/' + this.detailItem.id, {
-                            folderId: this.selection[0].id
+                            folderId: this.selection[0].id,
+                            user_id: localStorage.getItem('userid')
                         })
                         this.$store.commit('setNoti', {
                             typeNoti: 1,
@@ -604,7 +579,8 @@ export default {
                     } else {
                         let res = await Axios.post('http://localhost:3000/files/move/' + this.detailItem.id, {
                             oldFolderId: this.$route.params ? this.$route.params.folderId : null,
-                            newFolderId: this.selection[0].id
+                            newFolderId: this.selection[0].id,
+                            user_id: localStorage.getItem('userid')
                         })
                         this.$store.commit('setNoti', {
                             typeNoti: 1,
@@ -636,7 +612,7 @@ export default {
                 })
                 const link = document.createElement('a')
                 link.href = window.URL.createObjectURL(new Blob([res.data]))
-                link.setAttribute('download', name ? name : this.detailItem.name) 
+                link.setAttribute('download', name ? name.slice(14) : this.detailItem.name) 
                 document.body.appendChild(link);
                 link.click()
                 document.body.removeChild(link);

@@ -157,6 +157,10 @@ export default {
                     this.items[0].text = 'Được chia sẻ với tôi'
                     this.items[0].to = path
                     break;
+                case '/user/star':
+                    this.items[0].text = 'Có gắn dấu sao'
+                    this.items[0].to = path
+                    break;
                 case '/user/trash':
                     this.items[0].text = 'Thùng rác'
                     this.items[0].to = path
