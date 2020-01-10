@@ -184,9 +184,9 @@ export default {
     data: () => ({
         items: [
             {
-                text: 'Kho của tôi',
+                text: null,
                 disabled: false,
-                to: '/user/drive'
+                to: null
             },
         ],
         userrole: null,
@@ -194,6 +194,7 @@ export default {
     }),
 
     mounted() {
+        this.getBreadcrumbs()
         this.userrole = localStorage.getItem('userrole')
     },
 
@@ -203,32 +204,13 @@ export default {
                 viewFile: this.viewFile
             })
         },
-        $route(from) {
-            let path = from.fullPath
-            switch (path) {
-                case '/user/drive':
-                    this.items[0].text = 'Kho của tôi'
-                    this.items[0].to = path
-                    break;
-                case '/user/share':
-                    this.items[0].text = 'Được chia sẻ với tôi'
-                    this.items[0].to = path
-                    break;
-                case '/user/star':
-                    this.items[0].text = 'Có gắn dấu sao'
-                    this.items[0].to = path
-                    break;
-                case '/user/trash':
-                    this.items[0].text = 'Thùng rác'
-                    this.items[0].to = path
-                    break;
-                default:
-                    break;
-            }
+        $route() {
+            this.getBreadcrumbs()
         }, 
         textOptionBarForSearch (val) {
             if(val) {
                 this.items[0].text = 'Kết quả tìm kiếm'
+                this.items[0].to = this.$route.fullPath
             } else {
                 this.items[0].text = 'Kho của tôi'
                 this.items[0].to = '/user/drive'
@@ -256,6 +238,29 @@ export default {
     },
 
     methods: {
+        getBreadcrumbs() {
+            let path = this.$route.fullPath
+            switch (path) {
+                case '/user/drive':
+                    this.items[0].text = 'Kho của tôi'
+                    this.items[0].to = path
+                    break;
+                case '/user/share':
+                    this.items[0].text = 'Được chia sẻ với tôi'
+                    this.items[0].to = path
+                    break;
+                case '/user/star':
+                    this.items[0].text = 'Có gắn dấu sao'
+                    this.items[0].to = path
+                    break;
+                case '/user/trash':
+                    this.items[0].text = 'Thùng rác'
+                    this.items[0].to = path
+                    break;
+                default:
+                    break;
+            }
+        },
         openDialogDeleteTrash() {
             this.$store.commit('setDialogDeleteTrash', true)
         },
