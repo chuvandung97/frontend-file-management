@@ -24,6 +24,15 @@
                     <v-list-item-title>Đổi tên</v-list-item-title>
                 </v-list-item-content>
             </v-list-item>
+            <v-list-item @click="updateStar()">
+                <v-list-item-action>
+                    <v-icon>{{detailItem.is_star ? 'mdi-star' : 'mdi-star-outline'}}</v-icon>
+                </v-list-item-action>
+                <v-list-item-content>
+                    <v-list-item-title v-if="detailItem.is_star">Xóa khỏi thư mục Có gắn dấu sao</v-list-item-title>
+                    <v-list-item-title v-else>Thêm vào thư mục Có gắn dấu sao</v-list-item-title>
+                </v-list-item-content>
+            </v-list-item>
             <v-list-item @click="$store.commit('setMove', true)">
                 <v-list-item-action>
                     <v-icon>mdi-folder-move</v-icon>
@@ -89,6 +98,7 @@ export default {
         'showDownload': {default: false, type: Boolean},
         'showDelete': {default: false, type: Boolean},
         'showUpload': {default: false, type: Boolean},
+        'showUpdateStar': {default: false, type: Boolean},
     },
 
     data: () => ({
@@ -115,6 +125,11 @@ export default {
                 this.showUploadFile()
             }
         },
+        showUpdateStar: function(val) {
+            if(val) {
+                this.updateStar()
+            }
+        }
     },
 
     methods: {
@@ -133,6 +148,37 @@ export default {
             btn_upload[0].click()
             this.$emit('closeUpload', false)
             this.$store.commit('setUpload', false)
+        },
+
+        async updateStar() {
+            let detailItem = this.$props.detailItem
+            try {
+                var url = ''
+                if(detailItem.filetypedetail === undefined) {
+                    url = 'http://localhost:3000/folders/update/star/'
+                } else {
+                    url = 'http://localhost:3000/files/update/star/'
+                }
+                let res = await Axios.post(url + detailItem.id, {
+                    is_star: detailItem.is_star ? 0 : 1,
+                })
+                this.$store.commit('setNoti', {
+                    typeNoti: 1,
+                    textNoti: res.data.message,
+                    showNoti: true
+                })
+            } catch (error) {
+                console.log(error)
+                this.$store.commit('setNoti', {
+                    typeNoti: 0,
+                    textNoti: 'Thất bại',
+                    showNoti: true
+                })
+            } finally {
+                this.$emit('closeUpdateStar', false)
+                this.$store.commit('setReloadIndexDrive', true)
+                this.$store.commit('setUpdateStar', false)
+            }
         },
 
         async replaceFileUpload() {

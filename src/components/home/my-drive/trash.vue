@@ -259,7 +259,7 @@
             async deletePermanently() {
                 let folderIds = this.selected.filter(el => !el.filetypedetail).map(currentElArray => currentElArray.id)
                 let fileIds = this.selected.filter(el => el.filetypedetail).map(currentElArray => currentElArray.id)
-                let fileNames = this.selected.filter(el => el.filetypedetail).map(currentElArray => currentElArray.name)
+                let fileNames = this.selected.filter(el => el.filetypedetail).map(currentElArray => currentElArray.origin_name)
                 try {
                     if(folderIds.length == 0) {
                         await Axios.delete('http://localhost:3000/files/delete', {
@@ -272,19 +272,23 @@
                     } else if(fileIds.length == 0) {
                         await Axios.delete('http://localhost:3000/folders/delete', {
                             params: {
-                                folderIds: folderIds
+                                folderIds: folderIds,
+                                storage: localStorage.getItem('bucket')
                             }
                         })
                     } else {
                         await Axios.all([
                             Axios.delete('http://localhost:3000/folders/delete', {
                                 params: {
-                                    folderIds: folderIds
+                                    folderIds: folderIds,
+                                    storage: localStorage.getItem('bucket')
                                 }
                             }),
                             Axios.delete('http://localhost:3000/files/delete', {
                                 params: {
-                                    fileIds: fileIds
+                                    fileIds: fileIds,
+                                    fileNames: fileNames,
+                                    storage: localStorage.getItem('bucket')
                                 }
                             })
                         ])

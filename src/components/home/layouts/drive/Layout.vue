@@ -21,7 +21,7 @@
                         <td :title="item.name" style="width: 40%">
                             <v-icon class="mr-2" v-if="!item.filetypedetail">mdi-folder</v-icon> 
                             <v-icon class="mr-2" v-else :color="item.filetypedetail.color">{{item.filetypedetail.icon}}</v-icon>
-                            {{ item.name.length >=40 ? item.name.substring(0,40) + '...' : item.name }}
+                            {{ item.name.length >=40 ? item.name.substring(0,40) + '...' : item.name }}<v-icon v-if="item.is_star" x-small class="ml-1" :class="item.id === selectId && item.filetypedetail === selectType ? 'blue lighten-5 primary--text' : ''">mdi-star</v-icon>
                         </td>
                         <td>{{ item.User ? (item.User.id == userId ? 'tôi' : item.User.name) : '' }}</td>
                         <td>{{ item.updatedAt | formatDate }}</td>
@@ -81,6 +81,8 @@
             @closeDelete="showDelete = $event"
             :showUpload="showUpload"
             @closeUpload="showUpload = $event"
+            :showUpdateStar="showUpdateStar"
+            @closeUpdateStar="showUpdateStar = $event"
         ></FolderFileMenu>
         <Rename
             :detailItem="detailItem"
@@ -155,6 +157,7 @@ export default {
         showDownload: false,
         showDelete: false,
         showUpload: false,
+        showUpdateStar: false,
         showMenu: {
             active: false,
             x: 0,
@@ -228,6 +231,8 @@ export default {
                     this.showVersionManagement = true
                 } else if(val.activeUpload) {
                     this.showUpload = true
+                } else if(val.activeUpdateStar) {
+                    this.showUpdateStar = true
                 }
             }
         },

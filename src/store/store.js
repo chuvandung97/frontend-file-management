@@ -25,7 +25,8 @@ function defaultState() {
       activeMove: false,
       activeShare: false,
       activeUpload: false,
-      activeVersionManagement: false
+      activeVersionManagement: false,
+      activeUpdateStar: false
     },
     searchIndexDrive: {
       selectId: null,
@@ -93,6 +94,9 @@ export default new Vuex.Store({
     },
     setVersionManagement(state, payload) {
       state.optionBar.activeVersionManagement = payload
+    },
+    setUpdateStar(state, payload) {
+      state.optionBar.activeUpdateStar = payload
     },
     setSearchIndexDrive(state, payload) {
       state.searchIndexDrive.selectId = payload.selectId
