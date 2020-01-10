@@ -85,9 +85,9 @@
             @closeUpdateStar="showUpdateStar = $event"
         ></FolderFileMenu>
         <Rename
-            :detailItem="detailItem"
             :showRename="showRename"
             @closeRename="showRename = $event"
+            :detailItem="detailItem"
             :userId="userId"
         ></Rename>
         <VersionManagement

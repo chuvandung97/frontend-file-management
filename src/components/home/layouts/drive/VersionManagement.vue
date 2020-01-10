@@ -78,18 +78,18 @@ export default {
     },
 
     methods: {
-        async downloadFile(name = null) {
+        async downloadFile(name) {
             try {
                 let res = await Axios.get('http://localhost:3000/files/download', {
                     params: {
                         bucket_name: localStorage.getItem('bucket'),
-                        name: name ? name : this.$props.detailItem.origin_name
+                        name: name
                     }, 
                     responseType: 'blob'
                 })
                 const link = document.createElement('a')
                 link.href = window.URL.createObjectURL(new Blob([res.data]))
-                link.setAttribute('download', name ? name.slice(14) : this.$props.detailItem.name) 
+                link.setAttribute('download', name.slice(14)) 
                 document.body.appendChild(link);
                 link.click()
                 document.body.removeChild(link);
@@ -100,8 +100,6 @@ export default {
                     textNoti: 'Tải xuống thất bại !',
                     showNoti: true
                 })
-            } finally {
-                this.$store.commit('setDownload', false)
             }
         },
 

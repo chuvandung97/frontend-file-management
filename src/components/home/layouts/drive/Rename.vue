@@ -1,5 +1,5 @@
 <template>
-    <v-dialog v-model="showRename" width="400" persistent>
+    <v-dialog v-model="showDialogRename" width="400" persistent>
         <v-card>
             <v-card-title
                 class="headline primary white--text"
@@ -53,6 +53,17 @@ export default {
     data: () => ({
         name: null
     }),
+
+    computed: {
+        showDialogRename: {
+            get () {
+                return this.$props.showRename
+            },
+            set (value) {
+                this.$emit('change', value)
+            }
+        }
+    },
 
     watch: {
         detailItem: function(val) {
