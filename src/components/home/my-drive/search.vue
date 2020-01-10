@@ -2,7 +2,7 @@
     <v-card flat>
         <v-data-table
             :headers="headers"
-            :items="desserts"
+            :items="folderFileLists"
             hide-default-footer
             :items-per-page="999"
             :loading="isLoading"
@@ -72,6 +72,35 @@
             </v-card>
         </template>
         
+        <FolderFileMenu
+            :showMenu="showMenu"
+            :detailItem="detailItem"
+            :showDownload="showDownload"
+            @closeDownload="showDownload = $event"
+            :showDelete="showDelete"
+            @closeDelete="showDelete = $event"
+            :showUpload="showUpload"
+            @closeUpload="showUpload = $event"
+        ></FolderFileMenu>
+        <Rename
+            :detailItem="detailItem"
+            :showRename="showRename"
+            @closeRename="showRename = $event"
+            :userId="userId"
+        ></Rename>
+        <VersionManagement
+            :detailItem="detailItem"
+            :showVersionManagement="showVersionManagement"
+            @closeVersionManagement="showVersionManagement = $event"
+            :userId="userId"
+        ></VersionManagement>
+        <Move
+            :detailItem="detailItem"
+            :showMove="showMove"
+            @closeMove="showMove = $event"
+            :userId="userId"
+            :folderLists="folderLists"
+        ></Move>
         <ViewDetail
             :showDetailView="showDetailView"
             @closeDetailView="showDetailView = $event"
@@ -90,17 +119,15 @@ import numeral from 'numeral'
 import vClickOutside from 'v-click-outside'
 import Loading from '../layouts/Loading'
 import ViewDetail from '../layouts/drive/ViewDetail'
+import Rename from '../layouts/drive/Rename'
+import VersionManagement from '../layouts/drive/VersionManagement'
+import Move from '../layouts/drive/Move'
+import FolderFileMenu from '../layouts/drive/FolderFileMenu'
 
 Vue.use(vClickOutside)
 Vue.filter('formatDate', function(value) {
     if (value) {
         return moment(String(value)).format('DD/MM/YYYY')
-    }
-})
-
-Vue.filter('formatTime', function(value) {
-    if (value) {
-        return moment(String(value)).format('HH:mm')
     }
 })
 
@@ -112,18 +139,27 @@ Vue.filter('formatSize', function(value) {
 
 export default {
     components: {
-        Loading, ViewDetail
+        Loading, ViewDetail, Rename, VersionManagement, Move, FolderFileMenu
     },
     data: () => ({
-        selection: [],
-        overlay: false,
-        new_name: null,
-        dialog: false,
-        dialog1: false,
-        dialog3: false,
-        show: false,
-        x: 0,
-        y: 0,
+        showDetailView: false,
+        showRename: false,
+        showMove: false,
+        showVersionManagement: false,
+        showDownload: false,
+        showDelete: false,
+        showUpload: false,
+        showMenu: {
+            active: false,
+            x: 0,
+            y: 0
+        },
+        folderFileLists: [],
+        detailItem: {},
+        selectId: -1,
+        selectType: null,
+        isLoading: false,
+        userId: null,
         headers: [
             {
                 text: 'Tên',
@@ -134,21 +170,12 @@ export default {
             { text: 'Cập nhật lần cuối', value: 'updatedAt' },
             { text: 'Kích cỡ', value: 'size' },
         ],
-        desserts: [],
-        detailItem: {},
-        typeList: [],
-        selectId: -1,
-        selectType: null,
-        isLoading: false,
-        showDetailView: false,
-        userId: null
     }),
 
     mounted() {
         this.userId = localStorage.getItem('userid')
         this.$store.commit('setTextOptionBarForSearch', true)
         this.getFolderFileList()
-        this.getDetailFileType()
         this.$store.commit('setSelectedTrash', {
             selectedCount: null
         })
@@ -160,12 +187,12 @@ export default {
             'viewFile', 'reloadDrive', 'rolegroup', 'optionBar', 'searchIndexDrive'
         ]),
         folderLists: function() {
-            return this.desserts.filter((el) => {
+            return this.folderFileLists.filter((el) => {
                 return !el.filetypedetail
             })
         },
         fileLists: function() {
-            return this.desserts.filter((el) => {
+            return this.folderFileLists.filter((el) => {
                 return el.filetypedetail
             })
         },
@@ -191,6 +218,18 @@ export default {
             handler: function(val) {
                 if(val.activeViewDetail) {
                     this.showDetailView = true
+                } else if(val.activeRename) {
+                    this.showRename = true
+                } else if(val.activeDownload) {
+                    this.showDownload = true
+                } else if(val.activeDelete){
+                    this.showDelete = true
+                } else if(val.activeMove) {
+                    this.showMove = true
+                } else if(val.activeVersionManagement) {
+                    this.showVersionManagement = true
+                } else if(val.activeUpload) {
+                    this.showUpload = true
                 }
             }
         },
@@ -206,28 +245,25 @@ export default {
 
     methods: {
         clickOutSide() {
-            this.selectId = -1
-            this.selectType = null
+            //this.selectId = -1
+            //this.selectType = null
             //this.detailItem = {}
         },
         showDetailFolder(item) {
             if(!item.filetypedetail) {
                 this.$router.push('/user/folder/' + item.id)
-                //this.getFolderFileList()
             }
         },
 
         showSelectMenu(e, item) {
             e.preventDefault();
-            this.show = false;
-            this.x = e.clientX;
-            this.y = e.clientY;
+            this.showMenu.active = false;
+            this.showMenu.x = e.clientX;
+            this.showMenu.y = e.clientY;
             this.selectId = item.id
-            //this.$set(item, 'selected', true)
             this.detailItem = Object.assign({}, item)
-            this.new_name = item.name
             this.$nextTick(() => {
-                this.show = true;
+                this.showMenu.active = true;
             });
         },
 
@@ -252,203 +288,13 @@ export default {
                         owner: this.$route.query ? this.$route.query.owner : '',
                     }
                 })
-                this.desserts = res.data.body.folder_file_list
+                this.folderFileLists = res.data.body.folder_file_list
             } catch (error) {
                 console.log(error)
             } finally {
                 this.isLoading = false
             }
         },
-
-        async getDetailFileType() {
-            try {
-                let res = await Axios.get('http://localhost:3000/files/lists/detailtype')
-                this.typeList = res.data.body.detail_type_list
-                this.typeList = this.typeList.map(el => el.filetype.extension)
-            } catch (error) {
-                console.log(error)
-            }
-        },
-
-        async updateName() {
-            if(this.new_name == this.detailItem.name) {
-                this.$store.commit('setNoti', {
-                    typeNoti: 1,
-                    textNoti: 'Đổi tên thành công',
-                    showNoti: true
-                })
-                this.dialog = false
-            } else { 
-                try {
-                    var url = ''
-                    if(this.detailItem.filetypedetail === undefined) {
-                        url = 'http://localhost:3000/folders/update/'
-                    } else {
-                        url = 'http://localhost:3000/files/update/'
-                    }
-                    let res = await Axios.post(url + this.detailItem.id, {
-                        name: this.new_name,
-                        user_id: this.userId
-                    })
-                    this.$store.commit('setNoti', {
-                        typeNoti: 1,
-                        textNoti: res.data.message,
-                        showNoti: true
-                    })
-                } catch (error) {
-                    console.log(error)
-                    this.$store.commit('setNoti', {
-                        typeNoti: 0,
-                        textNoti: 'Đổi tên thất bại',
-                        showNoti: true
-                    })
-                } finally {
-                    this.dialog = false
-                    this.overlay = false
-                    this.getFolderFileList()
-                }
-            }
-        },
-
-        async removeToTrash() {
-            try {
-                var url = ''
-                if(this.detailItem.filetypedetail === undefined) {
-                    url = 'http://localhost:3000/folders/remove/trash/'
-                } else {
-                    url = 'http://localhost:3000/files/remove/trash/'
-                }
-                await Axios.post(url + this.detailItem.id, {
-                    user_id: this.userId
-                })
-                this.$store.commit('setNoti', {
-                    typeNoti: 1,
-                    textNoti: 'Chuyển đến thùng rác thành công',
-                    showNoti: true
-                })
-            } catch (error) {
-                this.$store.commit('setNoti', {
-                    typeNoti: 0,
-                    textNoti: 'Xóa thất bại',
-                    showNoti: true
-                })
-            } finally {
-                this.getFolderFileList()
-            }
-        },
-        
-        async moveFolderOrFile() {
-            if(this.detailItem.id == this.selection[0].id) {
-                this.$store.commit('setNoti', {
-                    typeNoti: 0,
-                    textNoti: 'Không thể di chuyển đến chính mình',
-                    showNoti: true
-                })
-            } else {
-                try {
-                    if(this.detailItem.filetypedetail === undefined) {
-                        let res = await Axios.post('http://localhost:3000/folders/move/' + this.detailItem.id, {
-                            folderId: this.selection[0].id,
-                            user_id: this.userId
-                        })
-                        this.$store.commit('setNoti', {
-                            typeNoti: 1,
-                            textNoti: res.data.message,
-                            showNoti: true
-                        })
-                    } else {
-                        let res = await Axios.post('http://localhost:3000/files/move/' + this.detailItem.id, {
-                            oldFolderId: this.$route.params ? this.$route.params.folderId : null,
-                            newFolderId: this.selection[0].id,
-                            user_id: this.userId
-                        })
-                        this.$store.commit('setNoti', {
-                            typeNoti: 1,
-                            textNoti: res.data.message,
-                            showNoti: true
-                        }) 
-                    }
-                } catch (error) {
-                    this.$store.commit('setNoti', {
-                        typeNoti: 0,
-                        textNoti: 'Di chuyển thất bại',
-                        showNoti: true
-                    })
-                } finally {
-                    this.dialog1 = false,
-                    this.getFolderFileList()
-                }
-            }
-        },
-
-        async downloadFile(name = null) {
-            try {
-                let res = await Axios.get('http://localhost:3000/files/download', {
-                    params: {
-                        bucket_name: localStorage.getItem('bucket'),
-                        name: name ? name : this.detailItem.origin_name
-                    }, 
-                    responseType: 'blob'
-                })
-                const link = document.createElement('a')
-                link.href = window.URL.createObjectURL(new Blob([res.data]))
-                link.setAttribute('download', name ? name : this.detailItem.name) 
-                document.body.appendChild(link);
-                link.click()
-                document.body.removeChild(link);
-            } catch (error) {
-                console.log(error)
-                this.$store.commit('setNoti', {
-                    typeNoti: 0,
-                    textNoti: 'Tải xuống thất bại !',
-                    showNoti: true
-                })
-            }
-        },
-
-        showUploadFile() {
-            const btn_upload = document.getElementById('file')
-            btn_upload.click()
-        },
-
-        async replaceFileUpload() {
-            this.file = this.$refs.file.files[0];
-            let formData = new FormData();
-            formData.append('file', this.file); // coi như là name="file"
-            try {
-                let res = await Axios.post('http://localhost:3000/files/upload/replace/' + this.detailItem.id, formData, {
-                    headers: {
-                        'Content-Type': 'multipart/form-data'
-                    }, 
-                    params: {
-                        bucket_name: localStorage.getItem('bucket'),
-                        created_by: this.userId,
-                        updated_by: this.userId
-                    },
-                    onUploadProgress: function( progressEvent ) {
-                        console.log( progressEvent.loaded);
-                    }
-                })
-                this.$store.commit('setNoti', {
-                    typeNoti: 1,
-                    textNoti: res.data.message,
-                    showNoti: true
-                })
-            } catch (error) {
-                console.log(error)
-                this.$store.commit('setNoti', {
-                    typeNoti: 0,
-                    textNoti: 'Tải file thất bại !',
-                    showNoti: true
-                })
-            } finally {
-                this.$store.commit('setReloadIndexDrive', true)
-            }
-        },
-
-        formSubmit() {
-            this.updateName()
-        }
     }
   }
 </script>
