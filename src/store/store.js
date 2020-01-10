@@ -21,13 +21,16 @@ function defaultState() {
       activeViewDetail: false,
       activeRename: false,
       activeDownload: false,
-      activeDelete: false
+      activeDelete: false,
+      activeMove: false,
+      activeShare: false,
+      activeUpload: false,
+      activeVersionManagement: false
     },
     searchIndexDrive: {
       selectId: null,
       selectType: null
     },
-    folderName: null,
     breadcrumbs: null,
     textOptionBarForSearch: false
   }
@@ -79,12 +82,21 @@ export default new Vuex.Store({
     setDelete(state, payload) {
       state.optionBar.activeDelete = payload
     },
+    setMove(state, payload) {
+      state.optionBar.activeMove = payload
+    },
+    setShare(state, payload) {
+      state.optionBar.activeShare = payload
+    },
+    setUpload(state, payload) {
+      state.optionBar.activeUpload = payload
+    },
+    setVersionManagement(state, payload) {
+      state.optionBar.activeVersionManagement = payload
+    },
     setSearchIndexDrive(state, payload) {
       state.searchIndexDrive.selectId = payload.selectId
       state.searchIndexDrive.selectType = payload.selectType
-    },
-    setFolderName(state, payload) {
-      state.folderName = payload
     },
     setBreadcrumbs(state, payload) {
       state.breadcrumbs = payload

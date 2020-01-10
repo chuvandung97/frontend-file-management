@@ -367,7 +367,6 @@ export default {
             selectedCount: null
         })
         this.$store.commit('setBreadcrumbs', null)
-        this.$store.commit('setFolderName', null)
     },
 
     computed: {

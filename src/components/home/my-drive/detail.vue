@@ -2,7 +2,7 @@
     <v-card flat>
         <v-data-table
             :headers="headers"
-            :items="desserts"
+            :items="folderFileLists"
             hide-default-footer
             :items-per-page="999"
             v-if="viewFile"
@@ -71,126 +71,7 @@
                 </v-card-text>
             </v-card>
         </template>
-        <v-menu
-            v-model="show"
-            :position-x="x"
-            :position-y="y"
-            absolute
-            offset-y
-            transition="scale-transition"
-        >
-            <v-list width="300">
-                <v-list-item @click="showDetailView = true">
-                    <v-list-item-action>
-                        <v-icon>mdi-eye</v-icon>
-                    </v-list-item-action>
-                    <v-list-item-content>
-                        <v-list-item-title>Xem chi tiết</v-list-item-title>
-                    </v-list-item-content>
-                </v-list-item>
-                <v-list-item @click="dialog = true, overlay = true" :disabled="rolegroup == 'READ' ? true : false">
-                    <v-list-item-action>
-                        <v-icon :disabled="rolegroup == 'READ' ? true : false">mdi-pencil</v-icon>
-                    </v-list-item-action>
-                    <v-list-item-content>
-                        <v-list-item-title>Đổi tên</v-list-item-title>
-                    </v-list-item-content>
-                </v-list-item>
-                <v-list-item @click="dialog1 = true" :disabled="rolegroup == 'READ' ? true : false">
-                    <v-list-item-action>
-                        <v-icon :disabled="rolegroup == 'READ' ? true : false">mdi-folder-move</v-icon>
-                    </v-list-item-action>
-                    <v-list-item-content>
-                        <v-list-item-title>Di chuyển</v-list-item-title>
-                    </v-list-item-content>
-                </v-list-item>
-                <v-list-item :disabled="rolegroup == 'READ' ? true : false">
-                    <v-list-item-action>
-                        <v-icon :disabled="rolegroup == 'READ' ? true : false">mdi-share</v-icon>
-                    </v-list-item-action>
-                    <v-list-item-content>
-                        <v-list-item-title>Chia sẻ</v-list-item-title>
-                    </v-list-item-content>
-                </v-list-item>
-                <v-list-item v-if="detailItem.filehistories && detailItem.filehistories.length != 0" @click="dialog3 = true">
-                    <v-list-item-action>
-                        <v-icon>mdi-history</v-icon>
-                    </v-list-item-action>
-                    <v-list-item-content>
-                        <v-list-item-title>Quản lý phiên bản</v-list-item-title>
-                    </v-list-item-content>
-                </v-list-item>
-                <v-divider></v-divider>
-                <v-list-item class="file-upload" @click="showUploadFile()" :disabled="detailItem.filetypedetail && rolegroup != 'READ' ? false : true"> 
-                    <v-list-item-action>
-                        <v-icon :disabled="detailItem.filetypedetail && rolegroup != 'READ' ? false : true">mdi-upload</v-icon>
-                    </v-list-item-action>
-                    <v-list-item-content>
-                        <v-list-item-title>Tải lên bản thay thế</v-list-item-title>
-                    </v-list-item-content>
-                    <input style="display: none" type="file" id="file" name="file" ref="file" :accept="typeList" v-on:change="replaceFileUpload()"/>
-                </v-list-item>
-                <v-list-item @click.prevent="downloadFile()">
-                    <v-list-item-action>
-                        <v-icon>mdi-download</v-icon>
-                    </v-list-item-action>
-                    <v-list-item-content>
-                        <v-list-item-title>Tải xuống</v-list-item-title>
-                    </v-list-item-content>
-                </v-list-item>
-                <v-divider></v-divider>
-                <v-list-item @click="removeToTrash()" :disabled="rolegroup == 'READ' ? true : false">
-                    <v-list-item-action>
-                        <v-icon :disabled="rolegroup == 'READ' ? true : false">mdi-delete</v-icon>
-                    </v-list-item-action>
-                    <v-list-item-content>
-                        <v-list-item-title>Xóa</v-list-item-title>
-                    </v-list-item-content>
-                </v-list-item>
-            </v-list>
-        </v-menu>
-        <v-dialog v-model="dialog" width="400" persistent>
-            <v-card>
-                <v-card-title
-                    class="headline primary white--text"
-                    primary-title
-                >
-                    Đổi tên thư mục
-                </v-card-title>
-
-                <v-card-text>
-                    <v-text-field
-                        v-model="new_name"
-                        label="Tên"
-                        required
-                        class="mt-3"
-                        :rules="[v => !!v || 'Mời bạn nhập tên']"
-                        @keypress.enter="formSubmit()"
-                        autofocus
-                    >
-                    </v-text-field>
-                </v-card-text>
-                <v-card-actions class="mt-n6 mr-4">
-                    <v-spacer></v-spacer>
-                    <v-btn
-                        @click="dialog = false, overlay = false, $store.commit('setRename', false)"
-                        class="text-none"
-                        depressed
-                        text
-                        color="primary"
-                        outlined
-                    >Hủy</v-btn>
-                    <v-btn
-                        color="primary"
-                        @click="updateName()"
-                        class="text-none"
-                        depressed
-                        :disabled="new_name == '' ? true : false"
-                    >Lưu</v-btn>
-                </v-card-actions>
-            </v-card>
-        </v-dialog>
-        <v-dialog v-model="dialog1" width="400" max-height="200" persistent>
+        <!-- <v-dialog v-model="dialog1" width="400" max-height="200" persistent>
             <v-card>
                 <v-card-title
                     class="primary white--text"
@@ -235,56 +116,36 @@
                     >Di chuyển</v-btn>
                 </v-card-actions>
             </v-card>
-        </v-dialog>
-        <v-dialog v-model="dialog3" width="600" scrollable>
-            <v-card>
-                <v-card-title
-                    class="headline primary white--text"
-                    primary-title
-                >
-                    Quản lý phiên bản
-                    <v-spacer></v-spacer>
-                    <v-btn depressed text icon>
-                        <v-icon color="white" @click="dialog3 = false">mdi-close</v-icon>
-                    </v-btn>
-                </v-card-title>
-
-                <v-card-text style="height: 600px;">
-                    <v-expansion-panels
-                        multiple
-                        focusable
-                        class="mt-3" 
-                    >
-                        <v-expansion-panel
-                            v-for="(item,i) in fileHistories"
-                            :key="i"
-                        >
-                            <v-expansion-panel-header class="pa-1" disable-icon-rotate>
-                                <v-icon class="mr-2" style="flex: 0" :color="item.filetypedetail.color">{{item.filetypedetail.icon}}</v-icon>
-                                {{ item.name }}<v-subheader>Phiên bản {{fileHistories.length - i}}</v-subheader>
-                                <template v-slot:actions>
-                                    <v-btn text icon depressed @click.stop="downloadFile(item.name)"><v-icon color="teal">mdi-download</v-icon></v-btn>
-                                </template>
-                            </v-expansion-panel-header>
-                            <v-expansion-panel-content>
-                                <v-subheader>Kích cỡ: {{item.size | formatSize}}</v-subheader>
-                                <v-subheader class="mt-n3">Được tải lên bởi: {{item.updated_by == userId ? 'tôi' : item.User.name}} vào lúc {{item.updatedAt | formatTime}} ngày {{item.updatedAt | formatDate}}</v-subheader>
-                                <v-divider></v-divider>
-                            </v-expansion-panel-content>
-                        </v-expansion-panel>
-                    </v-expansion-panels>
-                </v-card-text>
-                <v-card-actions class="mr-4">
-                    <v-spacer></v-spacer>
-                    <v-btn
-                        @click="dialog3 = false"
-                        class="text-none"
-                        depressed
-                        color="primary"
-                    >Đóng</v-btn>
-                </v-card-actions>
-            </v-card>
-        </v-dialog>
+        </v-dialog> -->
+        <FolderFileMenu
+            :showMenu="showMenu"
+            :detailItem="detailItem"
+            :showDownload="showDownload"
+            @closeDownload="showDownload = $event"
+            :showDelete="showDelete"
+            @closeDelete="showDelete = $event"
+            :showUpload="showUpload"
+            @closeUpload="showUpload = $event"
+        ></FolderFileMenu>
+        <Rename
+            :detailItem="detailItem"
+            :showRename="showRename"
+            @closeRename="showRename = $event"
+            :userId="userId"
+        ></Rename>
+        <VersionManagement
+            :detailItem="detailItem"
+            :showVersionManagement="showVersionManagement"
+            @closeVersionManagement="showVersionManagement = $event"
+            :userId="userId"
+        ></VersionManagement>
+        <Move
+            :detailItem="detailItem"
+            :showMove="showMove"
+            @closeMove="showMove = $event"
+            :userId="userId"
+            :folderLists="folderLists"
+        ></Move>
         <ViewDetail
             :showDetailView="showDetailView"
             @closeDetailView="showDetailView = $event"
@@ -303,6 +164,10 @@ import numeral from 'numeral'
 import Loading from '../layouts/Loading'
 import vClickOutside from 'v-click-outside'
 import ViewDetail from '../layouts/drive/ViewDetail'
+import Rename from '../layouts/drive/Rename'
+import VersionManagement from '../layouts/drive/VersionManagement'
+import Move from '../layouts/drive/Move'
+import FolderFileMenu from '../layouts/drive/FolderFileMenu'
 
 Vue.use(vClickOutside)
 Vue.filter('formatDate', function(value) {
@@ -318,18 +183,28 @@ Vue.filter('formatSize', function(value) {
 })
 export default {
     components: {
-        Loading, ViewDetail
+        Loading, ViewDetail, Rename, VersionManagement, Move, FolderFileMenu
     },
     data: () => ({
-        selection: [],
-        overlay: false,
-        new_name: null,
-        dialog: false,
-        dialog1: false,
-        dialog3: false,
-        show: false,
-        x: 0,
-        y: 0,
+        showDetailView: false,
+        showRename: false,
+        showMove: false,
+        showVersionManagement: false,
+        showDownload: false,
+        showDelete: false,
+        showUpload: false,
+        showMenu: {
+            active: false,
+            x: 0,
+            y: 0
+        },
+        
+        folderFileLists: [],
+        detailItem: {},
+        selectId: -1,
+        selectType: null,
+        isLoading: false,
+        folder_info: {},
         headers: [
             {
                 text: 'Tên',
@@ -340,20 +215,10 @@ export default {
             { text: 'Cập nhật lần cuối', value: 'updatedAt' },
             { text: 'Kích cỡ', value: 'size' },
         ],
-        desserts: [],
-        detailItem: {},
-        typeList: [],
-        selectId: -1,
-        selectType: null,
-        isLoading: false,
-        folder_info: {},
-        showDetailView: false,
-        folderPath: null
     }),
 
     mounted() {
         this.getFolderFileList()
-        this.getDetailFileType()
         this.getFolderInfo()
         this.$store.commit('setSelectedTrash', {
             selectedCount: null
@@ -366,17 +231,14 @@ export default {
             'viewFile', 'reloadDrive', 'rolegroup', 'searchIndexDrive', 'optionBar'
         ]),
         folderLists: function() {
-            return this.desserts.filter((el) => {
+            return this.folderFileLists.filter((el) => {
                 return !el.filetypedetail
             })
         },
         fileLists: function() {
-            return this.desserts.filter((el) => {
+            return this.folderFileLists.filter((el) => {
                 return el.filetypedetail
             })
-        },
-        fileHistories: function() {
-            return this.detailItem.filehistories
         },
         userId: function() {
             return localStorage.getItem('userid')
@@ -401,12 +263,17 @@ export default {
                 if(val.activeViewDetail) {
                     this.showDetailView = true
                 } else if(val.activeRename) {
-                    this.dialog = true
-                    this.new_name = this.detailItem.name
+                    this.showRename = true
                 } else if(val.activeDownload) {
-                    this.downloadFile()
+                    this.showDownload = true
                 } else if(val.activeDelete){
-                    this.removeToTrash()
+                    this.showDelete = true
+                } else if(val.activeMove) {
+                    this.showMove = true
+                } else if(val.activeVersionManagement) {
+                    this.showVersionManagement = true
+                } else if(val.activeUpload) {
+                    this.showUpload = true
                 }
             }
         },
@@ -421,27 +288,25 @@ export default {
 
     methods: {
         clickOutSide() {
-            this.selectId = -1
-            this.selectType = null
+            //this.selectId = -1
+            //this.selectType = null
             //this.detailItem = {}
         },
         showDetailFolder(item) {
             if(!item.filetypedetail) {
                 this.$router.push('/user/folder/' + item.id)
-                //this.getFolderFileList()
             }
         },
 
         showSelectMenu(e, item) {
             e.preventDefault();
-            this.show = false;
-            this.x = e.clientX;
-            this.y = e.clientY;
+            this.showMenu.active = false;
+            this.showMenu.x = e.clientX;
+            this.showMenu.y = e.clientY;
             this.selectId = item.id
             this.detailItem = Object.assign({}, item)
-            this.new_name = item.name
             this.$nextTick(() => {
-                this.show = true;
+                this.showMenu.active = true;
             });
         },
 
@@ -476,10 +341,8 @@ export default {
                         break;
                     }
                 }
-                this.folderPath = breadcrumbs.reverse().map(el => el.text).join('/')
-                this.$store.commit('setFolderName', this.folderPath)
                 this.$store.commit('setTextOptionBarForSearch', false)
-                this.$store.commit('setBreadcrumbs', breadcrumbs)
+                this.$store.commit('setBreadcrumbs', breadcrumbs.reverse())
             }
         },
 
@@ -501,90 +364,11 @@ export default {
                     })
                 ])
                 let folder_list = res[0].data.body.folder_list
-                this.desserts = folder_list.concat(res[1].data.body.file_list)
+                this.folderFileLists = folder_list.concat(res[1].data.body.file_list)
             } catch (error) {
                 console.log(error)
             } finally {
                 this.isLoading = false
-            }
-        },
-
-        async getDetailFileType() {
-            try {
-                let res = await Axios.get('http://localhost:3000/files/lists/detailtype')
-                this.typeList = res.data.body.detail_type_list
-                this.typeList = this.typeList.map(el => el.filetype.extension)
-            } catch (error) {
-                console.log(error)
-            }
-        },
-
-        async updateName() {
-            if(this.new_name == this.detailItem.name) {
-                this.$store.commit('setNoti', {
-                    typeNoti: 1,
-                    textNoti: 'Đổi tên thành công',
-                    showNoti: true
-                })
-                this.dialog = false
-            } else { 
-                try {
-                    var url = ''
-                    if(this.detailItem.filetypedetail === undefined) {
-                        url = 'http://localhost:3000/folders/update/'
-                    } else {
-                        url = 'http://localhost:3000/files/update/'
-                    }
-                    let res = await Axios.post(url + this.detailItem.id, {
-                        name: this.new_name,
-                        user_id: localStorage.getItem('userid')
-                    })
-                    this.$store.commit('setNoti', {
-                        typeNoti: 1,
-                        textNoti: res.data.message,
-                        showNoti: true
-                    })
-                } catch (error) {
-                    console.log(error)
-                    this.$store.commit('setNoti', {
-                        typeNoti: 0,
-                        textNoti: 'Đổi tên thất bại',
-                        showNoti: true
-                    })
-                } finally {
-                    this.dialog = false
-                    this.overlay = false
-                    this.getFolderFileList()
-                    this.$store.commit('setRename', false)
-                }
-            }
-        },
-
-        async removeToTrash() {
-            try {
-                var url = ''
-                if(this.detailItem.filetypedetail === undefined) {
-                    url = 'http://localhost:3000/folders/remove/trash/'
-                } else {
-                    url = 'http://localhost:3000/files/remove/trash/'
-                }
-                await Axios.post(url + this.detailItem.id, {
-                    user_id: localStorage.getItem('userid')
-                })
-                this.$store.commit('setNoti', {
-                    typeNoti: 1,
-                    textNoti: 'Chuyển đến thùng rác thành công',
-                    showNoti: true
-                })
-            } catch (error) {
-                this.$store.commit('setNoti', {
-                    typeNoti: 0,
-                    textNoti: 'Xóa thất bại',
-                    showNoti: true
-                })
-            } finally {
-                this.getFolderFileList()
-                this.$store.commit('setDelete', false)
             }
         },
 
@@ -631,78 +415,6 @@ export default {
                 }
             }
         },
-
-        async downloadFile(name = null) {
-            try {
-                let res = await Axios.get('http://localhost:3000/files/download', {
-                    params: {
-                        bucket_name: localStorage.getItem('bucket'),
-                        name: name ? name : this.detailItem.origin_name,
-                        folder_path: this.folderPath ? this.folderPath : ''
-                    }, 
-                    responseType: 'blob'
-                })
-                const link = document.createElement('a')
-                link.href = window.URL.createObjectURL(new Blob([res.data]))
-                link.setAttribute('download', name ? name : this.detailItem.name) 
-                document.body.appendChild(link);
-                link.click()
-                document.body.removeChild(link);
-            } catch (error) {
-                console.log(error)
-                this.$store.commit('setNoti', {
-                    typeNoti: 0,
-                    textNoti: 'Tải xuống thất bại !',
-                    showNoti: true
-                })
-            } finally {
-                this.$store.commit('setDownload', false)
-            }
-        },
-
-        showUploadFile() {
-            const btn_upload = document.getElementById('file')
-            btn_upload.click()
-        },
-
-        async replaceFileUpload() {
-            this.file = this.$refs.file.files[0];
-            let formData = new FormData();
-            formData.append('file', this.file); // coi như là name="file"
-            try {
-                let res = await Axios.post('http://localhost:3000/files/upload/replace/' + this.detailItem.id, formData, {
-                    headers: {
-                        'Content-Type': 'multipart/form-data'
-                    }, 
-                    params: {
-                        bucket_name: localStorage.getItem('bucket'),
-                        created_by: localStorage.getItem('userid'),
-                        updated_by: localStorage.getItem('userid')
-                    },
-                    onUploadProgress: function( progressEvent ) {
-                        console.log( progressEvent.loaded);
-                    }
-                })
-                this.$store.commit('setNoti', {
-                    typeNoti: 1,
-                    textNoti: res.data.message,
-                    showNoti: true
-                })
-            } catch (error) {
-                console.log(error)
-                this.$store.commit('setNoti', {
-                    typeNoti: 0,
-                    textNoti: 'Tải file thất bại !',
-                    showNoti: true
-                })
-            } finally {
-                this.$store.commit('setReloadIndexDrive', true)
-            }
-        },
-
-        formSubmit() {
-            this.updateName()
-        }
     }
   }
 </script>

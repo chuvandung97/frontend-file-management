@@ -88,20 +88,6 @@
                             text 
                             icon
                             v-on="on"
-                            @click="activeDownload()"
-                        >
-                            <v-icon>mdi-download</v-icon>
-                        </v-btn>
-                    </template>
-                    <span>Tải xuống</span>
-                </v-tooltip>
-                <v-tooltip bottom v-if="showDetail">
-                    <template v-slot:activator="{ on }">
-                        <v-btn 
-                            depressed 
-                            text 
-                            icon
-                            v-on="on"
                             @click="activeDelete()"
                         >
                             <v-icon>delete</v-icon>
@@ -109,6 +95,77 @@
                     </template>
                     <span>Xóa</span>
                 </v-tooltip>
+                <span v-show="showDetail">
+                    <v-menu 
+                        offset-y
+                        bottom
+                        left
+                        content-class="dropdown-menu"
+                        transition="slide-y-transition"
+                    >
+                        <template v-slot:activator="{ on }">
+                            <v-btn
+                                depressed 
+                                text 
+                                icon
+                                v-on="on"
+                            >
+                                <v-icon>mdi-dots-vertical</v-icon>
+                            </v-btn>
+                        </template>
+                        <v-list width="300">
+                            <v-list-item @click="activeMove()">
+                                <v-list-item-action>
+                                    <v-icon>mdi-folder-move</v-icon>
+                                </v-list-item-action>
+                                <v-list-item-content>
+                                    <v-list-item-title>Di chuyển</v-list-item-title>
+                                </v-list-item-content>
+                            </v-list-item>
+                            <v-list-item>
+                                <v-list-item-action>
+                                    <v-icon>mdi-star-outline</v-icon>
+                                </v-list-item-action>
+                                <v-list-item-content>
+                                    <v-list-item-title>Thêm vào thư mục có gắn dấu sao</v-list-item-title>
+                                </v-list-item-content>
+                            </v-list-item>
+                            <v-list-item @click="activeShare()">
+                                <v-list-item-action>
+                                    <v-icon>mdi-share</v-icon>
+                                </v-list-item-action>
+                                <v-list-item-content>
+                                    <v-list-item-title>Chia sẻ</v-list-item-title>
+                                </v-list-item-content>
+                            </v-list-item>
+                            <v-list-item @click="activeVersionManagement()">
+                                <v-list-item-action>
+                                    <v-icon>mdi-history</v-icon>
+                                </v-list-item-action>
+                                <v-list-item-content>
+                                    <v-list-item-title>Quản lý phiên bản</v-list-item-title>
+                                </v-list-item-content>
+                            </v-list-item>
+                            <v-list-item @click="activeUpload()">
+                                <v-list-item-action>
+                                    <v-icon>mdi-upload</v-icon>
+                                </v-list-item-action>
+                                <v-list-item-content>
+                                    <v-list-item-title>Tải lên bản thay thế</v-list-item-title>
+                                </v-list-item-content>
+                            </v-list-item>
+                            <v-divider></v-divider>
+                            <v-list-item @click="activeDownload()">
+                                <v-list-item-action>
+                                    <v-icon>mdi-download</v-icon>
+                                </v-list-item-action>
+                                <v-list-item-content>
+                                    <v-list-item-title>Tải xuống</v-list-item-title>
+                                </v-list-item-content>
+                            </v-list-item>
+                        </v-list>
+                    </v-menu>
+                </span>
                 <v-divider vertical class="mx-2" v-if="showDetail || selectedCount > 0"></v-divider>
                 <v-btn 
                     depressed 
@@ -217,6 +274,18 @@ export default {
         activeDelete() {
             this.$store.commit('setDelete', true)
         },
+        activeMove() {
+            this.$store.commit('setMove', true)
+        },
+        activeShare() {
+            this.$store.commit('setShare', true)
+        },
+        activeUpload() {
+            this.$store.commit('setUpload', true)
+        },
+        activeVersionManagement() {
+            this.$store.commit('setVersionManagement', true)
+        }
     }
 }
 </script>

@@ -1,5 +1,5 @@
 <template>
-    <v-dialog v-model="dialog1" width="400" scrollable persistent>
+    <v-dialog v-model="showMove" width="400" scrollable persistent>
         <v-card>
             <v-card-title
                 class="headline primary white--text"
@@ -29,7 +29,7 @@
             <v-card-actions class="mt-n6 mr-4">
                 <v-spacer></v-spacer>
                 <v-btn
-                    @click="dialog1 = false, selection = []"
+                    @click="closeMove()"
                     class="text-none"
                     depressed
                     text
@@ -47,3 +47,70 @@
         </v-card>
     </v-dialog>
 </template>
+
+<script>
+import Axios from 'axios'
+export default {
+    props: {
+        'showMove': {default: false, type: Boolean},
+        'detailItem': {type: Object},
+        'userId': {type: String},
+        'folderLists': {type: Array}
+    },
+
+    data: () => ({
+        selection: []
+    }),
+
+    methods: {
+        async moveFolderOrFile() {
+            if(this.detailItem.id == this.selection[0].id) {
+                this.$store.commit('setNoti', {
+                    typeNoti: 0,
+                    textNoti: 'Không thể di chuyển đến chính mình',
+                    showNoti: true
+                })
+            } else {
+                try {
+                    if(this.detailItem.filetypedetail === undefined) {
+                        let res = await Axios.post('http://localhost:3000/folders/move/' + this.detailItem.id, {
+                            folderId: this.selection[0].id,
+                            user_id: localStorage.getItem('userid')
+                        })
+                        this.$store.commit('setNoti', {
+                            typeNoti: 1,
+                            textNoti: res.data.message,
+                            showNoti: true
+                        })
+                    } else {
+                        let res = await Axios.post('http://localhost:3000/files/move/' + this.detailItem.id, {
+                            oldFolderId: this.$route.params ? this.$route.params.folderId : null,
+                            newFolderId: this.selection[0].id,
+                            user_id: localStorage.getItem('userid')
+                        })
+                        this.$store.commit('setNoti', {
+                            typeNoti: 1,
+                            textNoti: res.data.message,
+                            showNoti: true
+                        }) 
+                    }
+                } catch (error) {
+                    this.$store.commit('setNoti', {
+                        typeNoti: 0,
+                        textNoti: 'Di chuyển thất bại',
+                        showNoti: true
+                    })
+                } finally {
+                    this.$emit('closeMovee', false)
+                }
+            }
+        },
+
+        closeMove() {
+            this.$emit('closeMove', false)
+            this.selection = []
+            this.$store.commit('setMove', false)
+        }
+    }
+}
+</script>
