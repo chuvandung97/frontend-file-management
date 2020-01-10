@@ -269,13 +269,33 @@ export default {
             this.$nextTick(() => {
                 this.showMenu.active = true;
             });
+            this.setStateStar(item)
+            this.setStateShowVersionManagement(item)
         },
 
         clickRow(item) {
             this.detailItem = Object.assign({}, item)
             this.selectId = item.id
             this.selectType = item.filetypedetail
+            this.setStateStar(item)
+            this.setStateShowVersionManagement(item)
         },
+
+        setStateStar(item) {
+            if(item.is_star) {
+                this.$store.commit('setChangeStar', true)
+            } else {
+                this.$store.commit('setChangeStar', false)
+            }
+        },
+
+        setStateShowVersionManagement(item) {
+            if(item.filehistories && item.filehistories.length > 0) {
+                this.$store.commit('setShowVersionManagement', true)
+            } else {
+                this.$store.commit('setShowVersionManagement', false)
+            }
+        }
     }
 }
 </script>

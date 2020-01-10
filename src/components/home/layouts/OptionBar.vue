@@ -122,12 +122,20 @@
                                     <v-list-item-title>Di chuyển</v-list-item-title>
                                 </v-list-item-content>
                             </v-list-item>
-                            <v-list-item>
+                            <v-list-item v-if="!optionChangeStar" @click="activeUpdateStar()">
                                 <v-list-item-action>
                                     <v-icon>mdi-star-outline</v-icon>
                                 </v-list-item-action>
                                 <v-list-item-content>
-                                    <v-list-item-title>Thêm vào thư mục có gắn dấu sao</v-list-item-title>
+                                    <v-list-item-title>Thêm vào thư mục Có gắn dấu sao</v-list-item-title>
+                                </v-list-item-content>
+                            </v-list-item>
+                            <v-list-item v-else @click="activeUpdateStar()">
+                                <v-list-item-action>
+                                    <v-icon>mdi-star</v-icon>
+                                </v-list-item-action>
+                                <v-list-item-content>
+                                    <v-list-item-title>Xóa khỏi thư mục Có gắn dấu sao</v-list-item-title>
                                 </v-list-item-content>
                             </v-list-item>
                             <v-list-item @click="activeShare()">
@@ -138,7 +146,7 @@
                                     <v-list-item-title>Chia sẻ</v-list-item-title>
                                 </v-list-item-content>
                             </v-list-item>
-                            <v-list-item @click="activeVersionManagement()">
+                            <v-list-item v-if="optionShowVersionManagement" @click="activeVersionManagement()">
                                 <v-list-item-action>
                                     <v-icon>mdi-history</v-icon>
                                 </v-list-item-action>
@@ -220,7 +228,7 @@ export default {
 
     computed: {
         ...mapState ([
-            'selectedCount', 'showDetail', 'textOptionBarForSearch'
+            'selectedCount', 'showDetail', 'textOptionBarForSearch', 'optionShowVersionManagement', 'optionChangeStar'
         ]),
 
         breadcrumbs: {
@@ -290,6 +298,9 @@ export default {
         },
         activeVersionManagement() {
             this.$store.commit('setVersionManagement', true)
+        },
+        activeUpdateStar() {
+            this.$store.commit('setUpdateStar', true)
         }
     }
 }

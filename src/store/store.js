@@ -33,7 +33,9 @@ function defaultState() {
       selectType: null
     },
     breadcrumbs: null,
-    textOptionBarForSearch: false
+    textOptionBarForSearch: false,
+    optionShowVersionManagement: false, //hiển thị nút quản lý phiên bản 
+    optionChangeStar: false //thay đổi trạng thái sao (thêm/ xóa bỏ)
   }
 }
 export default new Vuex.Store({
@@ -107,6 +109,12 @@ export default new Vuex.Store({
     },
     setTextOptionBarForSearch(state, payload) {
       state.textOptionBarForSearch = payload
+    },
+    setShowVersionManagement(state, payload) {
+      state.optionShowVersionManagement = payload
+    },
+    setChangeStar(state, payload) {
+      state.optionChangeStar = payload
     }
   },
   actions: {
