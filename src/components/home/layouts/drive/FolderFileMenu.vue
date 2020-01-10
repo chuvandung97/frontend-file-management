@@ -65,7 +65,7 @@
                 <v-list-item-content>
                     <v-list-item-title>Tải lên bản thay thế</v-list-item-title>
                 </v-list-item-content>
-                <input style="display: none" type="file" id="file" class="file" name="file" ref="file" :accept="typeList" v-on:change="replaceFileUpload()"/>
+                <input style="display: none" type="file" id="file" class="upload_file" name="file" ref="file" :accept="typeList" v-on:change="replaceFileUpload()"/>
             </v-list-item>
             <v-list-item @click.prevent="downloadFile()">
                 <v-list-item-action>
@@ -144,7 +144,8 @@ export default {
         },
 
         showUploadFile() {
-            const btn_upload = document.getElementsByClassName('file')
+            var btn_upload = document.getElementsByClassName('upload_file')
+            console.log(btn_upload)
             btn_upload[0].click()
             this.$emit('closeUpload', false)
             this.$store.commit('setUpload', false)

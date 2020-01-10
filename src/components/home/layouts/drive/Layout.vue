@@ -248,8 +248,8 @@ export default {
 
     methods: {
         clickOutSide() {
-            this.selectId = -1
-            this.selectType = null 
+            //this.selectId = -1
+            //this.selectType = null 
             //this.detailItem = {}
         },
         

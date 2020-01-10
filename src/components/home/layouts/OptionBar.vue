@@ -266,6 +266,8 @@ export default {
                     this.items[0].to = path
                     break;
                 default:
+                    this.items[0].text = 'Kho của tôi'
+                    this.items[0].to = '/user/drive'
                     break;
             }
         },
