@@ -8,7 +8,7 @@
             :items-per-page="999"
             v-if="viewFile"
             :class="'view_list unselectable'"
-            item-key="name"
+            item-key="origin_name"
             :loading="isLoading"
             :show-select="isShowSelect"
             @click:row="clickRow"
