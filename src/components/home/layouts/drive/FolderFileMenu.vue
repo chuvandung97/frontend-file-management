@@ -145,7 +145,6 @@ export default {
 
         showUploadFile() {
             var btn_upload = document.getElementsByClassName('upload_file')
-            console.log(btn_upload)
             btn_upload[0].click()
             this.$emit('closeUpload', false)
             this.$store.commit('setUpload', false)

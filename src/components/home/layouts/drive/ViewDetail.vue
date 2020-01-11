@@ -7,7 +7,7 @@
                 Chi tiết
                 <v-spacer></v-spacer>
                 <v-btn depressed text icon>
-                    <v-icon color="white" @click="closeDetailView">mdi-close</v-icon>
+                    <v-icon color="white" @click.stop="closeDetailView">mdi-close</v-icon>
                 </v-btn>
             </v-card-title>
             <v-card-text class="pa-0 color-detail">
@@ -18,6 +18,7 @@
                     grow
                     height="40"
                     centered
+                    @click.native.stop
                 >
                     <v-tab class="text-none">Thông tin</v-tab>
                     <v-tab class="text-none">Hoạt động</v-tab>

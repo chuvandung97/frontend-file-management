@@ -60,7 +60,7 @@
                             text 
                             icon
                             v-on="on"
-                            @click="activeViewDetail()"
+                            @click.stop="activeViewDetail()"
                         >
                             <v-icon>mdi-eye</v-icon>
                         </v-btn>
@@ -74,7 +74,7 @@
                             text 
                             icon
                             v-on="on"
-                            @click="activeRename()"
+                            @click.stop="activeRename()"
                         >
                             <v-icon>mdi-pencil</v-icon>
                         </v-btn>
@@ -109,6 +109,7 @@
                                 text 
                                 icon
                                 v-on="on"
+                                @click.native.stop
                             >
                                 <v-icon>mdi-dots-vertical</v-icon>
                             </v-btn>

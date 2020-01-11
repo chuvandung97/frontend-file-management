@@ -248,8 +248,8 @@ export default {
 
     methods: {
         clickOutSide() {
-            //this.selectId = -1
-            //this.selectType = null 
+            this.selectId = -1
+            this.selectType = null 
             //this.detailItem = {}
         },
         
@@ -265,6 +265,7 @@ export default {
             this.showMenu.x = e.clientX;
             this.showMenu.y = e.clientY;
             this.selectId = item.id
+            this.selectType = item.filetypedetail
             this.detailItem = Object.assign({}, item)
             this.$nextTick(() => {
                 this.showMenu.active = true;
