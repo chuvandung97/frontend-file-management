@@ -63,7 +63,7 @@
                                     item-text="code"
                                     required
                                     return-object
-                                    :disabled="role.code != 'Admin' ? true : false"
+                                    disabled
                                 >
                                 </v-select>
                             </v-col>

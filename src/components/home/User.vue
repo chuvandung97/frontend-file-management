@@ -86,7 +86,7 @@
                                 :rules="editedIndex == -1 ? passwordRules : []"
                                 ></v-text-field>
                             </v-col>
-                            <v-col cols="12" sm="6" md="6">
+                            <v-col cols="12" sm="6" md="6" v-if="editedIndex < 0">
                                 <v-select
                                 v-model="editedItem.role"
                                 :items="roles"
@@ -256,7 +256,12 @@ export default {
                         Authorization: `Bearer ${localStorage.getItem('jwt_token')}`
                     }
                 })  
-                this.roles = res.data.body.role_list.filter(el => el.code != 'User' && el.code != 'Sysadmin')
+                if(localStorage.getItem('userrole') == 'Admin') {
+                    this.roles = res.data.body.role_list.filter(el => el.code != 'User' && el.code != 'Sysadmin')
+                } else {
+                    this.roles = res.data.body.role_list.filter(el => el.code != 'User' && el.code != 'Group')
+                }
+                
             } catch (error) {
                 console.log(error)
             }
@@ -269,7 +274,7 @@ export default {
 
         editItem (item) {
             if(this.$refs.form != undefined) {
-            this.$refs.form.resetValidation()
+                this.$refs.form.resetValidation()
             }
             this.editedIndex = this.desserts.indexOf(item)
             this.editedItem = Object.assign({}, item)

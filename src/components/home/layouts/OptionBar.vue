@@ -254,7 +254,7 @@ export default {
 
     methods: {
         getBreadcrumbs() {
-            let path = this.$route.fullPath
+            let path = this.$route.path
             switch (path) {
                 case '/user/membergroup':
                     this.items[0].text = 'Thành viên trong nhóm'
@@ -275,6 +275,10 @@ export default {
                 case '/user/trash':
                     this.items[0].text = 'Thùng rác'
                     this.items[0].to = path
+                    break;
+                case '/user/search':
+                    this.items[0].text = 'Kết quả tìm kiếm'
+                    this.items[0].to = this.$route.fullPath
                     break;
                 default:
                     this.items[0].text = 'Kho của tôi'
