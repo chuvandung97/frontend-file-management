@@ -257,9 +257,22 @@
             },
 
             async deletePermanently() {
-                let folderIds = this.selected.filter(el => !el.filetypedetail).map(currentElArray => currentElArray.id)
-                let fileIds = this.selected.filter(el => el.filetypedetail).map(currentElArray => currentElArray.id)
-                let fileNames = this.selected.filter(el => el.filetypedetail).map(currentElArray => currentElArray.origin_name)
+                let selected = this.selected
+                let folderIds = selected.filter(el => !el.filetypedetail).map(currentElArray => currentElArray.id)
+                let fileIds = selected.filter(el => el.filetypedetail).map(currentElArray => currentElArray.id)
+                let fileNames = selected.filter(el => el.filetypedetail).map(currentElArray => currentElArray.origin_name)     
+                let allFolder = []
+                for(var i = 0; i < 1000; i++) {
+                    if(selected.length > 0) {
+                        let temp = []
+                        selected.filter(el => el.children.length > 0).map(el => el.children).forEach((el, idx) => temp[idx] = el)
+                        selected = temp.flat()
+                        allFolder.push(selected)
+                    } else {
+                        break;
+                    }
+                }
+                allFolder = allFolder.flat().map(el => el.id)
                 try {
                     if(folderIds.length == 0) {
                         await Axios.delete('http://localhost:3000/files/delete', {
@@ -273,7 +286,8 @@
                         await Axios.delete('http://localhost:3000/folders/delete', {
                             params: {
                                 folderIds: folderIds,
-                                storage: localStorage.getItem('bucket')
+                                storage: localStorage.getItem('bucket'),
+                                allFolderIds: allFolder
                             }
                         })
                     } else {
@@ -281,7 +295,8 @@
                             Axios.delete('http://localhost:3000/folders/delete', {
                                 params: {
                                     folderIds: folderIds,
-                                    storage: localStorage.getItem('bucket')
+                                    storage: localStorage.getItem('bucket'),
+                                    allFolderIds: allFolder
                                 }
                             }),
                             Axios.delete('http://localhost:3000/files/delete', {

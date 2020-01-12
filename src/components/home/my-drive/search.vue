@@ -51,6 +51,7 @@ export default {
                         size: this.$route.query ? this.$route.query.size : '',
                         time: this.$route.query ? this.$route.query.time : '',
                         owner: this.$route.query ? this.$route.query.owner : '',
+                        is_star: this.$route.query ? this.$route.query.is_star : ''
                     }
                 })
                 this.folderFileLists = res.data.body.folder_file_list

@@ -10,7 +10,7 @@
             <v-toolbar-title
                 class="ml-0 pl-3"
             >
-                <span>Hệ thống quản lý file</span>
+                <span>Hệ thống quản lý tệp tin</span>
             </v-toolbar-title>
         </v-col>
         <v-col cols="9" md="5" xl="3">
@@ -61,7 +61,7 @@
                         <v-card>
                             <v-card-text class="pa-0 search-card">
                                 <v-form ref="form" lazy-validation>
-                                    <v-row class="mb-n3 px-5">
+                                    <!-- <v-row class="mb-n3 px-5">
                                         <v-col cols="4" class="py-0 d-flex align-center">
                                             Loại:
                                         </v-col>
@@ -79,7 +79,7 @@
                                                 </template>
                                             </v-select>
                                         </v-col>
-                                    </v-row>
+                                    </v-row> -->
                                     <v-row class="mb-n3 px-5">
                                         <v-col cols="4" class="py-0 d-flex align-center">
                                             Chủ sở hữu:
@@ -107,8 +107,9 @@
                                         <v-col cols="4" class="py-0 d-flex align-center">
                                             Địa điểm:
                                         </v-col>
-                                        <v-col cols="3" class="pa-0">
-                                            <v-checkbox v-model="isTrash" label="Thùng rác"></v-checkbox>
+                                        <v-col cols="8" class="pa-0 d-flex">
+                                            <v-checkbox style="flex: 0 0 120px" v-model="isStar" label="Có gắn dấu sao"></v-checkbox>
+                                            <v-checkbox class="ml-3 mt-6" v-model="isTrash" label="Thùng rác"></v-checkbox>
                                         </v-col>
                                     </v-row>
                                     <v-divider></v-divider>
@@ -376,6 +377,7 @@ export default {
             fromDate: new Date(new Date().setDate(new Date().getDate()-30)).toISOString().substr(0, 10),
             toDate: new Date().toISOString().substr(0, 10),
             showMenuSearch: false,
+            isStar: false,
             isTrash: false,
             emailRules: [
                 v => !!v || 'Mời bạn nhập email',
@@ -493,6 +495,9 @@ export default {
                 if(this.timeSearch.time) {
                     query.time = this.timeSearch.time
                 }
+                if(this.isStar) {
+                    query.is_star= 1
+                }
                 if(this.isTrash) {
                     query.active= false
                 }
@@ -509,6 +514,7 @@ export default {
         resetSearch() {
             this.ownerSearch = this.ownerSearchItems[0]
             this.isTrash = false
+            this.isStar = false
             this.nameSearch = null
             this.sizeSearch = this.sizeSearchItems[0]
             this.timeSearch = this.timeSearchItems[0]

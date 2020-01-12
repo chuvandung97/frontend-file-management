@@ -31,7 +31,7 @@
             </template>
         </v-data-table>
         <template v-if="!viewFile">
-            <v-card flat v-if="folderLists.length > 0">
+            <v-card flat v-if="folderLists.length > 0" v-click-outside="clickOutSide">
                 <v-subheader>Thư mục</v-subheader>
                 <v-card-text class="mt-n5 unselectable">
                     <v-row>
@@ -44,13 +44,13 @@
                                 @dblclick="showDetailFolder(folder)" 
                                 @contextmenu="showSelectMenu($event, folder)"
                             >
-                                <v-icon class="mr-2">mdi-folder</v-icon> {{ folder.name }}    
+                                <v-icon class="mr-2">mdi-folder</v-icon> {{ folder.name }}<v-icon v-if="folder.is_star" x-small class="ml-1" :class="folder.id === selectId && folder.filetypedetail === selectType ? 'blue lighten-5 primary--text' : ''">mdi-star</v-icon>  
                             </v-card>
                         </v-col>
                     </v-row>
                 </v-card-text>
             </v-card>
-            <v-card flat v-if="fileLists.length > 0">
+            <v-card flat v-if="fileLists.length > 0" v-click-outside="clickOutSide">
                 <v-subheader>File</v-subheader>
                 <v-card-text class="mt-n5 unselectable">
                     <v-row>
@@ -64,7 +64,7 @@
                             >
                                 <v-icon :color="file.filetypedetail.color" size="100" class="d-flex justify-center py-8">{{file.filetypedetail.icon}}</v-icon>
                                 <v-icon class="mr-2" :color="file.filetypedetail.color">{{file.filetypedetail.icon}}</v-icon>
-                                {{ file.name.length >=25 ? file.name.substring(0,25) + '...' : file.name }}
+                                {{ file.name.length >=25 ? file.name.substring(0,25) + '...' : file.name }} <v-icon v-if="file.is_star" x-small class="ml-1" :class="file.id === selectId && file.filetypedetail === selectType ? 'blue lighten-5 primary--text' : ''">mdi-star</v-icon>
                             </v-card>
                         </v-col>
                     </v-row>

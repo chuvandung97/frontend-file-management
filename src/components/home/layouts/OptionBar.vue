@@ -1,6 +1,6 @@
 <template>
     <v-card flat v-if="userrole == 'User' || userrole == 'Group'">
-        <v-row v-if="$route.fullPath != '/user/profile'" class="mr-0">
+        <v-row v-if="$route.fullPath != '/user/profile' && $route.fullPath != '/user/membergroup'" class="mr-0">
             <v-col cols="5" md="9" sm="8" class="pa-0">
                 <v-breadcrumbs :items="items" large v-if="!breadcrumbs">
                     <template v-slot:divider>
@@ -75,6 +75,7 @@
                             icon
                             v-on="on"
                             @click.stop="activeRename()"
+                            :disabled="isDisabled"
                         >
                             <v-icon>mdi-pencil</v-icon>
                         </v-btn>
@@ -89,6 +90,7 @@
                             icon
                             v-on="on"
                             @click="activeDelete()"
+                            :disabled="isDisabled"
                         >
                             <v-icon>delete</v-icon>
                         </v-btn>
@@ -115,25 +117,25 @@
                             </v-btn>
                         </template>
                         <v-list width="300">
-                            <v-list-item @click="activeMove()">
+                            <v-list-item @click="activeMove()" :disabled="isDisabled">
                                 <v-list-item-action>
-                                    <v-icon>mdi-folder-move</v-icon>
+                                    <v-icon :disabled="isDisabled">mdi-folder-move</v-icon>
                                 </v-list-item-action>
                                 <v-list-item-content>
                                     <v-list-item-title>Di chuyển</v-list-item-title>
                                 </v-list-item-content>
                             </v-list-item>
-                            <v-list-item v-if="!optionChangeStar" @click="activeUpdateStar()">
+                            <v-list-item v-if="!optionChangeStar" @click="activeUpdateStar()" :disabled="isDisabled">
                                 <v-list-item-action>
-                                    <v-icon>mdi-star-outline</v-icon>
+                                    <v-icon :disabled="isDisabled">mdi-star-outline</v-icon>
                                 </v-list-item-action>
                                 <v-list-item-content>
                                     <v-list-item-title>Thêm vào thư mục Có gắn dấu sao</v-list-item-title>
                                 </v-list-item-content>
                             </v-list-item>
-                            <v-list-item v-else @click="activeUpdateStar()">
+                            <v-list-item v-else @click="activeUpdateStar()" :disabled="isDisabled">
                                 <v-list-item-action>
-                                    <v-icon>mdi-star</v-icon>
+                                    <v-icon :disabled="isDisabled">mdi-star</v-icon>
                                 </v-list-item-action>
                                 <v-list-item-content>
                                     <v-list-item-title>Xóa khỏi thư mục Có gắn dấu sao</v-list-item-title>
@@ -155,9 +157,9 @@
                                     <v-list-item-title>Quản lý phiên bản</v-list-item-title>
                                 </v-list-item-content>
                             </v-list-item>
-                            <v-list-item @click="activeUpload()">
+                            <v-list-item @click="activeUpload()" :disabled="isDisabled">
                                 <v-list-item-action>
-                                    <v-icon>mdi-upload</v-icon>
+                                    <v-icon :disabled="isDisabled">mdi-upload</v-icon>
                                 </v-list-item-action>
                                 <v-list-item-content>
                                     <v-list-item-title>Tải lên bản thay thế</v-list-item-title>
@@ -200,11 +202,15 @@ export default {
         ],
         userrole: null,
         viewFile: true,
+        isDisabled: false
     }),
 
     mounted() {
         this.getBreadcrumbs()
         this.userrole = localStorage.getItem('userrole')
+        if(localStorage.getItem('rolegroup') == 'READ') {
+            this.isDisabled = true
+        }
     },
 
     watch: {
@@ -250,6 +256,10 @@ export default {
         getBreadcrumbs() {
             let path = this.$route.fullPath
             switch (path) {
+                case '/user/membergroup':
+                    this.items[0].text = 'Thành viên trong nhóm'
+                    this.items[0].to = path
+                    break;
                 case '/user/drive':
                     this.items[0].text = 'Kho của tôi'
                     this.items[0].to = path

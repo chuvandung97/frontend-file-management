@@ -1,6 +1,6 @@
 <template>
     <v-slide-x-reverse-transition>
-        <v-card v-show="showDetailView" class="detailview-card" elevation="5">
+        <v-card v-show="showDetailView" class="detailview-card" elevation="5" @click.native.stop>
             <v-card-title
                 class="primary white--text py-2 body-1"
             >
@@ -18,7 +18,6 @@
                     grow
                     height="40"
                     centered
-                    @click.native.stop
                 >
                     <v-tab class="text-none">Thông tin</v-tab>
                     <v-tab class="text-none">Hoạt động</v-tab>
@@ -80,8 +79,7 @@
                                         <span v-if="logList.action == 'created' && logList.file_id">tải lên</span>
                                         <span v-if="logList.action == 'renamed'">đổi tên</span> 
                                         <span v-if="logList.action == 'replaced'">thay thế</span>
-                                        <span v-if="logList.action == 'deleted' || logList.action == 'moved'">di chuyển</span>
-                                        <span v-if="logList.action == 'restored'">khôi phục</span>
+                                        <span v-if="logList.action == 'moved'">di chuyển</span>
                                         1 mục {{logList.log}}                                            
                                     </v-col>
                                     <v-col class="text-right pa-1 mr-1" cols="5">{{logList.createdAt | formatDate}}</v-col>

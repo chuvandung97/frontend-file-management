@@ -115,7 +115,7 @@
             <template v-slot:item.role_group="{ item }">
                 <v-btn-toggle color="primary" dense mandatory borderless v-model="item.rolegroup.code" @change="updateRoleCode(item.rolegroup.code, item.id)">
                     <v-btn class="text-none caption" :value="'READWRITE'">Đọc ghi</v-btn>
-                    <v-btn class="text-none caption" :value="'READ'">Đọc</v-btn>
+                    <v-btn class="text-none caption" :value="'READ'">Chỉ Đọc</v-btn>
                 </v-btn-toggle>
             </template>
             <template v-slot:item.active="{ item }">

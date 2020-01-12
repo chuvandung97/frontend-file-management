@@ -126,13 +126,18 @@ export default new Router({
         },
         {
           path: 'category',
-          name: 'category',
+          name: 'user.category',
           component: () => import('./components/home/Category.vue'),
         },
         {
           path: 'search',
-          name: 'search',
+          name: 'user.search',
           component: () => import('./components/home/my-drive/search'),
+        },
+        {
+          path: 'membergroup',
+          name: 'user.membergroup',
+          component: () => import('./components/home/my-drive/membergroup'),
         }
       ]
     }

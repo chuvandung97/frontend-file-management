@@ -16,26 +16,26 @@
                     <v-list-item-title>Xem chi tiết</v-list-item-title>
                 </v-list-item-content>
             </v-list-item>
-            <v-list-item @click="$store.commit('setRename', true)">
+            <v-list-item @click="$store.commit('setRename', true)" :disabled="isDisabled">
                 <v-list-item-action>
-                    <v-icon>mdi-pencil</v-icon>
+                    <v-icon :disabled="isDisabled">mdi-pencil</v-icon>
                 </v-list-item-action>
                 <v-list-item-content>
                     <v-list-item-title>Đổi tên</v-list-item-title>
                 </v-list-item-content>
             </v-list-item>
-            <v-list-item @click="updateStar()">
+            <v-list-item @click="updateStar()" :disabled="isDisabled">
                 <v-list-item-action>
-                    <v-icon>{{detailItem.is_star ? 'mdi-star' : 'mdi-star-outline'}}</v-icon>
+                    <v-icon :disabled="isDisabled">{{detailItem.is_star ? 'mdi-star' : 'mdi-star-outline'}}</v-icon>
                 </v-list-item-action>
                 <v-list-item-content>
                     <v-list-item-title v-if="detailItem.is_star">Xóa khỏi thư mục Có gắn dấu sao</v-list-item-title>
                     <v-list-item-title v-else>Thêm vào thư mục Có gắn dấu sao</v-list-item-title>
                 </v-list-item-content>
             </v-list-item>
-            <v-list-item @click="$store.commit('setMove', true)">
+            <v-list-item @click="$store.commit('setMove', true)" :disabled="isDisabled">
                 <v-list-item-action>
-                    <v-icon>mdi-folder-move</v-icon>
+                    <v-icon :disabled="isDisabled">mdi-folder-move</v-icon>
                 </v-list-item-action>
                 <v-list-item-content>
                     <v-list-item-title>Di chuyển</v-list-item-title>
@@ -58,9 +58,9 @@
                 </v-list-item-content>
             </v-list-item>
             <v-divider></v-divider>
-            <v-list-item class="file-upload" @click="showUploadFile()"> 
+            <v-list-item class="file-upload" @click="showUploadFile()" :disabled="isDisabled"> 
                 <v-list-item-action>
-                    <v-icon>mdi-upload</v-icon>
+                    <v-icon :disabled="isDisabled">mdi-upload</v-icon>
                 </v-list-item-action>
                 <v-list-item-content>
                     <v-list-item-title>Tải lên bản thay thế</v-list-item-title>
@@ -76,9 +76,9 @@
                 </v-list-item-content>
             </v-list-item>
             <v-divider></v-divider>
-            <v-list-item @click="removeToTrash()">
+            <v-list-item @click="removeToTrash()" :disabled="isDisabled">
                 <v-list-item-action>
-                    <v-icon>mdi-delete</v-icon>
+                    <v-icon :disabled="isDisabled">mdi-delete</v-icon>
                 </v-list-item-action>
                 <v-list-item-content>
                     <v-list-item-title>Xóa</v-list-item-title>
@@ -102,11 +102,15 @@ export default {
     },
 
     data: () => ({
-        typeList: []
+        typeList: [],
+        isDisabled: false
     }),
 
     mounted() {
         this.getDetailFileType()
+        if(localStorage.getItem('rolegroup') == 'READ') {
+            this.isDisabled = true
+        }
     },
     
     watch: {
