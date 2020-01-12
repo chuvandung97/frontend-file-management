@@ -7,7 +7,7 @@
         offset-y
         transition="scale-transition"
         >
-        <v-list width="300">
+        <v-list width="300" dense>
             <v-list-item @click="$store.commit('setViewDetail', true)">
                 <v-list-item-action>
                     <v-icon>mdi-eye</v-icon>

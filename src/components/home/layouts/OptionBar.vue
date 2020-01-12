@@ -116,7 +116,7 @@
                                 <v-icon>mdi-dots-vertical</v-icon>
                             </v-btn>
                         </template>
-                        <v-list width="300">
+                        <v-list width="300" dense>
                             <v-list-item @click="activeMove()" :disabled="isDisabled">
                                 <v-list-item-action>
                                     <v-icon :disabled="isDisabled">mdi-folder-move</v-icon>
